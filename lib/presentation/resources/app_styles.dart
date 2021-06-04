@@ -35,9 +35,7 @@ class AppStyles {
     ),
   );
 
-  static const Text signIn = Text(
-    AppStrings.signIn,
-    style: TextStyle(
+  static const TextStyle styleSign =  TextStyle(
       fontSize: 30,
       fontWeight: FontWeight.w700,
       shadows: [Shadow(color: Colors.black, offset: Offset(0, -7))],
@@ -45,11 +43,10 @@ class AppStyles {
       decoration: TextDecoration.underline,
       decorationColor: AppColors.decorationColor,
       decorationThickness: 2,
-    ),
-  );
+    );
 
   static const textCancel = Text(
-    'cancel',
+    'Cancel',
     style: TextStyle(color: AppColors.textTitleCancel, fontSize: 15),
   );
 

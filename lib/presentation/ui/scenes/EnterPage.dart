@@ -4,6 +4,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart'
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 
 import 'SignInPage.dart';
+import 'SignUpPage.dart';
 
 class EnterPage extends StatelessWidget {
   const EnterPage({Key key}) : super(key: key);
@@ -27,12 +28,12 @@ class EnterPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 22),
               child: buttons(context, AppStyles.styleButtonCreateAccount,
-                  AppStyles.textCreateAccount),
+                  AppStyles.textCreateAccount, SignUpPage()),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 22),
               child: buttons(context, AppStyles.styleButtonAlreadyHaveAccount,
-                  AppStyles.textAlreadyHaveAccount),
+                  AppStyles.textAlreadyHaveAccount, SignInPage()),
             ),
           ],
         ),
@@ -40,23 +41,23 @@ class EnterPage extends StatelessWidget {
     );
   }
 
-  Widget buttons(BuildContext context, ButtonStyle styleButton, Text text) {
+  Widget buttons(
+      BuildContext context, ButtonStyle styleButton, Text text, page) {
     double widthButton = MediaQuery.of(context).size.width * 0.91;
-
     return SizedBox(
-        width: widthButton,
-        height: heightButton,
-        child: ElevatedButton(
-          style: styleButton,
-          child: text,
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => SignInPage(),
-              ),
-            );
-          },
-        ),
+      width: widthButton,
+      height: heightButton,
+      child: ElevatedButton(
+        style: styleButton,
+        child: text,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => page,
+            ),
+          );
+        },
+      ),
     );
   }
 }

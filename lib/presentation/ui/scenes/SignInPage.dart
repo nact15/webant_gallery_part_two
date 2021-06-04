@@ -63,7 +63,7 @@ class _SignInPageState extends State<SignInPage> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(top: 188),
-                  child: AppStyles.signIn,
+                  child: Text(AppStrings.signIn, style: AppStyles.styleSign),
                 ),
                 Padding(
                   //email
@@ -73,11 +73,12 @@ class _SignInPageState extends State<SignInPage> {
                     height: heightTextForm,
                     child: TextFormField(
                       inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.deny(RegExp("[ ]")),
+                        FilteringTextInputFormatter.deny(RegExp('[ ]')),
+                        //FilteringTextInputFormatter.deny(RegExp('[А-я]')),
                       ],
                       decoration: InputDecoration(
                           errorStyle: TextStyle(height: 0),
-                          contentPadding: new EdgeInsets.all(8.0),
+                          contentPadding: EdgeInsets.all(8.0),
                           focusedBorder: AppStyles.borderTextField.copyWith(
                               borderSide:
                                   BorderSide(color: AppColors.decorationColor)),
@@ -88,7 +89,7 @@ class _SignInPageState extends State<SignInPage> {
                               color: Colors.red,
                             ),
                           ),
-                          hintText: 'Email',
+                          hintText: AppStrings.hintEmail,
                           hintStyle:
                               TextStyle(color: AppColors.mainColorAccent),
                           suffixIcon: Icon(
@@ -120,7 +121,7 @@ class _SignInPageState extends State<SignInPage> {
                       ],
                       decoration: InputDecoration(
                         errorStyle: TextStyle(height: 0),
-                        contentPadding: new EdgeInsets.all(8.0),
+                        contentPadding: EdgeInsets.all(8.0),
                         focusedBorder: AppStyles.borderTextField.copyWith(
                             borderSide:
                                 BorderSide(color: AppColors.decorationColor)),
@@ -131,14 +132,14 @@ class _SignInPageState extends State<SignInPage> {
                             color: Colors.red,
                           ),
                         ),
-                        hintText: 'Password',
+                        hintText: AppStrings.hintPassword,
                         hintStyle: TextStyle(color: AppColors.mainColorAccent),
                         suffixIcon: IconButton(
                             icon: _passwordVisible
                                 ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off),
+                                : Icon(Icons.visibility_off), //hide password
                             color: AppColors.mainColorAccent,
-                            padding: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(6.0),
                             onPressed: () {
                               setState(
                                 () {
@@ -150,9 +151,11 @@ class _SignInPageState extends State<SignInPage> {
                       obscureText: !_passwordVisible,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter the password';
+                          return 'Please enter password';
                         } else if (value.length < 8) {
-                          return 'The password must be longer than 8';
+                          return 'Password must be longer than 8';
+                        } else if (!value.contains(RegExp('[a-z]'))) {
+                          return 'Password must contain at least one lowercase letter';
                         }
                         return null;
                       },
@@ -161,9 +164,23 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: TextButton(
+                      child: Text(
+                        'Forgot login or password?',
+                        style: TextStyle(color: AppColors.mainColorAccent),
+                      ),
+                      onPressed: () {},
+                      style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                    ),
+                  ),
+                ),
                 Padding(
                   //sign in
-                  padding: EdgeInsets.only(top: 70),
+                  padding: EdgeInsets.only(top: 50),
                   child: SizedBox(
                     height: 36,
                     width: 120,
@@ -194,6 +211,7 @@ class _SignInPageState extends State<SignInPage> {
                     height: 36,
                     width: 120,
                     child: TextButton(
+                      style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                       onPressed: () {
                         _ifSignup();
                       }, //to SignUpPage
