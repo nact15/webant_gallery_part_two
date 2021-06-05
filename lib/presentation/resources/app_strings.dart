@@ -11,5 +11,8 @@ class AppStrings{
   static const String welcome = 'Welcome!';
   static const String hintPassword = 'Password';
   static const String hintEmail = 'Email';
+  static const String hintBirthday = 'Birthday';
   static const String hintName = 'User name';
+  static const String tooYoung = 'You must be over 18 years old';
+  static const String forgotPassOrEmail = 'Forgot login or password?';
 }

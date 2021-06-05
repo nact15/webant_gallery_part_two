@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 
-import 'SignInPage.dart';
-import 'SignUpPage.dart';
+import 'sign_in_page.dart';
+import 'sign_up_page.dart';
+
+enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PASSWORD }
 
 class EnterPage extends StatelessWidget {
   const EnterPage({Key key}) : super(key: key);
-
   final double heightButton = 36;
 
   @override
@@ -31,7 +32,7 @@ class EnterPage extends StatelessWidget {
                   AppStyles.textCreateAccount, SignUpPage()),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 22),
+              padding: const EdgeInsets.only(top: 10),
               child: buttons(context, AppStyles.styleButtonAlreadyHaveAccount,
                   AppStyles.textAlreadyHaveAccount, SignInPage()),
             ),

@@ -4,9 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/EnterPage.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/select_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/user_information/sign_in_info.dart';
 
-import 'SignUpPage.dart';
+import 'sign_up_page.dart';
+
+enum typeTextField { EMAIL, PASSWORD }
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key key}) : super(key: key);
@@ -16,12 +19,14 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+
   final _formKey = GlobalKey<FormState>();
 
-  String _password;
-  String _email;
   bool _passwordVisible = true;
-  double heightTextForm = 36;
+  double heightFields = 36.0;
+  double widthButton = 120.0;
+
+  SignInInfo signInInfo = SignInInfo();
 
   @override
   void initState() {
@@ -37,12 +42,12 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     final node = FocusScope.of(context);
-
     double widthTextForm = MediaQuery.of(context).size.width * 0.90;
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: AppColors.colorWhite,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leadingWidth: 75,
@@ -55,6 +60,7 @@ class _SignInPageState extends State<SignInPage> {
             )),
           ),
           backgroundColor: AppColors.colorWhite,
+          elevation: 1,
         ),
         body: Form(
           key: _formKey,
@@ -62,7 +68,7 @@ class _SignInPageState extends State<SignInPage> {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(top: 188),
+                  padding: const EdgeInsets.only(top: 100),
                   child: Text(AppStrings.signIn, style: AppStyles.styleSign),
                 ),
                 Padding(
@@ -70,12 +76,9 @@ class _SignInPageState extends State<SignInPage> {
                   padding: EdgeInsets.only(top: 50),
                   child: Container(
                     width: widthTextForm,
-                    height: heightTextForm,
+                    height: heightFields,
                     child: TextFormField(
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.deny(RegExp('[ ]')),
-                        //FilteringTextInputFormatter.deny(RegExp('[А-я]')),
-                      ],
+                      inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                           errorStyle: TextStyle(height: 0),
                           contentPadding: EdgeInsets.all(8.0),
@@ -96,14 +99,10 @@ class _SignInPageState extends State<SignInPage> {
                             Icons.mail_outline,
                             color: AppColors.mainColorAccent,
                           )),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return AppStrings.emptyEmail;
-                        } else if (!value.contains('@') || value.length < 3) {
-                          return AppStrings.incorrectEmail;
-                        }
-                        return null;
-                      },
+                      validator: (value) =>
+                          _selectValidator(value, typeTextField.EMAIL),
+                      onChanged: (value) => signInInfo.email = value,
+                      //save email value
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => node.nextFocus(),
                     ),
@@ -114,11 +113,9 @@ class _SignInPageState extends State<SignInPage> {
                   padding: EdgeInsets.only(top: 29),
                   child: SizedBox(
                     width: widthTextForm,
-                    height: heightTextForm,
+                    height: heightFields,
                     child: TextFormField(
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.deny(RegExp("[ ]")),
-                      ],
+                      inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                         errorStyle: TextStyle(height: 0),
                         contentPadding: EdgeInsets.all(8.0),
@@ -127,11 +124,7 @@ class _SignInPageState extends State<SignInPage> {
                                 BorderSide(color: AppColors.decorationColor)),
                         enabledBorder: AppStyles.borderTextField,
                         focusedErrorBorder: AppStyles.borderTextField,
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                          ),
-                        ),
+                        errorBorder: AppStyles.borderTextFieldError,
                         hintText: AppStrings.hintPassword,
                         hintStyle: TextStyle(color: AppColors.mainColorAccent),
                         suffixIcon: IconButton(
@@ -141,24 +134,17 @@ class _SignInPageState extends State<SignInPage> {
                             color: AppColors.mainColorAccent,
                             padding: EdgeInsets.all(6.0),
                             onPressed: () {
-                              setState(
-                                () {
+                              setState(() {
                                   _passwordVisible = !_passwordVisible;
                                 },
                               );
                             }),
                       ),
                       obscureText: !_passwordVisible,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter password';
-                        } else if (value.length < 8) {
-                          return 'Password must be longer than 8';
-                        } else if (!value.contains(RegExp('[a-z]'))) {
-                          return 'Password must contain at least one lowercase letter';
-                        }
-                        return null;
-                      },
+                      validator: (value) =>
+                          _selectValidator(value, typeTextField.PASSWORD),
+                      onChanged: (value) => signInInfo.password = value,
+                      //save password value
                       textInputAction: TextInputAction.done,
                       onEditingComplete: () => node.unfocus(),
                     ),
@@ -169,8 +155,7 @@ class _SignInPageState extends State<SignInPage> {
                   child: Padding(
                     padding: EdgeInsets.only(right: 8.0),
                     child: TextButton(
-                      child: Text(
-                        'Forgot login or password?',
+                      child: Text(AppStrings.forgotPassOrEmail,
                         style: TextStyle(color: AppColors.mainColorAccent),
                       ),
                       onPressed: () {},
@@ -182,24 +167,16 @@ class _SignInPageState extends State<SignInPage> {
                   //sign in
                   padding: EdgeInsets.only(top: 50),
                   child: SizedBox(
-                    height: 36,
-                    width: 120,
+                    height: heightFields,
+                    width: widthButton,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: AppColors.mainColor,
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Processing Data')));
-                        }
-                      },
+                      onPressed: () => _ifSignIn(),
                       child: Text(
-                        'Sign in',
-                        style: TextStyle(
-                            color: AppColors.colorWhite,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700),
+                        AppStrings.signIn,
+                        style: AppStyles.signInButtonMain,
                       ),
                     ),
                   ),
@@ -208,23 +185,20 @@ class _SignInPageState extends State<SignInPage> {
                   //sign up
                   padding: EdgeInsets.only(top: 10),
                   child: SizedBox(
-                    height: 36,
-                    width: 120,
+                    height: heightFields,
+                    width: widthButton,
                     child: TextButton(
                       style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                       onPressed: () {
                         _ifSignup();
                       }, //to SignUpPage
                       child: Text(
-                        'Sign up',
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.mainColor),
+                        AppStrings.signUp,
+                        style: AppStyles.signUpButtonSecondary,
                       ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -233,13 +207,35 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+  String _selectValidator(String value, typeTextField typeField) {
+    switch (typeField) {
+      case typeTextField.EMAIL:
+        if (value == null || value.isEmpty) {
+          return AppStrings.emptyEmail;
+        } else if (!value.contains('@') || value.length < 3) {
+          return AppStrings.incorrectEmail;
+        }
+        return null;
+        break;
+      case typeTextField.PASSWORD:
+        if (value == null || value.isEmpty) {
+          return 'Please enter password';
+        } else if (value.length < 8) {
+          return 'Password must be longer than 8';
+        } else if (!value.contains(RegExp('[a-z]'))) {
+          return 'Password must contain at least one lowercase letter';
+        }
+        return null;
+        break;
+    }
+    return 'Error';
+  }
+
   void _ifSignIn() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-          //TODO
-          //builder: (context) => GalleryScreen(),
-          ),
-    );
+    if (_formKey.currentState.validate()) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Processing Data')));
+    }
   }
 
   void _ifSignup() {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 
-import 'EnterPage.dart';
+import 'select_page.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key key}) : super(key: key);
@@ -12,7 +12,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          accentColor: AppColors.colorGreyAccent
+          accentColor: AppColors.colorGreyAccent,
       ),
       title: AppStrings.titleGallery,
       home: EnterPage(),

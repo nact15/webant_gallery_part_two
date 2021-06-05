@@ -1,13 +1,16 @@
+import 'package:date_field/date_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/EnterPage.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/select_page.dart';
 
-import 'SignInPage.dart';
-import 'SignUpPage.dart';
+import 'sign_in_page.dart';
+
+enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PASSWORD }
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key key}) : super(key: key);
@@ -21,8 +24,12 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String _password;
   String _email;
+  String _userName;
+  DateTime _birthday;
   bool _passwordVisible = true;
   double heightTextForm = 36;
+  DateTime selectedDate = DateTime.now();
+  TextEditingController controller;
 
   @override
   void initState() {
@@ -44,6 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: AppColors.colorWhite,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leadingWidth: 75,
@@ -56,6 +64,7 @@ class _SignUpPageState extends State<SignUpPage> {
             )),
           ),
           backgroundColor: AppColors.colorWhite,
+          elevation: 1,
         ),
         body: Form(
           key: _formKey,
@@ -63,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(top: 188),
+                  padding: const EdgeInsets.only(top: 100),
                   child: Text(AppStrings.signUp, style: AppStyles.styleSign),
                 ),
                 Padding(
@@ -73,12 +82,60 @@ class _SignUpPageState extends State<SignUpPage> {
                     width: widthTextForm,
                     height: heightTextForm,
                     child: TextFormField(
+                      keyboardType: TextInputType.name,
+                      decoration: InputDecoration(
+                        errorStyle: TextStyle(height: 0),
+                        contentPadding: EdgeInsets.all(8.0),
+                        focusedBorder: AppStyles.borderTextField.copyWith(
+                            borderSide:
+                                BorderSide(color: AppColors.decorationColor)),
+                        enabledBorder: AppStyles.borderTextField,
+                        focusedErrorBorder: AppStyles.borderTextField,
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                          ),
+                        ),
+                        hintText: AppStrings.hintName,
+                        hintStyle: TextStyle(color: AppColors.mainColorAccent),
+
+                        suffixIcon: Icon(
+                          Icons.account_circle_outlined,
+                          color: AppColors.mainColorAccent,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return AppStrings.emptyName;
+                        }
+                        return null;
+                      },
+                      onSaved: (String value) {
+                        _userName = value;
+                      },
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () => node.nextFocus(),
+                    ),
+                  ),
+                ),
+                Padding(
+                  //birthday
+                  padding: EdgeInsets.only(top: 29),
+                  child: Container(
+                    width: widthTextForm,
+                    height: heightTextForm,
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        MaskTextInputFormatter(mask: "##.##.####"),
+                        //FilteringTextInputFormatter.deny(RegExp('[А-я]')),
+                      ],
                       decoration: InputDecoration(
                           errorStyle: TextStyle(height: 0),
-                          contentPadding: new EdgeInsets.all(8.0),
+                          contentPadding: EdgeInsets.all(8.0),
                           focusedBorder: AppStyles.borderTextField.copyWith(
                               borderSide:
-                              BorderSide(color: AppColors.decorationColor)),
+                                  BorderSide(color: AppColors.decorationColor)),
                           enabledBorder: AppStyles.borderTextField,
                           focusedErrorBorder: AppStyles.borderTextField,
                           errorBorder: OutlineInputBorder(
@@ -86,19 +143,18 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.red,
                             ),
                           ),
-                          hintText: AppStrings.hintName,
+                          hintText: AppStrings.hintBirthday,
                           hintStyle:
-                      TextStyle(color: AppColors.mainColorAccent),
+                              TextStyle(color: AppColors.mainColorAccent),
                           suffixIcon: Icon(
-                            Icons.account_circle_outlined,
+                            Icons.date_range,
                             color: AppColors.mainColorAccent,
-                          ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return AppStrings.emptyName;
-                        } return null;
-                      },
+                          )),
+                      validator: (value) =>
+                          _selectValidator(value, typeTextField.EMAIL),
+                      // onDateSelected: (DateTime value) {
+                      //   _birthday = value;
+                      // },
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => node.nextFocus(),
                     ),
@@ -111,13 +167,11 @@ class _SignUpPageState extends State<SignUpPage> {
                     width: widthTextForm,
                     height: heightTextForm,
                     child: TextFormField(
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.deny(RegExp('[ ]')),
-                        //FilteringTextInputFormatter.deny(RegExp('[А-я]')),
-                      ],
+                      keyboardType: TextInputType.emailAddress,
+                      inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                           errorStyle: TextStyle(height: 0),
-                          contentPadding: new EdgeInsets.all(8.0),
+                          contentPadding: EdgeInsets.all(8.0),
                           focusedBorder: AppStyles.borderTextField.copyWith(
                               borderSide:
                                   BorderSide(color: AppColors.decorationColor)),
@@ -135,13 +189,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             Icons.mail_outline,
                             color: AppColors.mainColorAccent,
                           )),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return AppStrings.emptyEmail;
-                        } else if (!value.contains('@') || value.length < 3) {
-                          return AppStrings.incorrectEmail;
-                        }
-                        return null;
+                      validator: (value) =>
+                          _selectValidator(value, typeTextField.EMAIL),
+                      onSaved: (String value) {
+                        _email = value;
                       },
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => node.nextFocus(),
@@ -155,12 +206,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     width: widthTextForm,
                     height: heightTextForm,
                     child: TextFormField(
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.deny(RegExp("[ ]")),
-                      ],
+                      inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                         errorStyle: TextStyle(height: 0),
-                        contentPadding: new EdgeInsets.all(8.0),
+                        contentPadding: EdgeInsets.all(8.0),
                         focusedBorder: AppStyles.borderTextField.copyWith(
                             borderSide:
                                 BorderSide(color: AppColors.decorationColor)),
@@ -188,16 +237,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             }),
                       ),
                       obscureText: !_passwordVisible,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter password';
-                        } else if (value.length < 8) {
-                          return 'Password must be longer than 8';
-                        } else if (!value.contains(RegExp('[a-z]'))) {
-                          return 'Password must contain at least one lowercase letter';
-                        }
-                        return null;
-                      },
+                      validator: (value) =>
+                          _selectValidator(value, typeTextField.PASSWORD),
+                      // onSaved: (String value) {
+                      //   _password = value;
+                      // },
+                      onChanged: (value) => _password = value,
                       textInputAction: TextInputAction.done,
                       onEditingComplete: () => node.unfocus(),
                     ),
@@ -219,7 +264,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               SnackBar(content: Text('Processing Data')));
                         }
                       },
-                      child: Text(AppStrings.signUp,
+                      child: Text(
+                        AppStrings.signUp,
                         style: TextStyle(
                             color: AppColors.colorWhite,
                             fontSize: 17,
@@ -239,7 +285,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () {
                         _ifSignup();
                       }, //to SignInPage
-                      child: Text(AppStrings.signIn,
+                      child: Text(
+                        AppStrings.signIn,
                         style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w400,
@@ -254,6 +301,39 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  String _selectValidator(String value, typeTextField typeField) {
+    switch (typeField) {
+      case typeTextField.USERNAME:
+        if (value.isEmpty) {
+          return AppStrings.tooYoung;
+        }
+        return null;
+        break;
+      case typeTextField.EMAIL:
+        if (value == null || value.isEmpty) {
+          return AppStrings.emptyEmail;
+        } else if (!value.contains('@') || value.length < 3) {
+          return AppStrings.incorrectEmail;
+        }
+        return null;
+        break;
+      case typeTextField.PASSWORD:
+        if (value == null || value.isEmpty) {
+          return 'Please enter password';
+        } else if (value.length < 8) {
+          return 'Password must be longer than 8';
+        } else if (!value.contains(RegExp('[a-z]'))) {
+          return 'Password must contain at least one lowercase letter';
+        }
+        return null;
+        break;
+      case typeTextField.BIRTHDAY:
+        // TODO: Handle this case.
+        break;
+    }
+    return 'Error';
   }
 
   void _ifSignIn() {
