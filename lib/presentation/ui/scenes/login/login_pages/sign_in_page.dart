@@ -4,8 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/select_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/user_information/sign_in_info.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/user_information/sign_in_info.dart';
 
 import 'sign_up_page.dart';
 
@@ -19,7 +20,6 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-
   final _formKey = GlobalKey<FormState>();
 
   bool _passwordVisible = true;
@@ -49,19 +49,7 @@ class _SignInPageState extends State<SignInPage> {
       child: Scaffold(
         backgroundColor: AppColors.colorWhite,
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          leadingWidth: 75,
-          leading: TextButton(
-            child: AppStyles.textCancel,
-            onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (context) {
-                return EnterPage();
-              },
-            )),
-          ),
-          backgroundColor: AppColors.colorWhite,
-          elevation: 1,
-        ),
+        appBar: AppBarSign(),
         body: Form(
           key: _formKey,
           child: Center(
@@ -78,27 +66,25 @@ class _SignInPageState extends State<SignInPage> {
                     width: widthTextForm,
                     height: heightFields,
                     child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
                       inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
-                          errorStyle: TextStyle(height: 0),
-                          contentPadding: EdgeInsets.all(8.0),
-                          focusedBorder: AppStyles.borderTextField.copyWith(
-                              borderSide:
-                                  BorderSide(color: AppColors.decorationColor)),
-                          enabledBorder: AppStyles.borderTextField,
-                          focusedErrorBorder: AppStyles.borderTextField,
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                            ),
+                        errorStyle: TextStyle(height: 0),
+                        contentPadding: EdgeInsets.all(8.0),
+                        focusedBorder: AppStyles.borderTextField.copyWith(
+                            borderSide:
+                                BorderSide(color: AppColors.decorationColor)),
+                        enabledBorder: AppStyles.borderTextField,
+                        focusedErrorBorder: AppStyles.borderTextField,
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.red,
                           ),
-                          hintText: AppStrings.hintEmail,
-                          hintStyle:
-                              TextStyle(color: AppColors.mainColorAccent),
-                          suffixIcon: Icon(
-                            Icons.mail_outline,
-                            color: AppColors.mainColorAccent,
-                          )),
+                        ),
+                        hintText: AppStrings.hintEmail,
+                        hintStyle: TextStyle(color: AppColors.mainColorAccent),
+                        suffixIcon: selectIcon(typeTextField.EMAIL),
+                      ),
                       validator: (value) =>
                           _selectValidator(value, typeTextField.EMAIL),
                       onChanged: (value) => signInInfo.email = value,
@@ -127,18 +113,7 @@ class _SignInPageState extends State<SignInPage> {
                         errorBorder: AppStyles.borderTextFieldError,
                         hintText: AppStrings.hintPassword,
                         hintStyle: TextStyle(color: AppColors.mainColorAccent),
-                        suffixIcon: IconButton(
-                            icon: _passwordVisible
-                                ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off), //hide password
-                            color: AppColors.mainColorAccent,
-                            padding: EdgeInsets.all(6.0),
-                            onPressed: () {
-                              setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                },
-                              );
-                            }),
+                        suffixIcon: selectIcon(typeTextField.PASSWORD),
                       ),
                       obscureText: !_passwordVisible,
                       validator: (value) =>
@@ -146,7 +121,10 @@ class _SignInPageState extends State<SignInPage> {
                       onChanged: (value) => signInInfo.password = value,
                       //save password value
                       textInputAction: TextInputAction.done,
-                      onEditingComplete: () => node.unfocus(),
+                      onEditingComplete: () {
+                            _ifSignIn();
+                            node.unfocus();
+                      },
                     ),
                   ),
                 ),
@@ -155,7 +133,8 @@ class _SignInPageState extends State<SignInPage> {
                   child: Padding(
                     padding: EdgeInsets.only(right: 8.0),
                     child: TextButton(
-                      child: Text(AppStrings.forgotPassOrEmail,
+                      child: Text(
+                        AppStrings.forgotPassOrEmail,
                         style: TextStyle(color: AppColors.mainColorAccent),
                       ),
                       onPressed: () {},
@@ -207,12 +186,38 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+  Widget selectIcon(typeTextField typeField) {
+    switch (typeField) {
+      case typeTextField.PASSWORD:
+        return IconButton(
+            icon: _passwordVisible
+                ? Icon(Icons.visibility)
+                : Icon(Icons.visibility_off), //hide password
+            color: AppColors.mainColorAccent,
+            padding: EdgeInsets.all(6.0),
+            onPressed: () {
+              setState(
+                () {
+                  _passwordVisible = !_passwordVisible;
+                },
+              );
+            });
+        break;
+      case typeTextField.EMAIL:
+        return Icon(
+          Icons.mail_outline,
+          color: AppColors.mainColorAccent,
+        );
+        break;
+    } return null;
+  }
+
   String _selectValidator(String value, typeTextField typeField) {
     switch (typeField) {
       case typeTextField.EMAIL:
         if (value == null || value.isEmpty) {
           return AppStrings.emptyEmail;
-        } else if (!value.contains('@') || value.length < 3) {
+        } else if (!value.contains('@') || value.length < 3 || !value.contains('.')) {
           return AppStrings.incorrectEmail;
         }
         return null;
@@ -233,8 +238,11 @@ class _SignInPageState extends State<SignInPage> {
 
   void _ifSignIn() {
     if (_formKey.currentState.validate()) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Processing Data')));
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Gallery(),
+        ),
+      );
     }
   }
 

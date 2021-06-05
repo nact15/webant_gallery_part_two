@@ -8,11 +8,23 @@ class AppStrings{
   static const String emptyEmail = 'Please enter email';
   static const String emptyName = 'Please enter user name';
   static const String incorrectEmail = 'Please enter correct Email';
+  static const String passwordErrorLength = 'Password must contain at least eight characters';
+  static const String emptyPassword = 'Please enter password';
+  static const String confirmPassword = 'Please confirm password';
+  static const String passwordMatch = '''Passwords don't match''';
+  static const String passwordOneLetter = 'Password must contain at least one uppercase letter';
   static const String welcome = 'Welcome!';
   static const String hintPassword = 'Password';
+  static const String hintOldPassword = 'Password';
+  static const String hintConfirmPassword = 'Confirm password';
   static const String hintEmail = 'Email';
   static const String hintBirthday = 'Birthday';
   static const String hintName = 'User name';
-  static const String tooYoung = 'You must be over 18 years old';
+  static const String tooYoung = 'You must be over 18';
+  static const String error = 'Error';
   static const String forgotPassOrEmail = 'Forgot login or password?';
+  static const String urlMedia = 'http://gallery.dev.webant.ru/media/';
+  static const String urlPhotos = 'http://gallery.dev.webant.ru/api/photos';
+  static const String newType = 'New';
+  static const String popularType = 'Popular';
 }
