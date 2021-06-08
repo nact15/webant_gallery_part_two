@@ -3,12 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_registration_gateway.dart';
+import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/user_information/sign_up_info.dart';
 
 import 'sign_in_page.dart';
 
@@ -24,16 +25,16 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
 
-  SignUpInfo _signUpInfo = SignUpInfo();
+  RegistrationModel _registrationModel = RegistrationModel();
 
   bool _passwordVisible = true;
-  bool _passwordVisible2 = true;
   double heightTextForm = 36;
   DateTime selectedDate = DateTime.now();
-  TextEditingController controller;
+  //TextEditingController controller;
 
   @override
   void initState() {
+    //controller = TextEditingController();
     _passwordVisible = false;
     super.initState();
   }
@@ -47,7 +48,10 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     final node = FocusScope.of(context);
 
-    double widthTextForm = MediaQuery.of(context).size.width * 0.90;
+    double widthTextForm = MediaQuery
+        .of(context)
+        .size
+        .width * 0.90;
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -56,7 +60,10 @@ class _SignUpPageState extends State<SignUpPage> {
         resizeToAvoidBottomInset: true,
         appBar: AppBarSign(),
         body: Container(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -67,7 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 100),
                       child:
-                          Text(AppStrings.signUp, style: AppStyles.styleSign),
+                      Text(AppStrings.signUp, style: AppStyles.styleSign),
                     ),
                     Padding(
                       //user name
@@ -76,6 +83,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: widthTextForm,
                         height: heightTextForm,
                         child: TextFormField(
+                          //controller: controller,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
@@ -93,13 +101,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             hintText: AppStrings.hintName,
                             hintStyle:
-                                TextStyle(color: AppColors.mainColorAccent),
+                            TextStyle(color: AppColors.mainColorAccent),
                             suffixIcon: selectIcon(typeTextField.USERNAME),
                           ),
                           validator: (value) =>
                               _selectValidator(value, typeTextField.USERNAME),
                           onSaved: (String value) {
-                            _signUpInfo.name = value;
+                            _registrationModel.username = value;
                           },
                           textInputAction: TextInputAction.next,
                           onEditingComplete: () => node.nextFocus(),
@@ -113,6 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: widthTextForm,
                         height: heightTextForm,
                         child: TextFormField(
+                          //controller: controller,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
@@ -134,7 +143,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               hintText: AppStrings.hintBirthday,
                               hintStyle:
-                                  TextStyle(color: AppColors.mainColorAccent),
+                              TextStyle(color: AppColors.mainColorAccent),
                               suffixIcon: selectIcon(typeTextField.BIRTHDAY)),
                           // validator: (value) =>
                           //     _selectValidator(value, typeTextField.EMAIL),
@@ -153,6 +162,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: widthTextForm,
                         height: heightTextForm,
                         child: TextFormField(
+                          //controller: controller,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType: TextInputType.emailAddress,
                           inputFormatters: AppStyles.noSpace,
@@ -171,13 +181,13 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             hintText: AppStrings.hintEmail,
                             hintStyle:
-                                TextStyle(color: AppColors.mainColorAccent),
+                            TextStyle(color: AppColors.mainColorAccent),
                             suffixIcon: selectIcon(typeTextField.EMAIL),
                           ),
                           validator: (value) =>
                               _selectValidator(value, typeTextField.EMAIL),
                           onSaved: (String value) {
-                            //_email = value;
+                            _registrationModel.email = value;
                           },
                           textInputAction: TextInputAction.next,
                           onEditingComplete: () => node.nextFocus(),
@@ -191,6 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: widthTextForm,
                         height: heightTextForm,
                         child: TextFormField(
+                          //controller: controller,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           inputFormatters: AppStyles.noSpace,
                           decoration: InputDecoration(
@@ -208,13 +219,14 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               hintText: AppStrings.hintOldPassword,
                               hintStyle:
-                                  TextStyle(color: AppColors.mainColorAccent),
+                              TextStyle(color: AppColors.mainColorAccent),
                               suffixIcon: selectIcon(typeTextField.PASSWORD)),
                           obscureText: !_passwordVisible,
                           validator: (value) =>
                               _selectValidator(value, typeTextField.PASSWORD),
                           textInputAction: TextInputAction.next,
                           onEditingComplete: () => node.nextFocus(),
+
                         ),
                       ),
                     ),
@@ -225,6 +237,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         width: widthTextForm,
                         height: heightTextForm,
                         child: TextFormField(
+                          //controller: controller,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           inputFormatters: AppStyles.noSpace,
                           decoration: InputDecoration(
@@ -242,7 +255,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             hintText: AppStrings.hintOldPassword,
                             hintStyle:
-                                TextStyle(color: AppColors.mainColorAccent),
+                            TextStyle(color: AppColors.mainColorAccent),
                             suffixIcon: selectIcon(typeTextField.PASSWORD),
                           ),
                           obscureText: !_passwordVisible,
@@ -250,6 +263,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               _selectValidator(value, typeTextField.PASSWORD),
                           textInputAction: TextInputAction.done,
                           onEditingComplete: () => node.unfocus(),
+
                         ),
                       ),
                     ),
@@ -306,14 +320,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  void passwordVis() {
-    setState(
-      () {
-        _passwordVisible = !_passwordVisible;
-      },
-    );
-  }
-
   Widget selectIcon(typeTextField typeField) {
     switch (typeField) {
       case typeTextField.PASSWORD:
@@ -325,7 +331,7 @@ class _SignUpPageState extends State<SignUpPage> {
             padding: EdgeInsets.all(6.0),
             onPressed: () {
               setState(
-                () {
+                    () {
                   _passwordVisible = !_passwordVisible;
                 },
               );
@@ -349,7 +355,7 @@ class _SignUpPageState extends State<SignUpPage> {
           color: AppColors.mainColorAccent,
         );
       case typeTextField.CONFIRMPASSWORD:
-        // TODO: Handle this case.
+      // TODO: Handle this case.
         break;
     }
     return null;
@@ -386,12 +392,13 @@ class _SignUpPageState extends State<SignUpPage> {
       case typeTextField.CONFIRMPASSWORD:
         if (value == null || value.isEmpty) {
           return AppStrings.confirmPassword;
-        } else if (value != _signUpInfo.password) {
-          return AppStrings.passwordMatch;
         }
+        // else if (value != _signUpInfo.password) {
+        //   return AppStrings.passwordMatch;
+        // }
         return null;
       case typeTextField.BIRTHDAY:
-        //TODO
+      //TODO
         break;
     }
     return AppStrings.error;
@@ -399,19 +406,21 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void _ifSignUp() {
     if (_formKey.currentState.validate()) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Gallery(),
-        ),
-      );
+      print(_registrationModel.id);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Gallery(),
+          ),
+        );
     }
   }
 
-  void _ifSignIn() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => SignInPage(),
-      ),
-    );
-  }
+    void _ifSignIn() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SignInPage(),
+        ),
+      );
+    }
 }
+

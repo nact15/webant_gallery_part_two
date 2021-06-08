@@ -1,19 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_page.dart';
 
 import 'new_or_popular_photos.dart';
 
 class Gallery extends StatefulWidget {
-  const Gallery({Key key}) : super(key: key);
-
+  const Gallery({Key key, this.user}) : super(key: key);
+  final RegistrationModel user;
   @override
-  _GalleryState createState() => _GalleryState();
+  _GalleryState createState() => _GalleryState(user);
 }
 
 class _GalleryState extends State<Gallery> {
+  _GalleryState(this.user);
   int _bottomSelectedIndex = 0;
-
+RegistrationModel user;
   PageController pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -39,7 +42,7 @@ class _GalleryState extends State<Gallery> {
       children: <Widget>[
         NewOrPopularPhotos(),
         NewOrPopularPhotos(),
-        NewOrPopularPhotos(),
+        UserPage(user: user),
       ],
     );
   }
@@ -71,19 +74,22 @@ class _GalleryState extends State<Gallery> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.colorWhite,
-      body: buildPageView(),
-      bottomNavigationBar: BottomNavigationBar(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
         backgroundColor: AppColors.colorWhite,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.decorationColor,
-        unselectedItemColor: AppColors.mainColorAccent,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: buildBottomBar(),
-        currentIndex: _bottomSelectedIndex,
-        onTap: (int index) => bottomTapped(index),
+        body: buildPageView(),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AppColors.colorWhite,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: AppColors.decorationColor,
+          unselectedItemColor: AppColors.mainColorAccent,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          items: buildBottomBar(),
+          currentIndex: _bottomSelectedIndex,
+          onTap: (int index) => bottomTapped(index),
+        ),
       ),
     );
   }

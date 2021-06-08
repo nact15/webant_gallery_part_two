@@ -20,7 +20,7 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
       final Map<String, dynamic> queryParameters = <String, dynamic>{
         'page': page,
         'limit': 10,
-        EnumToString(): true,
+        enumToString(): true,
       };
       Response response = await dio.get(url, queryParameters: queryParameters);
       final statusCode = response.statusCode;
@@ -33,7 +33,7 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
     }
   }
 
-  String EnumToString() {
+  String enumToString() {
     switch (type) {
       case typePhoto.NEW:
         return AppStrings.newType.toLowerCase();

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/photos_bloc/gallery_bloc.dart';
@@ -43,19 +44,34 @@ class _GalleryGridState extends State<GalleryGrid> {
     super.initState();
   }
 
+  // @override
+  // void dispose() {
+  //   _reFresh = Completer<void>();
+  //   _controller = ScrollController();
+  //   _controller.addListener(_scrollListener);
+  //   super.dispose();
+  // }
+
   Widget _photosView(Box photosBox) {
     return OrientationBuilder(builder: (context, orientation) {
       return CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
         controller: _controller,
         slivers: <Widget>[
           SliverGrid(
               delegate: SliverChildBuilderDelegate(
                   (c, i) => Container(
-                    margin: i == 0 || i == 1 ? EdgeInsets.only(top: 20) : null,
+                        // decoration: BoxDecoration(boxShadow: [
+                        //   BoxShadow(
+                        //     color: AppColors.colorGreyAccentLight,
+                        //     spreadRadius: 0.5,
+                        //     blurRadius: 7,
+                        //     offset: Offset(0, 2.0),
+                        //   ),
+                        // ],),
+                        margin: i%2 != 0 ? EdgeInsets.only(right: 16) : EdgeInsets.only(left: 16),
                         child: GestureDetector(
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(15.0),
                             child: Hero(
                               tag: (photosBox.getAt(i) as PhotoModel).id,
                               child: photosBox.getAt(i).isPhotoSVG()
@@ -78,8 +94,8 @@ class _GalleryGridState extends State<GalleryGrid> {
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: orientation == Orientation.portrait ? 2 : 4,
                 childAspectRatio: 166 / 166,
-                mainAxisSpacing: 9.1,
-                crossAxisSpacing: 9.1,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
               )),
           SliverToBoxAdapter(
             child: Center(
@@ -132,10 +148,15 @@ class _GalleryGridState extends State<GalleryGrid> {
           if (state is GalleryData) {
             if (state.isLoading) {
               return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: AppColors.mainColorAccent,
-                  color: AppColors.mainColorAccent,
-                  semanticsLabel: 'Loading...',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(
+                      color: AppColors.mainColorAccent,
+                      strokeWidth: 2.0,
+                    ),
+                    Text('Loading...', style: TextStyle(color: AppColors.mainColorAccent),),
+                  ],
                 ),
               );
             }

@@ -1,12 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
+import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/user_information/sign_in_info.dart';
 
 import 'sign_up_page.dart';
 
@@ -25,12 +27,15 @@ class _SignInPageState extends State<SignInPage> {
   bool _passwordVisible = true;
   double heightFields = 36.0;
   double widthButton = 120.0;
-
-  SignInInfo signInInfo = SignInInfo();
+  TextEditingController emailController;
+  TextEditingController passwordController;
+  HttpOauthGateway httpOauthGateway = HttpOauthGateway();
 
   @override
   void initState() {
     _passwordVisible = false;
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
     super.initState();
   }
 
@@ -66,7 +71,8 @@ class _SignInPageState extends State<SignInPage> {
                     width: widthTextForm,
                     height: heightFields,
                     child: TextFormField(
-                      keyboardType: TextInputType.emailAddress,
+                      controller: emailController,
+                      keyboardType: TextInputType.name,
                       inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                         errorStyle: TextStyle(height: 0),
@@ -87,8 +93,6 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       validator: (value) =>
                           _selectValidator(value, typeTextField.EMAIL),
-                      onChanged: (value) => signInInfo.email = value,
-                      //save email value
                       textInputAction: TextInputAction.next,
                       onEditingComplete: () => node.nextFocus(),
                     ),
@@ -101,6 +105,7 @@ class _SignInPageState extends State<SignInPage> {
                     width: widthTextForm,
                     height: heightFields,
                     child: TextFormField(
+                      controller: passwordController,
                       inputFormatters: AppStyles.noSpace,
                       decoration: InputDecoration(
                         errorStyle: TextStyle(height: 0),
@@ -118,12 +123,11 @@ class _SignInPageState extends State<SignInPage> {
                       obscureText: !_passwordVisible,
                       validator: (value) =>
                           _selectValidator(value, typeTextField.PASSWORD),
-                      onChanged: (value) => signInInfo.password = value,
                       //save password value
                       textInputAction: TextInputAction.done,
                       onEditingComplete: () {
-                            _ifSignIn();
-                            node.unfocus();
+                        _ifSignIn();
+                        node.unfocus();
                       },
                     ),
                   ),
@@ -209,7 +213,8 @@ class _SignInPageState extends State<SignInPage> {
           color: AppColors.mainColorAccent,
         );
         break;
-    } return null;
+    }
+    return null;
   }
 
   String _selectValidator(String value, typeTextField typeField) {
@@ -217,32 +222,47 @@ class _SignInPageState extends State<SignInPage> {
       case typeTextField.EMAIL:
         if (value == null || value.isEmpty) {
           return AppStrings.emptyEmail;
-        } else if (!value.contains('@') || value.length < 3 || !value.contains('.')) {
-          return AppStrings.incorrectEmail;
         }
+        // else if (!value.contains('@') ||
+        //     value.length < 3 ||
+        //     !value.contains('.')) {
+        //   return AppStrings.incorrectEmail;
+        // }
         return null;
         break;
       case typeTextField.PASSWORD:
         if (value == null || value.isEmpty) {
           return 'Please enter password';
-        } else if (value.length < 8) {
-          return 'Password must be longer than 8';
-        } else if (!value.contains(RegExp('[a-z]'))) {
-          return 'Password must contain at least one lowercase letter';
         }
+        // else if (value.length < 8) {
+        //   return 'Password must be longer than 8';
+        // } else if (!value.contains(RegExp('[a-z]'))) {
+        //   return 'Password must contain at least one lowercase letter';
+        // }
         return null;
         break;
     }
     return 'Error';
   }
 
-  void _ifSignIn() {
+  void _ifSignIn() async {
     if (_formKey.currentState.validate()) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Gallery(),
-        ),
-      );
+      try {
+        RegistrationModel user = await httpOauthGateway.authorization(
+            emailController.text, passwordController.text);
+        {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Gallery(user: user),
+            ),
+          );
+        }
+      } on DioError {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Login Error'),
+          backgroundColor: Colors.red,
+        ));
+      }
     }
   }
 

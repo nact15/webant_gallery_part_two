@@ -25,6 +25,8 @@ class AppStrings{
   static const String forgotPassOrEmail = 'Forgot login or password?';
   static const String urlMedia = 'http://gallery.dev.webant.ru/media/';
   static const String urlPhotos = 'http://gallery.dev.webant.ru/api/photos';
+  static const String urlClients = 'http://gallery.dev.webant.ru/api/clients';
+  static const String urlUsers = 'http://gallery.dev.webant.ru/api/users';
   static const String newType = 'New';
   static const String popularType = 'Popular';
 }

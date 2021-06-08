@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:async';
 import 'dart:core';
 
 import 'package:bloc/bloc.dart';
@@ -23,12 +24,15 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
 
   @override
   Stream<GalleryState> mapEventToState(GalleryEvent event) async* {
-    photosBox = Hive.box(photoGateway.EnumToString());
+    photosBox = Hive.box(photoGateway.enumToString());
     if (event is GalleryFetch) {
       yield* _mapGalleryFetch(event);
     }
     if (event is GalleryRefresh) {
       yield* _mapGalleryRefresh(event);
+    }
+    if (event is GallerySearch) {
+      yield* _mapGallerySearch(event);
     }
   }
 
@@ -74,6 +78,18 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
     }
   }
 
+  Stream<GalleryState> _mapGallerySearch(GallerySearch event) async* {
+     photosBox.clear();
+     print(1111111111111111);
+    photosBox.values.toList().cast<PhotoModel>().forEach((element) {
+      if (element.name.contains('jopa')){
+        print(222222222222222222);
+      photosBox.add(element);
+    }}
+    );
+    yield GalleryData(photosBox: photosBox, isLoading: false, isLastPage: false);
+  }
+
   Stream<GalleryState> _internetError() async* {
     if (photosBox.isNotEmpty) {
       yield GalleryData(
@@ -88,12 +104,12 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   void _addToBox() {
     List<PhotoModel> basePhotoModel = baseModel.data as List<PhotoModel>;
     List<PhotoModel> boxPhotoModel =
-        photosBox.values.toList().cast<PhotoModel>();
+    photosBox.values.toList().cast<PhotoModel>();
     basePhotoModel.forEach((element) {
       if (boxPhotoModel.firstWhere(
             (elementB) => element.id == elementB.id,
-            orElse: () => null,
-          ) ==
+        orElse: () => null,
+      ) ==
           null) {
         photosBox.add(element);
         print("add new item ${element.id}");

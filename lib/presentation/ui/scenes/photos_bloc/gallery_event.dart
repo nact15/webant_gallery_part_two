@@ -5,6 +5,8 @@ abstract class GalleryEvent {}
 
 class GalleryFetch extends GalleryEvent {}
 
+class GallerySearch extends GalleryEvent {}
+
 class GalleryRefresh extends GalleryEvent {}
 
 class GalleryLoading extends GalleryEvent {}
