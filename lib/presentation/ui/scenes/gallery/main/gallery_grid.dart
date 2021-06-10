@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/photos_bloc/gallery_bloc.dart';
@@ -60,14 +59,6 @@ class _GalleryGridState extends State<GalleryGrid> {
           SliverGrid(
               delegate: SliverChildBuilderDelegate(
                   (c, i) => Container(
-                        // decoration: BoxDecoration(boxShadow: [
-                        //   BoxShadow(
-                        //     color: AppColors.colorGreyAccentLight,
-                        //     spreadRadius: 0.5,
-                        //     blurRadius: 7,
-                        //     offset: Offset(0, 2.0),
-                        //   ),
-                        // ],),
                         margin: i%2 != 0 ? EdgeInsets.only(right: 16) : EdgeInsets.only(left: 16),
                         child: GestureDetector(
                           child: ClipRRect(

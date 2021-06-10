@@ -8,5 +8,5 @@ class AppColors{
   static const Color textTitleCancel = Color(0xFF5F5F5F);
   static const Color decorationColor = Color(0xFFCF497E);
   static const Color mainColorAccent = Color(0xFFC4C4C4);
-  static const Color colorOfSearchBar = Color(0xFF1F8E8E93);
+  static const Color colorOfSearchBar = Color(0xFFF2F2F2);
 }

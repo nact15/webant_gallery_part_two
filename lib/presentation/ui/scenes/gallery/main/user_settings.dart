@@ -4,7 +4,6 @@ import 'package:webant_gallery_part_two/domain/models/registration/registration_
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_page.dart';
 
 class UserSettings extends StatefulWidget {
   const UserSettings({Key key, this.user}) : super(key: key);
@@ -24,7 +23,6 @@ class _UserSettingsState extends State<UserSettings> {
 
   @override
   Widget build(BuildContext context) {
-
     double widthTextForm = MediaQuery.of(context).size.width * 0.90;
 
     return Scaffold(
@@ -88,8 +86,7 @@ class _UserSettingsState extends State<UserSettings> {
               padding: EdgeInsets.fromLTRB(16, 44, 0, 0),
               child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Personal data',
+                  child: Text(AppStrings.personalData,
                     style: TextStyle(fontSize: 14),
                   )),
             ),
@@ -107,7 +104,7 @@ class _UserSettingsState extends State<UserSettings> {
                       contentPadding: EdgeInsets.all(8.0),
                       focusedBorder: AppStyles.borderTextField.copyWith(
                           borderSide:
-                          BorderSide(color: AppColors.decorationColor)),
+                              BorderSide(color: AppColors.decorationColor)),
                       enabledBorder: AppStyles.borderTextField,
                       focusedErrorBorder: AppStyles.borderTextField,
                       errorBorder: OutlineInputBorder(
@@ -116,16 +113,18 @@ class _UserSettingsState extends State<UserSettings> {
                         ),
                       ),
                       hintStyle: TextStyle(color: AppColors.mainColorAccent),
-                      suffixIcon: Icon(Icons.account_circle, color: AppColors.mainColorAccent,),
+                      suffixIcon: Icon(
+                        Icons.account_circle,
+                        color: AppColors.mainColorAccent,
+                      ),
                     ),
                     initialValue: user.username,
                     // validator: (value) =>
                     //     _selectValidator(value, typeTextField.EMAIL),
                   ),
                 ),
-                ),
               ),
-
+            ),
           ],
         ),
       ),

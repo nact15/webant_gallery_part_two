@@ -6,7 +6,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
 
-enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PASSWORD }
+enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PASSWORD, CONFIRM_PASSWORD, PASSWORD_SIGH_IN, PHONE }
 
 class EnterPage extends StatelessWidget {
   const EnterPage({Key key}) : super(key: key);

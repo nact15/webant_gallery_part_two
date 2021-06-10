@@ -1,21 +1,35 @@
 import 'package:dio/dio.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
-
 
 class HttpRegistrationGateway {
   HttpRegistrationGateway();
+
   Dio dio = Dio();
 
   // ignore: missing_return
-  Future<void> registration(RegistrationModel registrationModel) async {
+  Future<void> registration(
+      {String username,
+      String password,
+      String birthday,
+      String email,
+      String phone}) async {
     try {
-      final String url = AppStrings.urlUsers;
-      Response response = await dio.post(url, data: registrationModel.toJson());
+      print(birthday);
+      Response response = await dio.post(AppStrings.urlUsers, data: {
+        AppStrings.username: username,
+        'email': email,
+        AppStrings.password: password,
+        'birthday': birthday,
+        'phone': phone,
+        'fullName': username,
+      });
+
       final statusCode = response.statusCode;
       print(response.data);
-      if (statusCode == 201) {
-        print(statusCode);
+
+      print(response.statusMessage);
+      if (statusCode == 200) {
+        print(response.statusMessage);
       }
     } catch (e) {
       rethrow;

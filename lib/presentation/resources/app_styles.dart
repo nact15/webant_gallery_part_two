@@ -66,6 +66,9 @@ class AppStyles {
   static List<TextInputFormatter> noSpace = <TextInputFormatter>[
     FilteringTextInputFormatter.deny(RegExp("[ ]")),
   ];
+  static List<TextInputFormatter> noNumbers = <TextInputFormatter>[
+    FilteringTextInputFormatter.deny(RegExp(r'1-3')),
+  ];
 
   static const TextStyle signInButtonMain = TextStyle(
       color: AppColors.colorWhite, fontSize: 17, fontWeight: FontWeight.w700);

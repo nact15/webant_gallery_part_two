@@ -1,19 +1,20 @@
-import 'package:date_text_masked/date_widget.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_registration_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/select_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
 
 import 'sign_in_page.dart';
-
-enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PASSWORD, CONFIRMPASSWORD }
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key key}) : super(key: key);
@@ -25,34 +26,35 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
 
-  RegistrationModel _registrationModel = RegistrationModel();
-
-  bool _passwordVisible = true;
   double heightTextForm = 36;
   DateTime selectedDate = DateTime.now();
-  //TextEditingController controller;
+  TextEditingController nameController;
+  TextEditingController birthdayController;
+  TextEditingController emailController;
+  TextEditingController passwordController;
+  TextEditingController phoneController;
 
   @override
   void initState() {
-    //controller = TextEditingController();
-    _passwordVisible = false;
+    nameController = TextEditingController();
+    birthdayController = TextEditingController();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    phoneController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
+    nameController.dispose();
+    birthdayController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final node = FocusScope.of(context);
-
-    double widthTextForm = MediaQuery
-        .of(context)
-        .size
-        .width * 0.90;
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -60,10 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
         resizeToAvoidBottomInset: true,
         appBar: AppBarSign(),
         body: Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
+          height: MediaQuery.of(context).size.height,
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -74,197 +73,80 @@ class _SignUpPageState extends State<SignUpPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 100),
                       child:
-                      Text(AppStrings.signUp, style: AppStyles.styleSign),
+                          Text(AppStrings.signUp, style: AppStyles.styleSign),
                     ),
                     Padding(
                       //user name
-                      padding: EdgeInsets.only(top: 50),
-                      child: Container(
-                        width: widthTextForm,
-                        height: heightTextForm,
-                        child: TextFormField(
-                          //controller: controller,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.name,
-                          decoration: InputDecoration(
-                            errorStyle: TextStyle(height: 0),
-                            contentPadding: EdgeInsets.all(8.0),
-                            focusedBorder: AppStyles.borderTextField.copyWith(
-                                borderSide: BorderSide(
-                                    color: AppColors.decorationColor)),
-                            enabledBorder: AppStyles.borderTextField,
-                            focusedErrorBorder: AppStyles.borderTextField,
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                              ),
-                            ),
-                            hintText: AppStrings.hintName,
-                            hintStyle:
-                            TextStyle(color: AppColors.mainColorAccent),
-                            suffixIcon: selectIcon(typeTextField.USERNAME),
-                          ),
-                          validator: (value) =>
-                              _selectValidator(value, typeTextField.USERNAME),
-                          onSaved: (String value) {
-                            _registrationModel.username = value;
-                          },
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => node.nextFocus(),
-                        ),
+                      padding: const EdgeInsets.only(top: 50),
+                      child: TextFormFields(
+                        controller: nameController,
+                        hint: AppStrings.hintName,
+                        typeField: typeTextField.USERNAME,
+                        textInputType: TextInputType.name,
+                        obscure: false,
                       ),
                     ),
                     Padding(
                       //birthday
-                      padding: EdgeInsets.only(top: 29),
-                      child: Container(
-                        width: widthTextForm,
-                        height: heightTextForm,
-                        child: TextFormField(
-                          //controller: controller,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            MaskTextInputFormatter(mask: "##.##.####"),
-                          ],
-
-                          decoration: InputDecoration(
-                              errorStyle: TextStyle(height: 0),
-                              contentPadding: EdgeInsets.all(8.0),
-                              focusedBorder: AppStyles.borderTextField.copyWith(
-                                  borderSide: BorderSide(
-                                      color: AppColors.decorationColor)),
-                              enabledBorder: AppStyles.borderTextField,
-                              focusedErrorBorder: AppStyles.borderTextField,
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
-                              hintText: AppStrings.hintBirthday,
-                              hintStyle:
-                              TextStyle(color: AppColors.mainColorAccent),
-                              suffixIcon: selectIcon(typeTextField.BIRTHDAY)),
-                          // validator: (value) =>
-                          //     _selectValidator(value, typeTextField.EMAIL),
-                          // onDateSelected: (DateTime value) {
-                          //   _birthday = value;
-                          // },
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => node.nextFocus(),
-                        ),
+                      padding: const EdgeInsets.only(top: 29),
+                      child: TextFormFields(
+                        controller: birthdayController,
+                        hint: AppStrings.hintBirthday,
+                        typeField: typeTextField.BIRTHDAY,
+                        textInputType: TextInputType.datetime,
+                        textInputFormatter: <TextInputFormatter>[
+                          MaskTextInputFormatter(
+                              mask: (AppStrings.dateMask),
+                              filter: {"#": RegExp(r'[0-9]')})
+                        ],
+                        obscure: false,
                       ),
                     ),
                     Padding(
                       //email
                       padding: EdgeInsets.only(top: 29),
-                      child: Container(
-                        width: widthTextForm,
-                        height: heightTextForm,
-                        child: TextFormField(
-                          //controller: controller,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.emailAddress,
-                          inputFormatters: AppStyles.noSpace,
-                          decoration: InputDecoration(
-                            errorStyle: TextStyle(height: 0),
-                            contentPadding: EdgeInsets.all(8.0),
-                            focusedBorder: AppStyles.borderTextField.copyWith(
-                                borderSide: BorderSide(
-                                    color: AppColors.decorationColor)),
-                            enabledBorder: AppStyles.borderTextField,
-                            focusedErrorBorder: AppStyles.borderTextField,
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                              ),
-                            ),
-                            hintText: AppStrings.hintEmail,
-                            hintStyle:
-                            TextStyle(color: AppColors.mainColorAccent),
-                            suffixIcon: selectIcon(typeTextField.EMAIL),
-                          ),
-                          validator: (value) =>
-                              _selectValidator(value, typeTextField.EMAIL),
-                          onSaved: (String value) {
-                            _registrationModel.email = value;
-                          },
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => node.nextFocus(),
-                        ),
+                      child: TextFormFields(
+                        controller: emailController,
+                        hint: AppStrings.hintEmail,
+                        typeField: typeTextField.EMAIL,
+                        textInputType: TextInputType.emailAddress,
+                        obscure: false,
                       ),
                     ),
                     Padding(
-                      //old password
                       padding: EdgeInsets.only(top: 29),
-                      child: SizedBox(
-                        width: widthTextForm,
-                        height: heightTextForm,
-                        child: TextFormField(
-                          //controller: controller,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          inputFormatters: AppStyles.noSpace,
-                          decoration: InputDecoration(
-                              errorStyle: TextStyle(height: 0),
-                              contentPadding: EdgeInsets.all(8.0),
-                              focusedBorder: AppStyles.borderTextField.copyWith(
-                                  borderSide: BorderSide(
-                                      color: AppColors.decorationColor)),
-                              enabledBorder: AppStyles.borderTextField,
-                              focusedErrorBorder: AppStyles.borderTextField,
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
-                              hintText: AppStrings.hintOldPassword,
-                              hintStyle:
-                              TextStyle(color: AppColors.mainColorAccent),
-                              suffixIcon: selectIcon(typeTextField.PASSWORD)),
-                          obscureText: !_passwordVisible,
-                          validator: (value) =>
-                              _selectValidator(value, typeTextField.PASSWORD),
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () => node.nextFocus(),
-
-                        ),
+                      child: TextFormFields(
+                        controller: phoneController,
+                        hint: AppStrings.hintPhone,
+                        typeField: typeTextField.PHONE,
+                        textInputType: TextInputType.phone,
+                        textInputFormatter: <TextInputFormatter>[
+                          MaskTextInputFormatter(mask: (AppStrings.phoneMask),
+                          filter: {"#": RegExp(r'[0-9]')}),
+                        ],
+                        obscure: false,
+                      ),
+                    ),
+                    Padding(
+                      //password
+                      padding: EdgeInsets.only(top: 29),
+                      child: TextFormFields(
+                        controller: passwordController,
+                        hint: AppStrings.hintOldPassword,
+                        typeField: typeTextField.PASSWORD,
+                        textInputType: TextInputType.visiblePassword,
+                        obscure: true,
                       ),
                     ),
                     Padding(
                       //confirm password
                       padding: EdgeInsets.only(top: 29),
-                      child: SizedBox(
-                        width: widthTextForm,
-                        height: heightTextForm,
-                        child: TextFormField(
-                          //controller: controller,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          inputFormatters: AppStyles.noSpace,
-                          decoration: InputDecoration(
-                            errorStyle: TextStyle(height: 0),
-                            contentPadding: EdgeInsets.all(8.0),
-                            focusedBorder: AppStyles.borderTextField.copyWith(
-                                borderSide: BorderSide(
-                                    color: AppColors.decorationColor)),
-                            enabledBorder: AppStyles.borderTextField,
-                            focusedErrorBorder: AppStyles.borderTextField,
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.red,
-                              ),
-                            ),
-                            hintText: AppStrings.hintOldPassword,
-                            hintStyle:
-                            TextStyle(color: AppColors.mainColorAccent),
-                            suffixIcon: selectIcon(typeTextField.PASSWORD),
-                          ),
-                          obscureText: !_passwordVisible,
-                          validator: (value) =>
-                              _selectValidator(value, typeTextField.PASSWORD),
-                          textInputAction: TextInputAction.done,
-                          onEditingComplete: () => node.unfocus(),
-
-                        ),
+                      child: TextFormFields(
+                        controller: passwordController,
+                        hint: AppStrings.hintConfirmPassword,
+                        typeField: typeTextField.CONFIRM_PASSWORD,
+                        textInputType: TextInputType.visiblePassword,
+                        obscure: true,
                       ),
                     ),
                     Padding(
@@ -277,7 +159,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: ElevatedButton.styleFrom(
                             primary: AppColors.mainColor,
                           ),
-                          onPressed: () => _ifSignUp(),
+                          onPressed: () => ifSignUp(),
                           child: Text(
                             AppStrings.signUp,
                             style: TextStyle(
@@ -320,107 +202,42 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget selectIcon(typeTextField typeField) {
-    switch (typeField) {
-      case typeTextField.PASSWORD:
-        return IconButton(
-            icon: _passwordVisible
-                ? Icon(Icons.visibility)
-                : Icon(Icons.visibility_off), //hide password
-            color: AppColors.mainColorAccent,
-            padding: EdgeInsets.all(6.0),
-            onPressed: () {
-              setState(
-                    () {
-                  _passwordVisible = !_passwordVisible;
-                },
-              );
-            });
-        break;
-      case typeTextField.EMAIL:
-        return Icon(
-          Icons.mail_outline,
-          color: AppColors.mainColorAccent,
-        );
-        break;
-      case typeTextField.USERNAME:
-        return Icon(
-          Icons.account_circle_outlined,
-          color: AppColors.mainColorAccent,
-        );
-        break;
-      case typeTextField.BIRTHDAY:
-        return Icon(
-          Icons.date_range,
-          color: AppColors.mainColorAccent,
-        );
-      case typeTextField.CONFIRMPASSWORD:
-      // TODO: Handle this case.
-        break;
-    }
-    return null;
-  }
-
-  String _selectValidator(String value, typeTextField typeField) {
-    switch (typeField) {
-      case typeTextField.USERNAME:
-        if (value == null || value.isEmpty || value.length <= 3) {
-          return AppStrings.emptyName;
-        }
-        return null;
-        break;
-      case typeTextField.EMAIL:
-        if (value == null || value.isEmpty) {
-          return AppStrings.emptyEmail;
-        } else if (!value.contains('@') ||
-            value.length < 3 ||
-            !value.contains('.')) {
-          return AppStrings.incorrectEmail;
-        }
-        return null;
-        break;
-      case typeTextField.PASSWORD:
-        if (value == null || value.isEmpty) {
-          return AppStrings.emptyPassword;
-        } else if (value.length <= 8) {
-          return AppStrings.passwordErrorLength;
-        } else if (!value.contains(RegExp('[A-Z]'))) {
-          return AppStrings.passwordOneLetter;
-        }
-        return null;
-        break;
-      case typeTextField.CONFIRMPASSWORD:
-        if (value == null || value.isEmpty) {
-          return AppStrings.confirmPassword;
-        }
-        // else if (value != _signUpInfo.password) {
-        //   return AppStrings.passwordMatch;
-        // }
-        return null;
-      case typeTextField.BIRTHDAY:
-      //TODO
-        break;
-    }
-    return AppStrings.error;
-  }
-
-  void _ifSignUp() {
+  void ifSignUp() async {
     if (_formKey.currentState.validate()) {
-      print(_registrationModel.id);
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => Gallery(),
-          ),
-        );
+      try {
+        print(birthdayController.text ?? DateTime.now().toString());
+        print(DateTime.now().toString());
+        HttpRegistrationGateway().registration(
+            username: nameController.text,
+            password: passwordController.text,
+            birthday: birthdayController.text.isNotEmpty
+                ? birthdayController.text
+                : DateTime.now().toString(),
+            email: emailController.text,
+            phone: phoneController.text);
+        RegistrationModel user = await HttpOauthGateway().authorization(
+            nameController.text, passwordController.text);
+        {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Gallery(user: user),
+            ),
+          );
+        }
+      } on DioError {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppStrings.loginError),
+          backgroundColor: Colors.red,
+        ));
+      }
     }
   }
 
-    void _ifSignIn() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => SignInPage(),
-        ),
-      );
-    }
+  void _ifSignIn() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SignInPage(),
+      ),
+    );
+  }
 }
-

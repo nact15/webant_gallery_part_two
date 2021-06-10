@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
+import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/select_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_page.dart';
 
 import 'new_or_popular_photos.dart';
@@ -41,7 +43,7 @@ RegistrationModel user;
       },
       children: <Widget>[
         NewOrPopularPhotos(),
-        NewOrPopularPhotos(),
+        SelectPhoto(),
         UserPage(user: user),
       ],
     );
@@ -59,15 +61,15 @@ RegistrationModel user;
     return <BottomNavigationBarItem>[
       const BottomNavigationBarItem(
         icon: Icon(Icons.home, size: 24.8),
-        label: 'home',
+        label: AppStrings.home,
       ),
       const BottomNavigationBarItem(
         icon: Icon(Icons.camera_alt, size: 24.8),
-        label: 'camera',
+        label: AppStrings.camera,
       ),
       const BottomNavigationBarItem(
         icon: Icon(Icons.account_circle, size: 24.8),
-        label: 'profile',
+        label: AppStrings.profile,
       ),
     ];
   }
