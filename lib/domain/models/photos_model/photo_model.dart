@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 
 import 'image_model.dart';
 
@@ -44,7 +44,7 @@ class PhotoModel {
   Map<String, dynamic> toJson() => _$PhotoModelToJson(this);
 
   String getImage() {
-    return AppStrings.urlMedia + this.image.name.toString();
+    return HttpStrings.urlMedia + this.image.name.toString();
   }
 
   bool isPhotoSVG() {

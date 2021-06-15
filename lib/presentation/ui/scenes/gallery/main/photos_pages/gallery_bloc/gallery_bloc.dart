@@ -97,7 +97,6 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
       ) ==
           null) {
         photosBox.add(element);
-        print("add new item ${element.id}");
       }
     });
   }

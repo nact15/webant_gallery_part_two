@@ -9,7 +9,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/photos_bloc/gallery_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/photos_pages/gallery_bloc/gallery_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/photos_pages/single_photo.dart';
 
 class GalleryGrid extends StatefulWidget {
   const GalleryGrid({Key key}) : super(key: key);
@@ -53,59 +54,65 @@ class _GalleryGridState extends State<GalleryGrid> {
 
   Widget _photosView(Box photosBox) {
     return OrientationBuilder(builder: (context, orientation) {
-      return CustomScrollView(
-        controller: _controller,
-        slivers: <Widget>[
-          SliverGrid(
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        child: CustomScrollView(
+          controller: _controller,
+          slivers: <Widget>[
+            SliverGrid(
               delegate: SliverChildBuilderDelegate(
-                  (c, i) => Container(
-                        margin: i%2 != 0 ? EdgeInsets.only(right: 16) : EdgeInsets.only(left: 16),
-                        child: GestureDetector(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15.0),
-                            child: Hero(
-                              tag: (photosBox.getAt(i) as PhotoModel).id,
-                              child: photosBox.getAt(i).isPhotoSVG()
-                                  ? SvgPicture.network(
-                                      photosBox.getAt(i).getImage())
-                                  : CachedNetworkImage(
-                                      imageUrl: photosBox.getAt(i).getImage(),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                      fit: BoxFit.cover,
-                                    ),
-                            ),
-                          ),
-                          onTap: () async {
-                            _toScreenInfo(photosBox.getAt(i));
-                          },
-                        ),
+                (c, i) => Container(
+                  margin: i == 0 || i == 1
+                      ? EdgeInsets.only(top: 16)
+                      : EdgeInsets.zero,
+                  child: GestureDetector(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15.0),
+                      child: Hero(
+                        tag: (photosBox.getAt(i) as PhotoModel).id,
+                        child: photosBox.getAt(i).isPhotoSVG()
+                            ? SvgPicture.network(photosBox.getAt(i).getImage())
+                            : CachedNetworkImage(
+                                imageUrl: photosBox.getAt(i).getImage(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                                fit: BoxFit.cover,
+                              ),
                       ),
-                  childCount: photosBox?.length ?? 0),
+                    ),
+                    onTap: () async {
+                      _toScreenInfo(photosBox.getAt(i));
+                    },
+                  ),
+                ),
+                childCount: photosBox?.length ?? 0,
+              ),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: orientation == Orientation.portrait ? 2 : 4,
-                childAspectRatio: 166 / 166,
+                childAspectRatio: 1,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-              )),
-          SliverToBoxAdapter(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(5.0),
-                child: SizedBox(
-                  height: 40,
-                  width: 40,
-                  child: _isLastPage
-                      ? null
-                      : CircularProgressIndicator(
-                          color: AppColors.mainColorAccent,
-                          strokeWidth: 2.0,
-                        ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: _isLastPage
+                        ? null
+                        : CircularProgressIndicator(
+                            color: AppColors.mainColorAccent,
+                            strokeWidth: 2.0,
+                          ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     });
   }
@@ -146,7 +153,10 @@ class _GalleryGridState extends State<GalleryGrid> {
                       color: AppColors.mainColorAccent,
                       strokeWidth: 2.0,
                     ),
-                    Text('Loading...', style: TextStyle(color: AppColors.mainColorAccent),),
+                    Text(
+                      'Loading...',
+                      style: TextStyle(color: AppColors.mainColorAccent),
+                    ),
                   ],
                 ),
               );
@@ -195,10 +205,10 @@ class _GalleryGridState extends State<GalleryGrid> {
   }
 
   void _toScreenInfo(PhotoModel photo) {
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => ScreenInfo(photo: photo),
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ScreenInfo(photo: photo),
+      ),
+    );
   }
 }

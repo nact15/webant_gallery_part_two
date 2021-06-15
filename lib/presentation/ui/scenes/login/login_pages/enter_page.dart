@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_bloc/authorization_bloc.dart';
 
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
@@ -27,12 +29,12 @@ class EnterPage extends StatelessWidget {
               child: AppStyles.textWelcome,
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 22),
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
               child: buttons(context, AppStyles.styleButtonCreateAccount,
                   AppStyles.textCreateAccount, SignUpPage()),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: buttons(context, AppStyles.styleButtonAlreadyHaveAccount,
                   AppStyles.textAlreadyHaveAccount, SignInPage()),
             ),
@@ -44,7 +46,7 @@ class EnterPage extends StatelessWidget {
 
   Widget buttons(
       BuildContext context, ButtonStyle styleButton, Text text, page) {
-    double widthButton = MediaQuery.of(context).size.width * 0.91;
+    double widthButton = MediaQuery.of(context).size.width ;
     return SizedBox(
       width: widthButton,
       height: heightButton,
@@ -53,9 +55,12 @@ class EnterPage extends StatelessWidget {
         child: text,
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => page,
-            ),
+              MaterialPageRoute(
+                builder: (BuildContext context) => BlocProvider<AuthorizationBloc>(
+                  create: (BuildContext context) => AuthorizationBloc(),
+                  child: page,
+                ),
+              ),
           );
         },
       ),

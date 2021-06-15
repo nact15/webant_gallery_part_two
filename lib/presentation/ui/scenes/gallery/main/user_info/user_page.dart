@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_settings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_bloc/user_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_settings.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({Key key, this.user}) : super(key: key);
-  final RegistrationModel user;
+  final UserModel user;
 
   @override
   _UserPageState createState() => _UserPageState(user);
@@ -15,7 +17,7 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   _UserPageState(this.user);
 
-  RegistrationModel user;
+  UserModel user;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,10 @@ class _UserPageState extends State<UserPage> {
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => UserSettings(user: user),
+                  builder: (BuildContext context) => BlocProvider<UserBloc>(
+                    create: (BuildContext context) => UserBloc(user),
+                    child: UserSettings(user: user,),
+                  ),
                 ),
               );
             },
@@ -82,7 +87,7 @@ class _UserPageState extends State<UserPage> {
                 child: Text(
                   user.birthday,
                   style:
-                      TextStyle(fontSize: 12, color: AppColors.mainColorAccent),
+                  TextStyle(fontSize: 12, color: AppColors.mainColorAccent),
                 ),
               ),
             ),

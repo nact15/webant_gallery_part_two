@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'registration_model.dart';
+part of 'user_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-RegistrationModel _$RegistrationModelFromJson(Map<String, dynamic> json) {
-  return RegistrationModel(
+UserModel _$UserModelFromJson(Map<String, dynamic> json) {
+  return UserModel(
     id: json['id'] as int,
     email: json['email'] as String,
     enabled: json['enabled'] as bool,
@@ -19,7 +19,7 @@ RegistrationModel _$RegistrationModelFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$RegistrationModelToJson(RegistrationModel instance) =>
+Map<String, dynamic> _$UserModelToJson(UserModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'email': instance.email,

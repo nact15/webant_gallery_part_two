@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/domain/repositories/registration_gateway.dart';
+import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 
-class HttpRegistrationGateway {
+class HttpRegistrationGateway extends RegistrationGateway{
   HttpRegistrationGateway();
 
   Dio dio = Dio();
-
-  // ignore: missing_return
+@override
   Future<void> registration(
       {String username,
       String password,
@@ -14,15 +14,15 @@ class HttpRegistrationGateway {
       String email,
       String phone}) async {
     try {
-      print(birthday);
-      Response response = await dio.post(AppStrings.urlUsers, data: {
-        AppStrings.username: username,
+      Response response = await dio.post(HttpStrings.urlUsers, data: {
+        HttpStrings.username: username,
         'email': email,
-        AppStrings.password: password,
+        HttpStrings.password: password,
         'birthday': birthday,
         'phone': phone,
         'fullName': username,
-      });
+      }
+      );
 
       final statusCode = response.statusCode;
       print(response.data);

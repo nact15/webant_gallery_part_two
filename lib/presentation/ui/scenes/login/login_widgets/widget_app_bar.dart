@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 
-import '../login_pages/select_page.dart';
+import '../login_pages/enter_page.dart';
 
 class AppBarSign extends StatelessWidget implements PreferredSizeWidget {
   const AppBarSign({Key key}) : super(key: key);

@@ -18,16 +18,12 @@ class AppStrings{
   static const String hintOldPassword = 'Password';
   static const String hintConfirmPassword = 'Confirm password';
   static const String hintEmail = 'Email';
-  static const String hintPhone = 'Phone';
+  static const String hintPhone = '(999) 999-99-99';
   static const String hintBirthday = 'Birthday';
   static const String hintName = 'User name';
   static const String tooYoung = 'You must be over 18';
   static const String error = 'Error';
   static const String forgotPassOrEmail = 'Forgot login or password?';
-  static const String urlMedia = 'http://gallery.dev.webant.ru/media/';
-  static const String urlPhotos = 'http://gallery.dev.webant.ru/api/photos';
-  static const String urlClients = 'http://gallery.dev.webant.ru/api/clients';
-  static const String urlUsers = 'http://gallery.dev.webant.ru/api/users';
   static const String newType = 'New';
   static const String popularType = 'Popular';
   static const String personalData = 'Personal data';
@@ -35,17 +31,8 @@ class AppStrings{
   static const String profile = 'Profile';
   static const String home = 'Home';
   static const String camera = 'Camera';
-  static const String tokenEndpoint = 'http://gallery.dev.webant.ru/oauth/v2/token';
-  static const String currentUser = 'http://gallery.dev.webant.ru/api/users/current';
-  static const String typeToken = 'Bearer';
-  static const String authorization = 'Authorization';
-  static const String clientSecret = 'client_secret';
-  static const String password = 'password';
-  static const String username = 'username';
-  static const String grantType = 'grant_type';
-  static const String clientId = 'client_id';
-  static const String allowedGrantTypes = 'allowedGrantTypes';
   static const String name = 'name';
-  static const String phoneMask = '+7 (###) ###-##-##';
+  static const String refreshToken = 'refresh_token';
+  static const String phoneMask = '(###) ###-##-##';
   static const String dateMask = '##.##.####';
 }

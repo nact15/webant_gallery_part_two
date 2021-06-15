@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/registration_model.dart';
+import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/select_photo.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/add_photo/select_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_page.dart';
 
 import 'new_or_popular_photos.dart';
 
 class Gallery extends StatefulWidget {
   const Gallery({Key key, this.user}) : super(key: key);
-  final RegistrationModel user;
+  final UserModel user;
   @override
   _GalleryState createState() => _GalleryState(user);
 }
@@ -18,7 +18,7 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   _GalleryState(this.user);
   int _bottomSelectedIndex = 0;
-RegistrationModel user;
+UserModel user;
   PageController pageController = PageController(
     initialPage: 0,
     keepPage: true,
