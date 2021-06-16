@@ -10,8 +10,7 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  UserBloc(this.user) : super(UserInitial());
-  final UserModel user;
+  UserBloc() : super(UserInitial());
   final _storage = Storage.FlutterSecureStorage();
 
   @override
@@ -23,7 +22,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       yield Exit();
     }
     if (event is UpdateUser) {
-      //password, email, name and birthday
+
     }
   }
 }

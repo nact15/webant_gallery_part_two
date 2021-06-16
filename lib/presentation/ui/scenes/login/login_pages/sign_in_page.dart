@@ -7,8 +7,9 @@ import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_bloc/authorization_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/passwrod_text_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
 
@@ -84,17 +85,14 @@ class _SignInPageState extends State<SignInPage> {
                     hint: AppStrings.hintName,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
-                    obscure: false,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 29),
-                  child: TextFormFields(
+                  child: PasswordTextFields(
                     controller: passwordController,
                     hint: AppStrings.hintPassword,
                     typeField: typeTextField.PASSWORD_SIGH_IN,
-                    textInputType: TextInputType.visiblePassword,
-                    obscure: true,
                   ),
                 ),
                 Align(

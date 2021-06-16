@@ -2,7 +2,7 @@
     package="com.example.webant_gallery_part_two">
    <application
         android:label="webant_gallery_part_two"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ant">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

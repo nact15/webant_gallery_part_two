@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_bloc/authorization_bloc.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/login_bloc/login_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/welcome_screen.dart';
 
@@ -21,7 +22,7 @@ Future<void> main() async {
   runZonedGuarded(() {
     runApp(MultiBlocProvider(
       providers: [
-        BlocProvider(create: (BuildContext context) => LoginBloc()..add(LoginFetch())),
+        BlocProvider(create: (BuildContext context) => LoginBloc(HttpOauthGateway())..add(LoginFetch())),
         BlocProvider(create: (BuildContext context) => AuthorizationBloc())
         ],
         child: WelcomeScreen()));

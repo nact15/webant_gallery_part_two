@@ -33,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
                         strokeWidth: 2.0,
                       ),
                       Text(
-                        'Loading...',
+                        AppStrings.loading,
                         style: TextStyle(color: AppColors.mainColorAccent),
                       ),
                     ],
@@ -50,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
               );
             }
           }
-          return Text('Error');
+          return Text(AppStrings.error);
         },
       ),
     );

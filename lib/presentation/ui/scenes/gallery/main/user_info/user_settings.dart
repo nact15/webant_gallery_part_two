@@ -2,15 +2,20 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_bloc/user_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
+
+import 'alert_log_out_dialog.dart';
 
 class UserSettings extends StatefulWidget {
   const UserSettings({Key key, this.user}) : super(key: key);
@@ -25,20 +30,19 @@ class _UserSettingsState extends State<UserSettings> {
 
   UserModel user;
   final _formKey = GlobalKey<FormState>();
-  double heightFields = 36.0;
-  double widthButton = 120.0;
   File _image;
   final picker = ImagePicker();
   final dateFormatter = DateFormat('dd.MM.yyyy');
   TextEditingController _nameController;
   TextEditingController _birthdayController;
   TextEditingController _emailController;
+  String name;
 
   @override
   void initState() {
-    _nameController = TextEditingController();
-    _birthdayController = TextEditingController();
-    _emailController = TextEditingController();
+    _nameController = TextEditingController(text: user.username);
+    _birthdayController = TextEditingController(text: toDate(user.birthday));
+    _emailController = TextEditingController(text: user.email);
     super.initState();
   }
 
@@ -71,19 +75,17 @@ class _UserSettingsState extends State<UserSettings> {
 
   @override
   Widget build(BuildContext context) {
-
-    DateTime birthday = DateTime.parse(user.birthday);
-
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
-        if (state is Exit){
+        if (state is Exit) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-                EnterPage()), (Route<dynamic> route) => false);
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => EnterPage()),
+                (Route<dynamic> route) => false);
           });
         }
         return Scaffold(
-          resizeToAvoidBottomInset: false,
+          resizeToAvoidBottomInset: true,
           backgroundColor: AppColors.colorWhite,
           appBar: AppBar(
             leadingWidth: 75,
@@ -96,8 +98,14 @@ class _UserSettingsState extends State<UserSettings> {
             actions: [
               TextButton(
                 onPressed: () {
-                  //print(dateFormatter.format(birthday));
-                  print(DateTime.parse(user.birthday));
+                  if (_formKey.currentState.validate()) {
+                    user = UserModel(
+                        username: _nameController.text,
+                        birthday: _birthdayController.text,
+                        email: _emailController.text);
+                    print(user.toJson());
+                    //context.read<UserBloc>().add(UpdateUser(user));
+                  }
                 },
                 child: Text(
                   'Save',
@@ -125,17 +133,17 @@ class _UserSettingsState extends State<UserSettings> {
                         ),
                         child: _image == null
                             ? Icon(
-                          Icons.camera_alt,
-                          size: 55,
-                          color: AppColors.mainColorAccent,
-                        )
+                                Icons.camera_alt,
+                                size: 55,
+                                color: AppColors.mainColorAccent,
+                              )
                             : ClipOval(
-                          child: Image.file(
-                            _image,
-                            scale: 0.5,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                                child: Image.file(
+                                  _image,
+                                  scale: 0.5,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                         height: 100,
                         width: 100,
                       ),
@@ -166,61 +174,28 @@ class _UserSettingsState extends State<UserSettings> {
                   ),
                 ),
                 Padding(
+                  //name
                   padding: EdgeInsets.only(top: 10),
-                  child: Container(
-                    height: heightFields,
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        errorStyle: TextStyle(height: 0),
-                        contentPadding: EdgeInsets.all(8.0),
-                        focusedBorder: AppStyles.borderTextField.copyWith(
-                            borderSide:
-                            BorderSide(color: AppColors.decorationColor)),
-                        enabledBorder: AppStyles.borderTextField,
-                        focusedErrorBorder: AppStyles.borderTextField,
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                          ),
-                        ),
-                        hintStyle: TextStyle(color: AppColors.mainColorAccent),
-                        suffixIcon: Icon(
-                          Icons.account_circle,
-                          color: AppColors.mainColorAccent,
-                        ),
-                      ),
-                      initialValue: user.username,
-                    ),
+                  child: TextFormFields(
+                    controller: _nameController,
+                    hint: AppStrings.hintName,
+                    typeField: typeTextField.USERNAME,
+                    textInputType: TextInputType.name,
                   ),
                 ),
                 Padding(
+                  //birthday
                   padding: EdgeInsets.only(top: 29),
-                  child: Container(
-                    height: heightFields,
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        errorStyle: TextStyle(height: 0),
-                        contentPadding: EdgeInsets.all(8.0),
-                        focusedBorder: AppStyles.borderTextField.copyWith(
-                            borderSide:
-                            BorderSide(color: AppColors.decorationColor)),
-                        enabledBorder: AppStyles.borderTextField,
-                        focusedErrorBorder: AppStyles.borderTextField,
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                          ),
-                        ),
-                        hintStyle: TextStyle(color: AppColors.mainColorAccent),
-                        suffixIcon: Icon(
-                          Icons.date_range,
-                          color: AppColors.mainColorAccent,
-                        ),
-                      ),
-                      initialValue: toDate(user.birthday),
-                    ),
+                  child: TextFormFields(
+                    controller: _birthdayController,
+                    hint: AppStrings.hintBirthday,
+                    typeField: typeTextField.BIRTHDAY,
+                    textInputType: TextInputType.number,
+                    textInputFormatter: <TextInputFormatter>[
+                      MaskTextInputFormatter(
+                          mask: (AppStrings.dateMask),
+                          filter: {"#": RegExp(r'[0-9]')})
+                    ],
                   ),
                 ),
                 Padding(
@@ -234,32 +209,13 @@ class _UserSettingsState extends State<UserSettings> {
                   ),
                 ),
                 Padding(
+                  //email
                   padding: EdgeInsets.only(top: 20),
-                  child: Container(
-                    height: heightFields,
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        errorStyle: TextStyle(height: 0),
-                        contentPadding: EdgeInsets.all(8.0),
-                        focusedBorder: AppStyles.borderTextField.copyWith(
-                            borderSide:
-                            BorderSide(color: AppColors.decorationColor)),
-                        enabledBorder: AppStyles.borderTextField,
-                        focusedErrorBorder: AppStyles.borderTextField,
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.red,
-                          ),
-                        ),
-                        hintStyle: TextStyle(color: AppColors.mainColorAccent),
-                        suffixIcon: Icon(
-                          Icons.mail,
-                          color: AppColors.mainColorAccent,
-                        ),
-                      ),
-                      initialValue: user.email,
-                    ),
+                  child: TextFormFields(
+                    controller: _emailController,
+                    hint: AppStrings.hintEmail,
+                    typeField: typeTextField.EMAIL,
+                    textInputType: TextInputType.emailAddress,
                   ),
                 ),
                 Padding(
@@ -290,41 +246,6 @@ class _UserSettingsState extends State<UserSettings> {
             ),
           ),
         );
-      },
-    );
-  }
-
-  showAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = ElevatedButton(
-      child: Text("Cancel"),
-      style: ElevatedButton.styleFrom(
-        primary: AppColors.decorationColor,
-      ),
-      onPressed: () => Navigator.of(context).pop(),
-    );
-    Widget continueButton = ElevatedButton(
-      child: Text("Yes"),
-      style: ElevatedButton.styleFrom(
-        primary: AppColors.mainColorAccent,
-      ),
-      onPressed: () {
-        context.read<UserBloc>().add(LogOut());
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: Text("Sign out"),
-      content: Text("Would you like to sign out?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
       },
     );
   }

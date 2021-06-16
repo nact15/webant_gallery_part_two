@@ -12,23 +12,24 @@ class HttpOauthGateway extends OauthGateway {
 
   final _storage = Storage.FlutterSecureStorage();
 
-  Dio dio = Dio()..interceptors.add(LogInterceptor(
+  Dio dio = Dio()
+    ..interceptors.add(LogInterceptor(
       responseBody: true,
-      requestBody: false,
-      requestHeader: false,
-      responseHeader: false));
+    ));
 
   UserModel userModel;
   OauthModel oauthModel;
 
   @override
-// ignore: missing_return
-  Future<UserModel> authorization(
-      String username, String password) async {
+  // ignore: missing_return
+  Future<UserModel> authorization(String username, String password) async {
     try {
       Response client = await dio.post(HttpStrings.urlClients, data: {
         AppStrings.name: username,
-        HttpStrings.allowedGrantTypes: [HttpStrings.password, AppStrings.refreshToken]
+        HttpStrings.allowedGrantTypes: [
+          HttpStrings.password,
+          AppStrings.refreshToken
+        ]
       });
       if (client.statusCode == 201) {
         oauthModel = OauthModel.fromJson(client.data);
@@ -41,26 +42,18 @@ class HttpOauthGateway extends OauthGateway {
         };
         var getToken = await dio.get(HttpStrings.tokenEndpoint,
             queryParameters: queryParameters);
-        print(getToken);
-        print(getToken.statusMessage);
         if (getToken.statusCode == 200) {
-
-          String accessToken = getToken.data['access_token'];
+          String accessToken = getToken.data[AppStrings.accessToken];
           String refreshToken = getToken.data[AppStrings.refreshToken];
           String secret = oauthModel.secret;
           String id = '${oauthModel.id}_${oauthModel.randomId}';
-
           _writeTokens(
               accessToken: accessToken,
               refreshToken: refreshToken,
               id: id,
               secret: secret);
-          dio.options.headers['authorization'] = 'Bearer $accessToken';
-          var user = await dio.get(HttpStrings.currentUser);
-          if (user.statusCode == 200) {
-            userModel = UserModel.fromJson(user.data);
-            return userModel;
-          }
+          userModel = await getUser();
+          return userModel;
         }
       }
     } catch (e) {
@@ -69,6 +62,7 @@ class HttpOauthGateway extends OauthGateway {
     }
   }
 
+  @override
   Future<UserModel> getUser() async {
     dio.interceptors.add(HttpOauthInterceptor(dio));
     var user = await dio.get(HttpStrings.currentUser);
@@ -76,25 +70,31 @@ class HttpOauthGateway extends OauthGateway {
     return userModel;
   }
 
+  @override
   Future<String> refreshToken() async {
-    final refreshToken = await _storage.read(key: 'USER_REFRESH_TOKEN');
-    final id = await _storage.read(key: 'USER_ID');
-    final secret = await _storage.read(key: 'USER_SECRET');
+    String refreshToken =
+        await _storage.read(key: HttpStrings.userRefreshToken);
+    final id = await _storage.read(key: HttpStrings.userId);
+    final secret = await _storage.read(key: HttpStrings.userSecret);
     final Map<String, dynamic> queryParameters = <String, dynamic>{
       HttpStrings.clientId: id,
-      HttpStrings.grantType: 'refresh_token',
-      'refresh_token': refreshToken,
+      HttpStrings.grantType: AppStrings.refreshToken,
+      AppStrings.refreshToken: refreshToken,
       HttpStrings.clientSecret: secret,
     };
     var getToken = await dio.get(HttpStrings.tokenEndpoint,
         queryParameters: queryParameters);
     if (getToken.statusCode == 200) {
-      String token = getToken.data['access_token'];
-      String refreshToken = getToken.data['refresh_token'];
-      _writeTokens(accessToken: token, refreshToken: refreshToken, id: id, secret: secret);
+      String token = getToken.data[AppStrings.accessToken];
+      String refreshToken = getToken.data[AppStrings.refreshToken];
+      _writeTokens(
+          accessToken: token,
+          refreshToken: refreshToken,
+          id: id,
+          secret: secret);
       return token;
     }
-    return 'error';
+    return AppStrings.error;
   }
 
   void _writeTokens(
@@ -102,9 +102,10 @@ class HttpOauthGateway extends OauthGateway {
       String refreshToken,
       String id,
       String secret}) async {
-    await _storage.write(key: 'USER_ACCESS_TOKEN', value: accessToken);
-    await _storage.write(key: 'USER_REFRESH_TOKEN', value: refreshToken);
-    await _storage.write(key: 'USER_ID', value: id);
-    await _storage.write(key: 'USER_SECRET', value: secret);
+    await _storage.write(key: HttpStrings.userAccessToken, value: accessToken);
+    await _storage.write(
+        key: HttpStrings.userRefreshToken, value: refreshToken);
+    await _storage.write(key: HttpStrings.userId, value: id);
+    await _storage.write(key: HttpStrings.userSecret, value: secret);
   }
 }

@@ -13,4 +13,8 @@ class HttpStrings{
   static const String grantType = 'grant_type';
   static const String clientId = 'client_id';
   static const String allowedGrantTypes = 'allowedGrantTypes';
+  static const String userAccessToken = 'USER_ACCESS_TOKEN';
+  static const String userRefreshToken = 'USER_REFRESH_TOKEN';
+  static const String userId = 'USER_ID';
+  static const String userSecret = 'USER_SECRET';
 }

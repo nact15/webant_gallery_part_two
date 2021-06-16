@@ -1,21 +1,19 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_registration_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/passwrod_text_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
 
-import 'enter_bloc/authorization_bloc.dart';
+import 'authorization_bloc/authorization_bloc.dart';
 import 'sign_in_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -105,7 +103,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     hint: AppStrings.hintName,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
-                    obscure: false,
                     scrollController: scrollController,
                   ),
                 ),
@@ -116,13 +113,12 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: birthdayController,
                     hint: AppStrings.hintBirthday,
                     typeField: typeTextField.BIRTHDAY,
-                    textInputType: TextInputType.datetime,
+                    textInputType: TextInputType.number,
                     textInputFormatter: <TextInputFormatter>[
                       MaskTextInputFormatter(
                           mask: (AppStrings.dateMask),
                           filter: {"#": RegExp(r'[0-9]')})
                     ],
-                    obscure: false,
                     scrollController: scrollController,
                   ),
                 ),
@@ -134,7 +130,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     hint: AppStrings.hintEmail,
                     typeField: typeTextField.EMAIL,
                     textInputType: TextInputType.emailAddress,
-                    obscure: false,
                     scrollController: scrollController,
                   ),
                 ),
@@ -151,32 +146,25 @@ class _SignUpPageState extends State<SignUpPage> {
                           mask: (AppStrings.phoneMask),
                           filter: {"#": RegExp(r'[0-9]')}),
                     ],
-                    obscure: false,
                     scrollController: scrollController,
                   ),
                 ),
                 Padding(
                   //password
                   padding: EdgeInsets.only(top: 29),
-                  child: TextFormFields(
+                  child: PasswordTextFields(
                     controller: passwordController,
                     hint: AppStrings.hintOldPassword,
                     typeField: typeTextField.PASSWORD,
-                    textInputType: TextInputType.visiblePassword,
-                    obscure: true,
-                    scrollController: scrollController,
                   ),
                 ),
                 Padding(
                   //confirm password
                   padding: EdgeInsets.only(top: 29),
-                  child: TextFormFields(
+                  child: PasswordTextFields(
                     controller: confirmPasswordController,
                     hint: AppStrings.hintConfirmPassword,
                     typeField: typeTextField.CONFIRM_PASSWORD,
-                    textInputType: TextInputType.visiblePassword,
-                    obscure: true,
-                    scrollController: scrollController,
                   ),
                 ),
                 Center(

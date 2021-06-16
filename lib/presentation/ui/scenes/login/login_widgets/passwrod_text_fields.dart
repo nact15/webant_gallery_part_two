@@ -1,50 +1,41 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/validation.dart';
 
-import 'icons.dart';
-
-class TextFormFields extends StatefulWidget {
-  const TextFormFields(
+class PasswordTextFields extends StatefulWidget {
+  PasswordTextFields(
       {Key key,
-      this.controller,
-      this.hint,
       this.typeField,
-      this.textInputType,
-      this.textInputFormatter,
-      this.scrollController})
+      this.controller,
+      this.hint,})
       : super(key: key);
-  final TextEditingController controller;
-  final ScrollController scrollController;
-  final String hint;
   final typeTextField typeField;
-  final TextInputType textInputType;
-  final List<TextInputFormatter> textInputFormatter;
+  final TextEditingController controller;
+  final String hint;
 
   @override
-  _TextFormFieldsState createState() => _TextFormFieldsState(controller, hint,
-      typeField, textInputType, textInputFormatter);
+  _PasswordTextFieldsState createState() =>
+      _PasswordTextFieldsState(typeField, controller, hint);
 }
 
-class _TextFormFieldsState extends State<TextFormFields> {
-  _TextFormFieldsState(
-      this.controller,
-      this.hint,
-      this.typeField,
-      this.textInputType,
-      this.textInputFormatter);
-
+class _PasswordTextFieldsState extends State<PasswordTextFields> {
+  typeTextField typeField;
+  bool _passwordVisible;
   TextEditingController controller;
   String hint;
-  typeTextField typeField;
-  TextInputType textInputType;
-  List<TextInputFormatter> textInputFormatter;
-  double heightFields = 36.0;
-  double widthButton = 120.0;
+  String confirmPassword;
+
+  _PasswordTextFieldsState(
+      this.typeField, this.controller, this.hint,);
+
+  @override
+  void initState() {
+    _passwordVisible = false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +47,7 @@ class _TextFormFieldsState extends State<TextFormFields> {
         cursorHeight: 20,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
-        keyboardType: textInputType,
-        inputFormatters: textInputFormatter,
+        keyboardType: TextInputType.visiblePassword,
         decoration: InputDecoration(
           //errorStyle: TextStyle(height: 0),
           contentPadding: EdgeInsets.all(6),
@@ -74,18 +64,26 @@ class _TextFormFieldsState extends State<TextFormFields> {
           hintStyle: TextStyle(
             color: AppColors.mainColorAccent,
           ),
-          prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 5, bottom: 2),
-              child: typeField == typeTextField.PHONE
-                  ? Text('+7 ',
-                      style: TextStyle(
-                          fontSize: 17, color: AppColors.mainColorAccent),
-                    )
-                  : null),
-          prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
-          suffixIcon: IconsFields(typeField: typeField),
+          suffixIcon: IconButton(
+              icon: _passwordVisible
+                  ? Icon(Icons.visibility)
+                  : Icon(Icons.visibility_off), //hide password
+              color: AppColors.mainColorAccent,
+              padding: EdgeInsets.all(6.0),
+              onPressed: () {
+                setState(
+                  () {
+                    _passwordVisible = !_passwordVisible;
+                  },
+                );
+              }),
         ),
-        validator: (value) => Validation().selectValidator(value: value, typeField: typeField),
+        obscureText: !_passwordVisible,
+        obscuringCharacter: '*',
+        validator: (value) => Validation().selectValidator(
+            value: value,
+            typeField: typeField,
+            confirmPassword: confirmPassword),
         textInputAction: TextInputAction.next,
         onEditingComplete: () => node.nextFocus(),
       ),

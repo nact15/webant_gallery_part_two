@@ -16,7 +16,6 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   _UserPageState(this.user);
-
   UserModel user;
 
   @override
@@ -34,7 +33,7 @@ class _UserPageState extends State<UserPage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext context) => BlocProvider<UserBloc>(
-                    create: (BuildContext context) => UserBloc(user),
+                    create: (BuildContext context) => UserBloc(),
                     child: UserSettings(user: user,),
                   ),
                 ),

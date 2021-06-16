@@ -11,7 +11,7 @@ class HttpOauthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    String accessToken = await _storage.read(key: 'USER_ACCESS_TOKEN');
+    String accessToken = await _storage.read(key: HttpStrings.userAccessToken);
     if (accessToken.isNotEmpty || accessToken != null) {
       options.headers = {HttpStrings.authorization: 'Bearer $accessToken'};
     }
