@@ -4,3 +4,10 @@ part of 'add_photo_bloc.dart';
 abstract class AddPhotoState {}
 
 class AddPhotoInitial extends AddPhotoState {}
+class ErrorPostPhoto extends AddPhotoState{}
+class LoadingPostPhoto extends AddPhotoState{}
+class CompletePost extends AddPhotoState{
+  final PhotoModel photo;
+
+  CompletePost(this.photo);
+}

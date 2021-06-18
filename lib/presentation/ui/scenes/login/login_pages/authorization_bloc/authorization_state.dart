@@ -4,10 +4,6 @@ part of 'authorization_bloc.dart';
 abstract class AuthorizationState {}
 
 class AuthorizationInitial extends AuthorizationState {}
-class AccessAuthorization extends AuthorizationState{
-  final UserModel user;
-
-  AccessAuthorization(this.user);
-}
+class AccessAuthorization extends AuthorizationState{}
 class ErrorAuthorization extends AuthorizationState{}
 class LoadingAuthorization extends AuthorizationState{}

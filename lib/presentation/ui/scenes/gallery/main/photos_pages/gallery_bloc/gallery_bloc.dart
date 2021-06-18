@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:async';
 import 'dart:core';
 
 import 'package:bloc/bloc.dart';
@@ -41,18 +40,19 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
           isLastPage: false,
         );
       }
-      baseModel = await photoGateway.fetchPhotos(_page);
-      if (_page == baseModel.countOfPages) {
+      baseModel = await photoGateway.fetchPhotos(page: _page);
+      if (photosBox.length < baseModel.totalItems) {
+        _addToBox(); //add photos to box
+        _page++;
+        yield GalleryData(
+            isLoading: false, isLastPage: false, photosBox: photosBox);
+      }else {
         yield GalleryData(
           isLastPage: true,
           isLoading: false,
           photosBox: photosBox,
-        ); //list PhotoModel
-      }
-      _addToBox(); //add items to box
-      _page++;
-      yield GalleryData(
-          isLoading: false, isLastPage: false, photosBox: photosBox);
+        );
+     }
     } on DioError {
       yield* _internetError();
     }
@@ -62,7 +62,7 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
     try {
       photosBox.clear();
       _page = 1;
-      baseModel = await photoGateway.fetchPhotos(_page);
+      baseModel = await photoGateway.fetchPhotos(page: _page);
       _addToBox(); //add items to box after refresh
       _page++;
       yield GalleryData(
@@ -89,12 +89,12 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   void _addToBox() {
     List<PhotoModel> basePhotoModel = baseModel.data as List<PhotoModel>;
     List<PhotoModel> boxPhotoModel =
-    photosBox.values.toList().cast<PhotoModel>();
+        photosBox.values.toList().cast<PhotoModel>();
     basePhotoModel.forEach((element) {
       if (boxPhotoModel.firstWhere(
             (elementB) => element.id == elementB.id,
-        orElse: () => null,
-      ) ==
+            orElse: () => null,
+          ) ==
           null) {
         photosBox.add(element);
       }

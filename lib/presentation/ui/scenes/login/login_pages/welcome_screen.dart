@@ -45,9 +45,7 @@ class WelcomeScreen extends StatelessWidget {
               return EnterPage();
             }
             if (state.isLogin) {
-              return Gallery(
-                user: state.user,
-              );
+              return Gallery();
             }
           }
           return Text(AppStrings.error);

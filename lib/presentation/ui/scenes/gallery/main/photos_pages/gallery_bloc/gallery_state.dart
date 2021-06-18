@@ -13,7 +13,6 @@ class GalleryData extends GalleryState {
   final List photos;
 
   GalleryData({this.isLoading, this.isLastPage, this.photosBox, this.photos});
-
 }
 
 class GalleryLoaded extends GalleryState {}

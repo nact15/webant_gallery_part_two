@@ -4,7 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
+import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/photos_pages/gallery_bloc/gallery_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/search_photo/search_bar.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/search_photo/search_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/search_photo/search_photo_bloc/search_photo_bloc.dart';
 
 import 'photos_pages/gallery_grid.dart';
 
@@ -18,88 +22,145 @@ class NewOrPopularPhotos extends StatefulWidget {
 enum typePhoto { NEW, POPULAR }
 
 class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
-  TextEditingController _searchController;
-
-  _searchListener() {}
+  TextEditingController searchController;
+  bool _search;
+  String queryText;
 
   @override
   void initState() {
-    _searchController = TextEditingController();
-    _searchController.addListener(_searchListener);
+    _search = false;
+    searchController = TextEditingController();
+    searchController.addListener(_searchListener);
     super.initState();
   }
 
-  Widget buildAppBarSearch() {
-    return Container(
-      height: 40,
-      width: MediaQuery.of(context).size.width * 0.91,
-      child: TextField(
-        cursorColor: AppColors.mainColorAccent,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: AppColors.colorOfSearchBar,
-          contentPadding: EdgeInsets.all(8),
-          hintText: 'Search',
-          hintStyle: TextStyle(
-            fontSize: 17,
-            color: AppColors.mainColorAccent,
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: AppColors.mainColorAccent,
-          ),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: AppColors.decorationColor)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: AppColors.colorWhite),
-          ),
-        ),
-        controller: _searchController,
-        onTap: () {},
-      ),
-    );
+  _searchListener() {
+    String searchText = searchController.text;
+    if (searchController.text.isEmpty) {
+      queryText = '';
+      context.read<SearchPhotoBloc>().add(NotSearching());
+    } else if (searchText != queryText) {
+      setState(() {
+        queryText = searchController.text;
+        context
+            .read<SearchPhotoBloc>()
+            .add(Searching(queryText: queryText, newQuery: true));
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: AppColors.colorWhite,
-          appBar: AppBar(
-            title: buildAppBarSearch(),
-            elevation: 0,
-            automaticallyImplyLeading: false,
+    return BlocListener<SearchPhotoBloc, SearchPhotoState>(
+      listener: (context, state) {
+        if (state is! NothingToSearch) {
+          setState(() {
+            _search = true;
+          });
+        } else
+          setState(() {
+            _search = false;
+          });
+      },
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        onHorizontalDragCancel: () =>
+            FocusManager.instance.primaryFocus?.unfocus(),
+        child: DefaultTabController(
+          length: _search ? 1 : 2,
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
             backgroundColor: AppColors.colorWhite,
-            bottom: TabBar(
-              tabs: [
-                Container(child: Tab(text: 'New')),
-                Tab(text: 'Popular'),
-              ],
-              indicatorColor: AppColors.decorationColor,
-              labelColor: AppColors.mainColor,
-              unselectedLabelColor: AppColors.mainColorAccent,
-              labelStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+            appBar: AppBar(
+              title: SearchBar(
+                searchController: searchController,
+              ),
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              backgroundColor: AppColors.colorWhite,
+              bottom: //_search ? null :
+                  PreferredSize(
+                preferredSize: Size.fromHeight(kToolbarHeight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: TabBar(
+                    tabs: _search
+                        ? [Tab(text: 'Search by photo name')]
+                        : ([Tab(text: 'New'), Tab(text: 'Popular')]),
+                    indicatorColor: AppColors.decorationColor,
+                    labelColor: AppColors.mainColor,
+                    unselectedLabelColor: AppColors.mainColorAccent,
+                    labelStyle:
+                        TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+                  ),
+                ),
+              ),
             ),
-          ),
-          body: TabBarView(
-            children: <Widget>[
-              BlocProvider<GalleryBloc>(
-                  create: (BuildContext c) =>
-                      GalleryBloc<PhotoModel>(HttpPhotoGateway(typePhoto.NEW))
-                        ..add(GalleryFetch()),
-                  child: GalleryGrid()),
-              BlocProvider<GalleryBloc>(
-                  create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                      HttpPhotoGateway(typePhoto.POPULAR))
-                    ..add(GalleryFetch()),
-                  child: GalleryGrid()),
-            ],
+            body: BlocBuilder<SearchPhotoBloc, SearchPhotoState>(
+              builder: (context, state) {
+                if (state is Loading) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CircularProgressIndicator(
+                          color: AppColors.mainColorAccent,
+                          strokeWidth: 2.0,
+                        ),
+                        Text(
+                          AppStrings.loading,
+                          style: TextStyle(color: AppColors.mainColorAccent),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                if (state is Search) {
+                  return SearchGrid(
+                    photos: state.photos,
+                    queryText: queryText,
+                  );
+                }
+                if (state is NotFound) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 200),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.image_not_supported_outlined,
+                            color: AppColors.decorationColor,
+                            size: 75,
+                          ),
+                          Text(
+                            'Image not found',
+                            style: TextStyle(
+                                color: AppColors.mainColorAccent, fontSize: 25),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                if (state is NothingToSearch || !_search) {
+                  return TabBarView(
+                    children: <Widget>[
+                      BlocProvider<GalleryBloc>(
+                          create: (BuildContext c) => GalleryBloc<PhotoModel>(
+                              HttpPhotoGateway(type: typePhoto.NEW))
+                            ..add(GalleryFetch()),
+                          child: GalleryGrid()),
+                      BlocProvider<GalleryBloc>(
+                          create: (BuildContext c) => GalleryBloc<PhotoModel>(
+                              HttpPhotoGateway(type: typePhoto.POPULAR))
+                            ..add(GalleryFetch()),
+                          child: GalleryGrid()),
+                    ],
+                  );
+                }
+                return Text('');
+              },
+            ),
           ),
         ),
       ),

@@ -1,24 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_search_photo.dart';
+import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/add_photo/select_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/search_photo/search_photo_bloc/search_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_page.dart';
 
 import 'new_or_popular_photos.dart';
 
 class Gallery extends StatefulWidget {
-  const Gallery({Key key, this.user}) : super(key: key);
-  final UserModel user;
+  const Gallery({Key key}) : super(key: key);
+
   @override
-  _GalleryState createState() => _GalleryState(user);
+  _GalleryState createState() => _GalleryState();
 }
 
 class _GalleryState extends State<Gallery> {
-  _GalleryState(this.user);
+  _GalleryState();
+
   int _bottomSelectedIndex = 0;
-UserModel user;
   PageController pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -42,9 +45,12 @@ UserModel user;
         pageChanged(index);
       },
       children: <Widget>[
-        NewOrPopularPhotos(),
+        BlocProvider<SearchPhotoBloc>(
+            create: (BuildContext c) =>
+                SearchPhotoBloc<PhotoModel>(HttpSearchPhotoGateway()),
+            child: NewOrPopularPhotos()),
         SelectPhoto(),
-        UserPage(user: user),
+        UserPage(),
       ],
     );
   }

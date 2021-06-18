@@ -12,9 +12,13 @@ class HttpOauthGateway extends OauthGateway {
 
   final _storage = Storage.FlutterSecureStorage();
 
-  Dio dio = Dio()
+  final Dio dio = Dio()
     ..interceptors.add(LogInterceptor(
       responseBody: true,
+      requestBody: true,
+      responseHeader: true,
+      requestHeader: true,
+      request: true
     ));
 
   UserModel userModel;
@@ -57,7 +61,6 @@ class HttpOauthGateway extends OauthGateway {
         }
       }
     } catch (e) {
-      print(e.toString());
       rethrow;
     }
   }

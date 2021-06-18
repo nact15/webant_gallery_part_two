@@ -6,9 +6,9 @@ import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_bloc/user_bloc.dart';
 
 part 'authorization_event.dart';
-
 part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
@@ -16,7 +16,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   HttpOauthGateway httpOauthGateway = HttpOauthGateway();
   HttpRegistrationGateway httpRegistrationGateway = HttpRegistrationGateway();
   UserModel user;
-
+UserBloc userBloc;
   @override
   Stream<AuthorizationState> mapEventToState(
     AuthorizationEvent event,
@@ -32,7 +32,8 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
             password: event.password);
         httpRegistrationGateway.registration(user);
         user = await httpOauthGateway.authorization(event.name, event.password);
-        yield AccessAuthorization(user);
+        userBloc.add(UserFetch());
+        yield AccessAuthorization();
       } on DioError {
         yield ErrorAuthorization();
       }
@@ -41,7 +42,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
       try {
         yield LoadingAuthorization();
         user = await httpOauthGateway.authorization(event.name, event.password);
-        yield AccessAuthorization(user);
+        yield AccessAuthorization();
       } on DioError {
         yield ErrorAuthorization();
       }

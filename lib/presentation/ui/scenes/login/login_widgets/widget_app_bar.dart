@@ -15,9 +15,7 @@ class AppBarSign extends StatelessWidget implements PreferredSizeWidget {
       leading: TextButton(
         child: AppStyles.textCancel,
         onPressed: () => Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return EnterPage();
-          },
+          builder: (context) => EnterPage(),
         )),
       ),
       backgroundColor: AppColors.colorWhite,

@@ -53,45 +53,42 @@ class _GalleryGridState extends State<GalleryGrid> {
   // }
 
   Widget _photosView(Box photosBox) {
-    return OrientationBuilder(builder: (context, orientation) {
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        child: CustomScrollView(
+      return CustomScrollView(
           controller: _controller,
           slivers: <Widget>[
-            SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                (c, i) => Container(
-                  margin: i == 0 || i == 1
-                      ? EdgeInsets.only(top: 16)
-                      : EdgeInsets.zero,
-                  child: GestureDetector(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Hero(
-                        tag: (photosBox.getAt(i) as PhotoModel).id,
-                        child: photosBox.getAt(i).isPhotoSVG()
-                            ? SvgPicture.network(photosBox.getAt(i).getImage())
-                            : CachedNetworkImage(
-                                imageUrl: photosBox.getAt(i).getImage(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                                fit: BoxFit.cover,
-                              ),
+            SliverPadding(
+              padding: const EdgeInsets.all(16.0),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (c, i) => Container(
+                    child: GestureDetector(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: Hero(
+                          tag: (photosBox.getAt(i) as PhotoModel).id,
+                          child: photosBox.getAt(i).isPhotoSVG()
+                              ? SvgPicture.network(photosBox.getAt(i).getImage())
+                              : CachedNetworkImage(
+                                  imageUrl: photosBox.getAt(i).getImage(),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
+                      onTap: () {
+                        _toScreenInfo(photosBox.getAt(i));
+                      },
                     ),
-                    onTap: () async {
-                      _toScreenInfo(photosBox.getAt(i));
-                    },
                   ),
+                  childCount: photosBox?.length ?? 0,
                 ),
-                childCount: photosBox?.length ?? 0,
-              ),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: orientation == Orientation.portrait ? 2 : 4,
-                childAspectRatio: 1,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2 ,
+                  childAspectRatio: 1,
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                ),
               ),
             ),
             SliverToBoxAdapter(
@@ -112,10 +109,8 @@ class _GalleryGridState extends State<GalleryGrid> {
               ),
             ),
           ],
-        ),
       );
-    });
-  }
+    }
 
   @override
   Widget build(BuildContext context) {

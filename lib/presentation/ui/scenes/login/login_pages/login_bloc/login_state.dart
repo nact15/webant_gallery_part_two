@@ -8,7 +8,6 @@ class LoginInitial extends LoginState {}
 class LoginData extends LoginState {
   final bool isLoading;
   final bool isLogin;
-  final UserModel user;
 
-  LoginData({this.user, this.isLoading, this.isLogin});
+  LoginData({this.isLoading, this.isLogin});
 }

@@ -6,3 +6,13 @@ abstract class UserState {}
 class UserInitial extends UserState {}
 
 class Exit extends UserState{}
+
+class LoadingUpdate extends UserState{}
+class UserData extends UserState{
+  final UserModel user;
+
+  UserData(this.user);
+
+}
+
+class ErrorUpdate extends UserState{}

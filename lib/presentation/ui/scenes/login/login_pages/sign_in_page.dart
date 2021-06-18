@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
@@ -9,7 +10,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/passwrod_text_fields.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/password_text_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
 
@@ -48,6 +49,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final node = FocusScope.of(context);
     return BlocConsumer<AuthorizationBloc, AuthorizationState>(
       listener: (context, state) {
         if (state is ErrorAuthorization) {
@@ -85,6 +87,7 @@ class _SignInPageState extends State<SignInPage> {
                     hint: AppStrings.hintName,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
+                    node: node,
                   ),
                 ),
                 Padding(
@@ -93,6 +96,8 @@ class _SignInPageState extends State<SignInPage> {
                     controller: passwordController,
                     hint: AppStrings.hintPassword,
                     typeField: typeTextField.PASSWORD_SIGH_IN,
+                    node: node,
+                    callBack: addLoginEvent,
                   ),
                 ),
                 Align(
@@ -124,7 +129,7 @@ class _SignInPageState extends State<SignInPage> {
                           primary:
                               buttonColor ? AppColors.mainColor : Colors.white,
                         ),
-                        onPressed: () => addLoginEvent(),
+                        onPressed: addLoginEvent,
                         child: signIn(),
                       ),
                     ),
@@ -140,9 +145,7 @@ class _SignInPageState extends State<SignInPage> {
                       child: TextButton(
                         style:
                             ButtonStyle(splashFactory: NoSplash.splashFactory),
-                        onPressed: () {
-                          signup();
-                        }, //to SignUpPage
+                        onPressed: signup, //to SignUpPage
                         child: Text(
                           AppStrings.signUp,
                           style: AppStyles.signUpButtonSecondary,
@@ -167,6 +170,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Widget signIn() {
+
     return BlocBuilder<AuthorizationBloc, AuthorizationState>(
         builder: (context, state) {
       if (state is LoadingAuthorization) {
@@ -181,9 +185,7 @@ class _SignInPageState extends State<SignInPage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => Gallery(
-                user: state.user,
-              ),
+              builder: (context) => Gallery(),
             ),
           );
         });

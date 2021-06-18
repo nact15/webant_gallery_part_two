@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_model.g.dart';
 
 @JsonSerializable()
-class UserModel {
+class UserModel extends ChangeNotifier{
 
   @JsonKey(name: 'id')
   int id;
@@ -38,7 +39,7 @@ class UserModel {
     this.roles,
   });
 
-  UserModel copyWith({
+  UserModel updateWith({
     int id,
     String email,
     bool enabled,
@@ -53,7 +54,12 @@ class UserModel {
       id: id ?? this.id,
       email: email ?? this.email,
       enabled: enabled ?? this.enabled,
-      phone:
+      phone: phone ?? this.phone,
+      password: password ?? this.password,
+      fullName: fullName ?? this.fullName,
+      username: username ?? this.username,
+      birthday: birthday ?? this.birthday,
+      roles: roles ?? this.roles,
     );
   }
 

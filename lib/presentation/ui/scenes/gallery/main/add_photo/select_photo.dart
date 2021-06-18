@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/add_photo/upload_photo.dart';
+
+import 'add_photo_bloc/add_photo_bloc.dart';
 
 class SelectPhoto extends StatefulWidget {
   const SelectPhoto({Key key}) : super(key: key);
@@ -107,7 +110,10 @@ class _SelectPhotoState extends State<SelectPhoto> {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => UploadPhoto(image: _image,),
+          builder: (BuildContext context) => BlocProvider<AddPhotoBloc>(
+            create: (BuildContext context) => AddPhotoBloc(),
+            child: UploadPhoto(image: _image,),
+          ),
         ),
       );
     }

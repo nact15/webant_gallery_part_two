@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:provider/provider.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/passwrod_text_fields.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/password_text_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/widget_app_bar.dart';
 
@@ -25,17 +25,13 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  UserModel userModel;
 
-  double heightTextForm = 36;
-  DateTime selectedDate = DateTime.now();
   TextEditingController nameController;
   TextEditingController birthdayController;
   TextEditingController emailController;
   TextEditingController passwordController;
   TextEditingController phoneController;
   TextEditingController confirmPasswordController;
-  ScrollController scrollController;
   bool buttonColor;
 
   @override
@@ -63,6 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final node = FocusScope.of(context);
     return BlocConsumer<AuthorizationBloc, AuthorizationState>(
       listener: (context, state) {
         if (state is ErrorAuthorization) {
@@ -80,13 +77,12 @@ class _SignUpPageState extends State<SignUpPage> {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: Scaffold(
           backgroundColor: AppColors.colorWhite,
-          resizeToAvoidBottomInset: true,
+          //resizeToAvoidBottomInset: true,
           appBar: AppBarSign(),
           body: Form(
             key: _formKey,
             child: ListView(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              controller: scrollController,
               physics: AlwaysScrollableScrollPhysics(),
               children: <Widget>[
                 Center(
@@ -99,55 +95,51 @@ class _SignUpPageState extends State<SignUpPage> {
                   //user name
                   padding: const EdgeInsets.only(top: 50),
                   child: TextFormFields(
-                    controller: nameController,
-                    hint: AppStrings.hintName,
-                    typeField: typeTextField.USERNAME,
-                    textInputType: TextInputType.name,
-                    scrollController: scrollController,
-                  ),
+                      controller: nameController,
+                      hint: AppStrings.hintName,
+                      typeField: typeTextField.USERNAME,
+                      textInputType: TextInputType.name,
+                      node: node),
                 ),
                 Padding(
                   //birthday
                   padding: const EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: birthdayController,
-                    hint: AppStrings.hintBirthday,
-                    typeField: typeTextField.BIRTHDAY,
-                    textInputType: TextInputType.number,
-                    textInputFormatter: <TextInputFormatter>[
-                      MaskTextInputFormatter(
-                          mask: (AppStrings.dateMask),
-                          filter: {"#": RegExp(r'[0-9]')})
-                    ],
-                    scrollController: scrollController,
-                  ),
+                      controller: birthdayController,
+                      hint: AppStrings.hintBirthday,
+                      typeField: typeTextField.BIRTHDAY,
+                      textInputType: TextInputType.number,
+                      textInputFormatter: <TextInputFormatter>[
+                        MaskTextInputFormatter(
+                            mask: (AppStrings.dateMask),
+                            filter: {"#": RegExp(r'[0-9]')})
+                      ],
+                      node: node),
                 ),
                 Padding(
                   //email
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: emailController,
-                    hint: AppStrings.hintEmail,
-                    typeField: typeTextField.EMAIL,
-                    textInputType: TextInputType.emailAddress,
-                    scrollController: scrollController,
-                  ),
+                      controller: emailController,
+                      hint: AppStrings.hintEmail,
+                      typeField: typeTextField.EMAIL,
+                      textInputType: TextInputType.emailAddress,
+                      node: node),
                 ),
                 Padding(
                   //phone
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: phoneController,
-                    hint: AppStrings.hintPhone,
-                    typeField: typeTextField.PHONE,
-                    textInputType: TextInputType.phone,
-                    textInputFormatter: <TextInputFormatter>[
-                      MaskTextInputFormatter(
-                          mask: (AppStrings.phoneMask),
-                          filter: {"#": RegExp(r'[0-9]')}),
-                    ],
-                    scrollController: scrollController,
-                  ),
+                      controller: phoneController,
+                      hint: AppStrings.hintPhone,
+                      typeField: typeTextField.PHONE,
+                      textInputType: TextInputType.phone,
+                      textInputFormatter: <TextInputFormatter>[
+                        MaskTextInputFormatter(
+                            mask: (AppStrings.phoneMask),
+                            filter: {"#": RegExp(r'[0-9]')}),
+                      ],
+                      node: node),
                 ),
                 Padding(
                   //password
@@ -156,6 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: passwordController,
                     hint: AppStrings.hintOldPassword,
                     typeField: typeTextField.PASSWORD,
+                    node: node,
                   ),
                 ),
                 Padding(
@@ -165,6 +158,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     controller: confirmPasswordController,
                     hint: AppStrings.hintConfirmPassword,
                     typeField: typeTextField.CONFIRM_PASSWORD,
+                    node: node,
+                    callBack: signUp,
                   ),
                 ),
                 Center(
@@ -182,7 +177,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           primary:
                               buttonColor ? AppColors.mainColor : Colors.white,
                         ),
-                        onPressed: () => addSignUpEvent(),
+                        onPressed: addSignUpEvent,
                         child: signUp(),
                       ),
                     ),
@@ -251,9 +246,7 @@ class _SignUpPageState extends State<SignUpPage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => Gallery(
-                user: state.user,
-              ),
+              builder: (context) => Gallery(),
             ),
           );
         });

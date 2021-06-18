@@ -14,6 +14,7 @@ class HttpOauthInterceptor extends Interceptor {
     String accessToken = await _storage.read(key: HttpStrings.userAccessToken);
     if (accessToken.isNotEmpty || accessToken != null) {
       options.headers = {HttpStrings.authorization: 'Bearer $accessToken'};
+      print(accessToken);
     }
     return handler.next(options);
   }

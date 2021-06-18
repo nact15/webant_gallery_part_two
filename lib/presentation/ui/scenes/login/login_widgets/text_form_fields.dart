@@ -16,7 +16,7 @@ class TextFormFields extends StatefulWidget {
       this.typeField,
       this.textInputType,
       this.textInputFormatter,
-      this.scrollController})
+      this.scrollController, this.node})
       : super(key: key);
   final TextEditingController controller;
   final ScrollController scrollController;
@@ -24,10 +24,11 @@ class TextFormFields extends StatefulWidget {
   final typeTextField typeField;
   final TextInputType textInputType;
   final List<TextInputFormatter> textInputFormatter;
+  final node;
 
   @override
   _TextFormFieldsState createState() => _TextFormFieldsState(controller, hint,
-      typeField, textInputType, textInputFormatter);
+      typeField, textInputType, textInputFormatter, node);
 }
 
 class _TextFormFieldsState extends State<TextFormFields> {
@@ -36,22 +37,22 @@ class _TextFormFieldsState extends State<TextFormFields> {
       this.hint,
       this.typeField,
       this.textInputType,
-      this.textInputFormatter);
+      this.textInputFormatter,
+      this.node);
 
   TextEditingController controller;
   String hint;
   typeTextField typeField;
   TextInputType textInputType;
+  var node;
   List<TextInputFormatter> textInputFormatter;
   double heightFields = 36.0;
   double widthButton = 120.0;
+  Validation validation = Validation();
 
   @override
   Widget build(BuildContext context) {
-    final node = FocusScope.of(context);
-    return SizedBox(
-      //height: heightFields,
-      child: TextFormField(
+    return TextFormField(
         cursorColor: AppColors.mainColorAccent,
         cursorHeight: 20,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -59,7 +60,6 @@ class _TextFormFieldsState extends State<TextFormFields> {
         keyboardType: textInputType,
         inputFormatters: textInputFormatter,
         decoration: InputDecoration(
-          //errorStyle: TextStyle(height: 0),
           contentPadding: EdgeInsets.all(6),
           focusedBorder: AppStyles.borderTextField.copyWith(
               borderSide: BorderSide(color: AppColors.decorationColor)),
@@ -85,10 +85,9 @@ class _TextFormFieldsState extends State<TextFormFields> {
           prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
           suffixIcon: IconsFields(typeField: typeField),
         ),
-        validator: (value) => Validation().selectValidator(value: value, typeField: typeField),
+        validator: (value) => validation.selectValidator(value: value, typeField: typeField),
         textInputAction: TextInputAction.next,
         onEditingComplete: () => node.nextFocus(),
-      ),
     );
   }
 }

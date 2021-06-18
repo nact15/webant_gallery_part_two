@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
@@ -7,7 +6,6 @@ class Validation {
 
   DateTime toDate(String birthday) {
     DateTime date = DateFormat("dd.MM.yyyy").parseLoose(birthday);
-    print(date);
     return date;
   }
   String confirmPassword;
@@ -42,18 +40,15 @@ class Validation {
         return null;
         break;
       case typeTextField.CONFIRM_PASSWORD:
-        if (value == null || value.isEmpty) {
-          return AppStrings.confirmPassword;
-        } else if (value != confirmPassword) {
-          print(confirmPassword);
-          return AppStrings.passwordMatch;
-        }
-        return null;
+      //   if (value == null || value.isEmpty) {
+      //     return AppStrings.confirmPassword;
+      //   } else if (value != confirmPassword) {
+      //     return AppStrings.passwordMatch;
+      //   }
+      return null;
+      break;
       case typeTextField.BIRTHDAY:
         try {
-          if (value.length < 10){
-            return AppStrings.hintBirthday;
-          }
           if (value.length == 10) {
             DateTime birthday = toDate(value);
             DateTime today = DateTime.now();

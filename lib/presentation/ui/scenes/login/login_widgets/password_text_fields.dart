@@ -10,15 +10,19 @@ class PasswordTextFields extends StatefulWidget {
       {Key key,
       this.typeField,
       this.controller,
-      this.hint,})
+      this.hint,
+      this.node,
+      this.callBack})
       : super(key: key);
   final typeTextField typeField;
   final TextEditingController controller;
   final String hint;
+  final node;
+  final VoidCallback callBack;
 
   @override
   _PasswordTextFieldsState createState() =>
-      _PasswordTextFieldsState(typeField, controller, hint);
+      _PasswordTextFieldsState(typeField, controller, hint, node, callBack);
 }
 
 class _PasswordTextFieldsState extends State<PasswordTextFields> {
@@ -27,29 +31,29 @@ class _PasswordTextFieldsState extends State<PasswordTextFields> {
   TextEditingController controller;
   String hint;
   String confirmPassword;
+  var node;
+  VoidCallback callBack;
+  Validation validation;
 
   _PasswordTextFieldsState(
-      this.typeField, this.controller, this.hint,);
+      this.typeField, this.controller, this.hint, this.node, this.callBack);
 
   @override
   void initState() {
     _passwordVisible = false;
+    validation = Validation();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final node = FocusScope.of(context);
-    return SizedBox(
-      //height: heightFields,
-      child: TextFormField(
+    return TextFormField(
         cursorColor: AppColors.mainColorAccent,
         cursorHeight: 20,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
         keyboardType: TextInputType.visiblePassword,
         decoration: InputDecoration(
-          //errorStyle: TextStyle(height: 0),
           contentPadding: EdgeInsets.all(6),
           focusedBorder: AppStyles.borderTextField.copyWith(
               borderSide: BorderSide(color: AppColors.decorationColor)),
@@ -64,29 +68,32 @@ class _PasswordTextFieldsState extends State<PasswordTextFields> {
           hintStyle: TextStyle(
             color: AppColors.mainColorAccent,
           ),
-          suffixIcon: IconButton(
-              icon: _passwordVisible
-                  ? Icon(Icons.visibility)
-                  : Icon(Icons.visibility_off), //hide password
+          suffixIcon: GestureDetector(
+            onTap: () => setState(() => _passwordVisible = !_passwordVisible),
+            child: Icon(
+              _passwordVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off, //hide password
               color: AppColors.mainColorAccent,
-              padding: EdgeInsets.all(6.0),
-              onPressed: () {
-                setState(
-                  () {
-                    _passwordVisible = !_passwordVisible;
-                  },
-                );
-              }),
+            ),
+          ),
         ),
         obscureText: !_passwordVisible,
         obscuringCharacter: '*',
-        validator: (value) => Validation().selectValidator(
+        validator: (value) => validation.selectValidator(
             value: value,
             typeField: typeField,
             confirmPassword: confirmPassword),
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () => node.nextFocus(),
-      ),
+        textInputAction: typeField == typeTextField.PASSWORD ? TextInputAction.next : TextInputAction.go,
+        onEditingComplete: () {
+          if (typeField == typeTextField.PASSWORD) {
+            node.unfocus();
+          }
+          else{
+            callBack();
+            node.unfocus();
+          }
+        },
     );
   }
 }

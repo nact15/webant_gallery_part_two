@@ -56,8 +56,8 @@ class EnterPage extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (BuildContext context) => BlocProvider<AuthorizationBloc>(
-                  create: (BuildContext context) => AuthorizationBloc(),
+                builder: (_) => BlocProvider<AuthorizationBloc>(
+                  create: (_) => AuthorizationBloc(),
                   child: page,
                 ),
               ),

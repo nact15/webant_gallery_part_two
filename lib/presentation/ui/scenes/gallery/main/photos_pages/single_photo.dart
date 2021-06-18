@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 
+import '../gallery.dart';
+
 class ScreenInfo extends StatelessWidget {
   const ScreenInfo({Key key, this.photo}) : super(key: key);
   final PhotoModel photo;
@@ -12,25 +14,21 @@ class ScreenInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
               icon: const Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.push(context, MaterialPageRoute(
+                builder: (context) => Gallery(),
+              )),
               color: AppColors.mainColor,
               iconSize: 17,
             );
           },
         ),
         backgroundColor: AppColors.colorWhite,
-        title: Text(
-          '#' + photo.id.toString() ?? 000,
-          style: TextStyle(color: AppColors.mainColor),
-          textAlign: TextAlign.left,
-        ),
       ),
       body: Column(
         children: <Widget>[
@@ -43,7 +41,7 @@ class ScreenInfo extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Text(
-                photo.name ?? ' ', //и тут
+                photo.name ?? '', //и тут
                 style:
                     TextStyle(fontSize: 26, color: AppColors.decorationColor),
               ),

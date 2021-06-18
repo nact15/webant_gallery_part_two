@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/authorization_bloc/authorization_bloc.dart';
@@ -10,6 +12,8 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages
 
 import 'domain/models/photos_model/image_model.dart';
 import 'domain/models/photos_model/photo_model.dart';
+
+GetIt getIt = GetIt.instance;
 
 Future<void> main() async {
   var path = Directory.systemTemp.path;
@@ -23,7 +27,7 @@ Future<void> main() async {
     runApp(MultiBlocProvider(
       providers: [
         BlocProvider(create: (BuildContext context) => LoginBloc(HttpOauthGateway())..add(LoginFetch())),
-        BlocProvider(create: (BuildContext context) => AuthorizationBloc())
+        BlocProvider(create: (BuildContext context) => AuthorizationBloc()),
         ],
         child: WelcomeScreen()));
     }, (error, stackTrace) {});

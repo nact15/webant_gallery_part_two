@@ -4,5 +4,6 @@ abstract class PhotoGateway<T> {
 
   String enumToString();
 
-  Future<BaseModel<T>> fetchPhotos(int page);
+  Future<BaseModel<T>> fetchPhotos({int page, String queryText});
+
 }

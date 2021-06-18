@@ -4,9 +4,10 @@ part of 'user_bloc.dart';
 abstract class UserEvent {}
 
 class LogOut extends UserEvent {}
+
 class UpdateUser extends UserEvent{
-  final UserModel userModel;
+  final UserModel user;
 
-  UpdateUser(this.userModel);
-
+  UpdateUser({this.user});
 }
+class UserFetch extends UserEvent{}

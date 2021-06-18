@@ -10,25 +10,24 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_bloc/user_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/widgets/back_widget.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_pages/enter_page.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/login_widgets/text_form_fields.dart';
 
+import '../../../../../../main.dart';
 import 'alert_log_out_dialog.dart';
 
 class UserSettings extends StatefulWidget {
-  const UserSettings({Key key, this.user}) : super(key: key);
-  final UserModel user;
+  const UserSettings({Key key}) : super(key: key);
 
   @override
-  _UserSettingsState createState() => _UserSettingsState(user);
+  _UserSettingsState createState() => _UserSettingsState();
 }
 
 class _UserSettingsState extends State<UserSettings> {
-  _UserSettingsState(this.user);
+  _UserSettingsState();
 
-  UserModel user;
   final _formKey = GlobalKey<FormState>();
   File _image;
   final picker = ImagePicker();
@@ -37,14 +36,22 @@ class _UserSettingsState extends State<UserSettings> {
   TextEditingController _birthdayController;
   TextEditingController _emailController;
   String name;
+  UserModel user = getIt.get<UserModel>();
 
   @override
   void initState() {
     _nameController = TextEditingController(text: user.username);
-    _birthdayController = TextEditingController(text: toDate(user.birthday));
+    _birthdayController = TextEditingController(text: user.birthday);
     _emailController = TextEditingController(text: user.email);
+    getIt
+        .isReady<UserModel>()
+        .then((_) => getIt<UserModel>().addListener(update));
     super.initState();
   }
+
+  void update() => setState(() => {
+    user.username = _nameController.text,
+      });
 
   @override
   void dispose() {
@@ -83,6 +90,20 @@ class _UserSettingsState extends State<UserSettings> {
                 MaterialPageRoute(builder: (context) => EnterPage()),
                 (Route<dynamic> route) => false);
           });
+          if (state is LoadingUpdate) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is ErrorUpdate) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(AppStrings.error),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 1),
+              ),
+            );
+          }
         }
         return Scaffold(
           resizeToAvoidBottomInset: true,
@@ -91,20 +112,13 @@ class _UserSettingsState extends State<UserSettings> {
             leadingWidth: 75,
             backgroundColor: AppColors.colorWhite,
             elevation: 1,
-            leading: TextButton(
-              child: AppStyles.textCancel,
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+            leading: BackWidget(),
             actions: [
               TextButton(
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
-                    user = UserModel(
-                        username: _nameController.text,
-                        birthday: _birthdayController.text,
-                        email: _emailController.text);
-                    print(user.toJson());
-                    //context.read<UserBloc>().add(UpdateUser(user));
+                    update();
+                    //context.read<UserBloc>().add(UpdateUser(user: user));
                   }
                 },
                 child: Text(
@@ -223,7 +237,7 @@ class _UserSettingsState extends State<UserSettings> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Password',
+                      AppStrings.hintPassword,
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
