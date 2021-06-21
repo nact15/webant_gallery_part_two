@@ -5,9 +5,9 @@ import 'package:webant_gallery_part_two/data/repositories/http_search_photo.dart
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/add_photo/select_photo.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/search_photo/search_photo_bloc/search_photo_bloc.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/user_info/user_page.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/select_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_page.dart';
 
 import 'new_or_popular_photos.dart';
 

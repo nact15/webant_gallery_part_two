@@ -34,7 +34,9 @@ class AppStrings{
   static const String name = 'name';
   static const String refreshToken = 'refresh_token';
   static const String accessToken = 'access_token';
-  static const String phoneMask = ' (###) ###-##-##';
+  static const String phoneMask = '(###) ###-##-##';
   static const String dateMask = '##.##.####';
   static const String loading = 'loading...';
+  static const String noInternet = 'No internet';
+  static const String roleUser = 'ROLE_USER';
 }

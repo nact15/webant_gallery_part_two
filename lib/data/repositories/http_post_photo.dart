@@ -9,29 +9,42 @@ import 'http_oauth_interceptor.dart';
 
 class HttpPostPhoto extends PostPhotoGateway {
   final Dio dio = Dio()
-    ..interceptors.add(LogInterceptor(
-        responseBody: true,));
+    ..interceptors.add(
+      LogInterceptor(
+        responseBody: true,
+      ),
+    )
+    ..options.baseUrl = 'http://gallery.dev.webant.ru/api';
 
   @override
-  Future<PhotoModel> postPhoto({File file, String name, String description}) async {
+  Future<PhotoModel> postPhoto(
+      {File file, String name, String description}) async {
     dio.interceptors.add(HttpOauthInterceptor(dio));
     String fileName = file.path.split('/').last;
     FormData formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(file.path, filename: fileName),
     });
-    Response response = await dio
-        .post('http://gallery.dev.webant.ru/api/media_objects', data: formData);
+    Response response = await dio.post('/media_objects', data: formData);
     var mediaObject = ImageModel.fromJson(response.data);
     String date = DateTime.now().toString();
-    Response photo =
-        await dio.post('http://gallery.dev.webant.ru/api/photos', data: {
+    Response photo = await dio.post('/photos', data: {
       'name': name,
       'dateCreate': date,
       'description': description,
       'new': true,
       'popular': false,
-          'image': 'api/media_objects/${mediaObject.id}'
+      'image': 'api/media_objects/${mediaObject.id}'
     });
     return PhotoModel.fromJson(photo.data);
+  }
+
+  @override
+  Future<void> deletePhoto(PhotoModel photo) async {
+    try{
+      await dio.delete('/photos/${photo.id}');
+      //await dio.delete('/media_objects/${photo.image.id}');
+    } catch (e) {
+      rethrow;
+    }
   }
 }

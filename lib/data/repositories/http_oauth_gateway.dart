@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as Storage;
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_interceptor.dart';
 import 'package:webant_gallery_part_two/domain/models/oauth/oauth_model.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/oauth_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
@@ -18,7 +18,8 @@ class HttpOauthGateway extends OauthGateway {
       requestBody: true,
       responseHeader: true,
       requestHeader: true,
-      request: true
+      request: true,
+      error: true
     ));
 
   UserModel userModel;
@@ -27,7 +28,6 @@ class HttpOauthGateway extends OauthGateway {
   @override
   // ignore: missing_return
   Future<UserModel> authorization(String username, String password) async {
-    try {
       Response client = await dio.post(HttpStrings.urlClients, data: {
         AppStrings.name: username,
         HttpStrings.allowedGrantTypes: [
@@ -60,9 +60,6 @@ class HttpOauthGateway extends OauthGateway {
           return userModel;
         }
       }
-    } catch (e) {
-      rethrow;
-    }
   }
 
   @override

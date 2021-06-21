@@ -1,4 +1,4 @@
-import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 
 abstract class UserGateway{
   Future<void> registration (UserModel userModel);

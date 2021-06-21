@@ -1,38 +1,48 @@
 import 'package:dio/dio.dart';
-import 'package:webant_gallery_part_two/domain/models/registration/user_model.dart';
+import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 
-class HttpRegistrationGateway extends UserGateway{
-  HttpRegistrationGateway();
+import 'http_oauth_interceptor.dart';
 
-  Dio dio = Dio()..interceptors.add(LogInterceptor(
-    responseBody: true,requestBody: true, error: true
-  ));
- @override
+class HttpUserGateway extends UserGateway {
+  HttpUserGateway();
+
+  Dio dio = Dio()
+    ..interceptors.add(LogInterceptor(
+        responseBody: true,
+        requestBody: true,
+        responseHeader: true,
+        requestHeader: true,
+        request: true,
+        error: true))
+    ..options.baseUrl = HttpStrings.baseUrl;
+
+  @override
   Future<void> registration(UserModel userModel) async {
-    try {
-      await dio.post(HttpStrings.urlUsers, data: userModel.toJson());
-    } catch (e) {
-      rethrow;
+    await dio.post('/users', data: userModel.toJson());
+  }
+
+  @override
+  Future<void> updateUser(UserModel userModel) async {
+    dio.interceptors.add(HttpOauthInterceptor(dio));
+    await dio.put('/users/${userModel.id}', data: {
+      'username': userModel.username,
+      'email': userModel.email,
+      'birthday': userModel.birthday,
+    });
+  }
+
+  @override
+  Future<void> deleteUser(UserModel userModel) async {
+    dio.interceptors.add(HttpOauthInterceptor(dio));
+    await dio.delete('/users/${userModel.id}');
+  }
+
+  @override
+  Future<void> updatePasswordUser(UserModel userModel) async {
+    try {} on DioError catch (e) {
+      throw e.response.data;
     }
-  }
-
-  @override
-  Future<void> deleteUser(UserModel userModel) {
-    // TODO: implement deleteUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> updatePasswordUser(UserModel userModel) {
-    // TODO: implement updatePasswordUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> updateUser(UserModel userModel) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
   }
 }

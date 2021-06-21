@@ -17,4 +17,5 @@ class HttpStrings{
   static const String userRefreshToken = 'USER_REFRESH_TOKEN';
   static const String userId = 'USER_ID';
   static const String userSecret = 'USER_SECRET';
+  static const String baseUrl = 'http://gallery.dev.webant.ru/api';
 }
