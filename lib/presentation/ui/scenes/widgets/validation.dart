@@ -15,7 +15,7 @@ class Validation {
       {String value, typeTextField typeField, String confirmPassword}) {
     switch (typeField) {
       case typeTextField.USERNAME:
-        if (value == null || value.isEmpty || value.length < 3) {
+        if (value == null || value.isEmpty) {
           return AppStrings.emptyName;
         }
         return null;

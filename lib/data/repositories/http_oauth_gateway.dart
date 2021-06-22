@@ -13,14 +13,8 @@ class HttpOauthGateway extends OauthGateway {
   final _storage = Storage.FlutterSecureStorage();
 
   final Dio dio = Dio()
-    ..interceptors.add(LogInterceptor(
-      responseBody: true,
-      requestBody: true,
-      responseHeader: true,
-      requestHeader: true,
-      request: true,
-      error: true
-    ));
+    ..interceptors.add(
+        LogInterceptor(responseBody: true, requestBody: true, error: true));
 
   UserModel userModel;
   OauthModel oauthModel;
@@ -28,43 +22,47 @@ class HttpOauthGateway extends OauthGateway {
   @override
   // ignore: missing_return
   Future<UserModel> authorization(String username, String password) async {
-      Response client = await dio.post(HttpStrings.urlClients, data: {
-        AppStrings.name: username,
-        HttpStrings.allowedGrantTypes: [
-          HttpStrings.password,
-          AppStrings.refreshToken
-        ]
-      });
-      if (client.statusCode == 201) {
-        oauthModel = OauthModel.fromJson(client.data);
-        final Map<String, dynamic> queryParameters = <String, dynamic>{
-          HttpStrings.clientId: '${oauthModel.id}_${oauthModel.randomId}',
-          HttpStrings.grantType: HttpStrings.password,
-          HttpStrings.username: username,
-          HttpStrings.password: password,
-          HttpStrings.clientSecret: oauthModel.secret,
-        };
-        var getToken = await dio.get(HttpStrings.tokenEndpoint,
-            queryParameters: queryParameters);
-        if (getToken.statusCode == 200) {
-          String accessToken = getToken.data[AppStrings.accessToken];
-          String refreshToken = getToken.data[AppStrings.refreshToken];
-          String secret = oauthModel.secret;
-          String id = '${oauthModel.id}_${oauthModel.randomId}';
-          _writeTokens(
-              accessToken: accessToken,
-              refreshToken: refreshToken,
-              id: id,
-              secret: secret);
-          userModel = await getUser();
-          return userModel;
-        }
+    dio
+      ..interceptors.clear()
+      ..interceptors.add(
+          LogInterceptor(responseBody: true, requestBody: true, error: true));
+    Response client = await dio.post(HttpStrings.urlClients, data: {
+      AppStrings.name: username,
+      HttpStrings.allowedGrantTypes: [
+        HttpStrings.password,
+        AppStrings.refreshToken
+      ]
+    });
+    if (client.statusCode == 201) {
+      oauthModel = OauthModel.fromJson(client.data);
+      final Map<String, dynamic> queryParameters = <String, dynamic>{
+        HttpStrings.clientId: '${oauthModel.id}_${oauthModel.randomId}',
+        HttpStrings.grantType: HttpStrings.password,
+        HttpStrings.username: username,
+        HttpStrings.password: password,
+        HttpStrings.clientSecret: oauthModel.secret,
+      };
+      var getToken = await dio.get(HttpStrings.tokenEndpoint,
+          queryParameters: queryParameters);
+      if (getToken.statusCode == 200) {
+        String accessToken = getToken.data[AppStrings.accessToken];
+        String refreshToken = getToken.data[AppStrings.refreshToken];
+        String secret = oauthModel.secret;
+        String id = '${oauthModel.id}_${oauthModel.randomId}';
+        _writeTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            id: id,
+            secret: secret);
+        userModel = await getUser();
+        return userModel;
       }
+    }
   }
 
   @override
   Future<UserModel> getUser() async {
-    dio.interceptors.add(HttpOauthInterceptor(dio));
+    dio.interceptors.add(HttpOauthInterceptor(dio, this));
     var user = await dio.get(HttpStrings.currentUser);
     userModel = UserModel.fromJson(user.data);
     return userModel;

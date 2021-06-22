@@ -9,10 +9,10 @@ import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart'
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/validation.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/widget_app_bar.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/password_inputs.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/user_text_fields.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/validation.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/widget_app_bar.dart';
 
 import 'authorization_bloc/authorization_bloc.dart';
 import 'sign_in_page.dart';
@@ -227,7 +227,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void addSignUpEvent() {
     if (_formKey.currentState.validate()) {
       context.read<AuthorizationBloc>().add(
-            AuthorizationSignUpEvent(
+            SignUpEvent(
               name: nameController.text,
               password: passwordController.text,
               email: emailController.text,

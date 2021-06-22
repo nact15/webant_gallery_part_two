@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/validation.dart';
 
 class PasswordInputs extends StatefulWidget {
   const PasswordInputs(

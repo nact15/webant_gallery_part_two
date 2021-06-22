@@ -14,7 +14,6 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       theme: ThemeData(
         accentColor: AppColors.colorGreyAccent,
@@ -31,11 +30,14 @@ class WelcomeScreen extends StatelessWidget {
             if (state.isLogin) {
               return Gallery();
             }
-            if (!state.isLogin){
+            if (!state.isLogin) {
               return EnterPage();
             }
           }
-         return Container();
+          if (state is AuthorizationInitial) {
+            return EnterPage();
+          }
+          return Container();
         },
       ),
     );

@@ -13,8 +13,9 @@ class UpdateUser extends UserEvent{
 class UpdatePassword extends UserEvent{
   final String oldPassword;
   final String newPassword;
+  final UserModel user;
 
-  UpdatePassword(this.oldPassword, this.newPassword);
+  UpdatePassword(this.user, this.oldPassword, this.newPassword);
 
 }
 class UserFetch extends UserEvent{}

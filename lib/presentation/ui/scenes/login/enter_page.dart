@@ -11,7 +11,6 @@ enum typePasswordField { OLD_PASSWORD, NEW_PASSWORD, CONFIRM_PASSWORD }
 class EnterPage extends StatelessWidget {
   const EnterPage({Key key}) : super(key: key);
   final double heightButton = 36;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

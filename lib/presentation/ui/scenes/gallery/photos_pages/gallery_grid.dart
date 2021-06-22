@@ -65,7 +65,7 @@ class _GalleryGridState extends State<GalleryGrid> {
               (c, i) => Container(
                     child: GestureDetector(
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
+                          borderRadius: BorderRadius.circular(10.0),
                           child: Hero(
                             tag: (photosBox.getAt(i) as PhotoModel).id,
                             child: photosBox.getAt(i).isPhotoSVG()
@@ -92,8 +92,8 @@ class _GalleryGridState extends State<GalleryGrid> {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 1,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: 9,
+              crossAxisSpacing: 9,
             ),
           ),
         ),

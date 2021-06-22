@@ -2,20 +2,20 @@ part of 'authorization_bloc.dart';
 
 @immutable
 abstract class AuthorizationEvent {}
-class AuthorizationSignInEvent extends AuthorizationEvent{
+class SignInEvent extends AuthorizationEvent{
   final String name;
   final String password;
 
-  AuthorizationSignInEvent(this.name, this.password);
+  SignInEvent(this.name, this.password);
 }
-class AuthorizationSignUpEvent extends AuthorizationEvent{
+class SignUpEvent extends AuthorizationEvent{
   final String name;
   final String password;
   final String birthday;
   final String phone;
   final String email;
 
-  AuthorizationSignUpEvent(
+  SignUpEvent(
       {this.name, this.password, this.birthday, this.phone, this.email});
 }
 class LoginFetch extends AuthorizationEvent{}

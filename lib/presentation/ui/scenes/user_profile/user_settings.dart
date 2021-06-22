@@ -8,17 +8,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/sign_out_dialog.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/update_validation.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/back_widget.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/password_inputs.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/user_text_fields.dart';
 
@@ -95,60 +93,71 @@ class _UserSettingsState extends State<UserSettings> {
   @override
   Widget build(BuildContext context) {
     final node = FocusScope.of(context);
-    return BlocBuilder<UserBloc, UserState>(
-      builder: (context, state) {
-        if (state is Exit) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: AppColors.colorWhite,
+      appBar: AppBar(
+        leadingWidth: 75,
+        backgroundColor: AppColors.colorWhite,
+        elevation: 1,
+        leading: BackWidget(),
+        actions: [
+          TextButton(
+            onPressed: () => updateUser(),
+            child: Text(
+              'Save',
+              style: TextStyle(
+                  color: AppColors.decorationColor,
+                  fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+      body: BlocConsumer<UserBloc, UserState>(
+        listener: (context, state) {
+          if (state is UserData) {
+            if (state.isUpdate) {
+              Fluttertoast.showToast(
+                  msg: 'User profile has been updated',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: AppColors.mainColorAccent,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+          }
+          if (state is Exit) {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => EnterPage()),
                 (Route<dynamic> route) => false);
-          });
-        }
-        if (state is LoadingUpdate) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (state is ErrorUpdate) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppStrings.error),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        if (state is UserUpdate) {
-          Fluttertoast.showToast(
-              msg: 'User profile has been updated',
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: AppColors.mainColorAccent,
-              textColor: Colors.white,
-              fontSize: 16.0);
-        }
-        if (state is UserData) {
-          user = state.user;
-          return Scaffold(
-            resizeToAvoidBottomInset: true,
-            backgroundColor: AppColors.colorWhite,
-            appBar: AppBar(
-              leadingWidth: 75,
-              backgroundColor: AppColors.colorWhite,
-              elevation: 1,
-              leading: BackWidget(),
-              actions: [
-                TextButton(
-                  onPressed: () => updateUser(),
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                        color: AppColors.decorationColor,
-                        fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ],
-            ),
-            body: Form(
+          }
+          if (state is ErrorUpdate) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.err),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is LoadingUpdate) {
+            return Center(
+              child: LoadingCircular(),
+            );
+          }
+          if (state is UserUpdate) {
+            Fluttertoast.showToast(
+                msg: 'User profile has been updated',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                backgroundColor: AppColors.mainColorAccent,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          }
+          if (state is UserData) {
+            user = state.user;
+            return Form(
               key: _formKey,
               child: ListView(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -327,17 +336,17 @@ class _UserSettingsState extends State<UserSettings> {
                   ),
                 ],
               ),
-            ),
-          );
-        }
-        return Container();
-      },
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 
   void updateUser() {
     if (_formKey.currentState.validate()) {
-      user.copyWith(
+      user = user.copyWith(
           email: _emailController.text,
           username: _nameController.text,
           birthday: _birthdayController.text);
@@ -345,7 +354,7 @@ class _UserSettingsState extends State<UserSettings> {
       if (_oldPasswordController.text.isNotEmpty &&
           _newPasswordController.text.isNotEmpty) {
         context.read<UserBloc>().add(UpdatePassword(
-            _oldPasswordController.text, _newPasswordController.text));
+            user, _oldPasswordController.text, _newPasswordController.text));
       }
     }
   }

@@ -5,6 +5,7 @@ import 'package:webant_gallery_part_two/domain/models/photos_model/image_model.d
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/post_photo_gateway.dart';
 
+import 'http_oauth_gateway.dart';
 import 'http_oauth_interceptor.dart';
 
 class HttpPostPhoto extends PostPhotoGateway {
@@ -19,7 +20,8 @@ class HttpPostPhoto extends PostPhotoGateway {
   @override
   Future<PhotoModel> postPhoto(
       {File file, String name, String description}) async {
-    dio.interceptors.add(HttpOauthInterceptor(dio));
+    //dio.interceptors.clear();
+    dio.interceptors.add(HttpOauthInterceptor(dio, HttpOauthGateway()));
     String fileName = file.path.split('/').last;
     FormData formData = FormData.fromMap({
       'file': await MultipartFile.fromFile(file.path, filename: fileName),

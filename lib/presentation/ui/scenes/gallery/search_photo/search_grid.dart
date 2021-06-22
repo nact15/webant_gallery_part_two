@@ -68,7 +68,7 @@ class _SearchGridState extends State<SearchGrid> {
                 (c, i) => Container(
                   child: GestureDetector(
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15.0),
+                      borderRadius: BorderRadius.circular(10.0),
                       child: Hero(
                         tag: photos[i].id,
                         child: photos[i].isPhotoSVG()

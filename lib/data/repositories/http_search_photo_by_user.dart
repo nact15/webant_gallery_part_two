@@ -6,7 +6,7 @@ import 'package:webant_gallery_part_two/domain/repositories/search_photo_gateway
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 
 
-class HttpSearchPhotoGateway extends SearchPhotoGateway<PhotoModel> {
+class HttpSearchPhotoByUserGateway extends SearchPhotoGateway<PhotoModel> {
 
   Dio dio = Dio()..interceptors.add(LogInterceptor(
     responseBody: true,));
@@ -17,9 +17,7 @@ class HttpSearchPhotoGateway extends SearchPhotoGateway<PhotoModel> {
     try {
       final String url = HttpStrings.urlPhotos;
       final Map<String, dynamic> queryParameters = <String, dynamic>{
-        'name': queryText,
-        'limit': 10,
-        'page': page
+        'user.id': queryText,
       };
       Response response = await dio.get(url, queryParameters: queryParameters);
       final statusCode = response.statusCode;

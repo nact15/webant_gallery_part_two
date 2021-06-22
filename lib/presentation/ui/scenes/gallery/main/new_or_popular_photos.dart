@@ -8,7 +8,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart'
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_bloc/gallery_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_grid.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_bar.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_grid.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 
 class NewOrPopularPhotos extends StatefulWidget {
@@ -24,6 +24,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
   TextEditingController searchController;
   bool _search;
   String queryText;
+  SearchPhotoBloc searchPhotoBloc;
 
   @override
   void initState() {
