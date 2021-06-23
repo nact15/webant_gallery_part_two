@@ -48,7 +48,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
     _descriptionController.dispose();
     super.dispose();
   }
-
+  //TODO: edit photo
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

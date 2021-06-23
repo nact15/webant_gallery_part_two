@@ -67,26 +67,25 @@ class _SearchGridState extends State<SearchGrid> {
               delegate: SliverChildBuilderDelegate(
                 (c, i) => Container(
                   child: GestureDetector(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Hero(
-                        tag: photos[i].id,
-                        child: photos[i].isPhotoSVG()
-                            ? SvgPicture.network(photos[i].getImage())
-                            : CachedNetworkImage(
-                                imageUrl: photos[i].getImage(),
-                                fit: BoxFit.cover,
-                              ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Hero(
+                          tag: photos[i].id,
+                          child: photos[i].isPhotoSVG()
+                              ? SvgPicture.network(photos[i].getImage())
+                              : CachedNetworkImage(
+                                  imageUrl: photos[i].getImage(),
+                                  fit: BoxFit.cover,
+                                ),
+                        ),
                       ),
-                    ),
-                    onTap: () => _toScreenInfo(photos[i]),
+                      onTap: () => _toScreenInfo(photos[i]),
                       onLongPress: () {
                         showCupertinoModalPopup(
                             context: context,
                             builder: (BuildContext context) =>
                                 PhotoBottomSheet(photo: photos[i]));
-                      }
-                  ),
+                      }),
                 ),
                 childCount: photos.length,
               ),

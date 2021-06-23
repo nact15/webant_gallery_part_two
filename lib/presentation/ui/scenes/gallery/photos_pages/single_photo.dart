@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/photo_bottom_sheet.dart';
 
 class ScreenInfo extends StatelessWidget {
   const ScreenInfo({Key key, this.photo}) : super(key: key);
@@ -11,11 +12,7 @@ class ScreenInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      // WillPopScope(
-      // onWillPop:() async => false,
-      // child:
-      Scaffold(
+    return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           leading: Builder(
@@ -35,9 +32,17 @@ class ScreenInfo extends StatelessWidget {
         ),
         body: Column(
           children: <Widget>[
-            Hero(
-              tag: photo.id,
-              child: selectPhoto(),
+            GestureDetector(
+              child: Hero(
+                tag: photo.id,
+                child: selectPhoto(),
+              ),
+                onLongPress: () {
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          PhotoBottomSheet(photo: photo));
+                }
             ),
             Align(
               alignment: Alignment.centerLeft,

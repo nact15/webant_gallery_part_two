@@ -49,4 +49,10 @@ class HttpPostPhoto extends PostPhotoGateway {
       rethrow;
     }
   }
+
+  @override
+  Future<void> editPhoto(PhotoModel photo, String name, String description) async {
+    // TODO: implement editPhoto
+    throw UnimplementedError();
+  }
 }
