@@ -1,3 +1,5 @@
+import 'package:alice/alice.dart';
+import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as Storage;
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_interceptor.dart';
@@ -6,15 +8,16 @@ import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/oauth_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 
 class HttpOauthGateway extends OauthGateway {
   HttpOauthGateway();
 
   final _storage = Storage.FlutterSecureStorage();
-
   final Dio dio = Dio()
-    ..interceptors.add(
-        LogInterceptor(responseBody: true, requestBody: true, error: true));
+    ..interceptors
+        .add(LogInterceptor(responseBody: true, requestBody: true, error: true))
+    ..interceptors.add(alice.getDioInterceptor());
 
   UserModel userModel;
   OauthModel oauthModel;
@@ -25,7 +28,8 @@ class HttpOauthGateway extends OauthGateway {
     dio
       ..interceptors.clear()
       ..interceptors.add(
-          LogInterceptor(responseBody: true, requestBody: true, error: true));
+          LogInterceptor(responseBody: true, requestBody: true, error: true))
+      ..interceptors.add(alice.getDioInterceptor());
     Response client = await dio.post(HttpStrings.urlClients, data: {
       AppStrings.name: username,
       HttpStrings.allowedGrantTypes: [
@@ -62,7 +66,7 @@ class HttpOauthGateway extends OauthGateway {
 
   @override
   Future<UserModel> getUser() async {
-    dio.interceptors.add(HttpOauthInterceptor(dio, this));
+    dio.interceptors..add(HttpOauthInterceptor(dio, this));
     var user = await dio.get(HttpStrings.currentUser);
     userModel = UserModel.fromJson(user.data);
     return userModel;

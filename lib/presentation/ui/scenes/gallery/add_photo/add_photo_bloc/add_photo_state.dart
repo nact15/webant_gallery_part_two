@@ -4,13 +4,13 @@ part of 'add_photo_bloc.dart';
 abstract class AddPhotoState {}
 
 class AddPhotoInitial extends AddPhotoState {}
-class ErrorPostPhoto extends AddPhotoState{}
-class LoadingPostPhoto extends AddPhotoState{}
-class CompletePost extends AddPhotoState{
-  final PhotoModel photo;
+class ErrorPostPhoto extends AddPhotoState{
+  final String err;
 
-  CompletePost(this.photo);
+  ErrorPostPhoto(this.err);
 }
+class LoadingPostPhoto extends AddPhotoState{}
+class CompletePost extends AddPhotoState{}
 class DeletePhoto extends AddPhotoState{
   final int index;
 

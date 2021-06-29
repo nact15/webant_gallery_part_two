@@ -50,7 +50,7 @@ class _GalleryState extends State<Gallery> {
                 SearchPhotoBloc<PhotoModel>(HttpSearchPhotoGateway()),
             child: NewOrPopularPhotos()),
         SelectPhoto(),
-        UserPage(),
+         UserPage(),
       ],
     );
   }

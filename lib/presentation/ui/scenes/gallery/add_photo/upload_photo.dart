@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
@@ -13,18 +14,20 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_c
 import 'add_photo_bloc/add_photo_bloc.dart';
 
 class UploadPhoto extends StatefulWidget {
-  const UploadPhoto({Key key, this.image}) : super(key: key);
+  const UploadPhoto({Key key, this.image, this.photo}) : super(key: key);
   final File image;
+  final PhotoModel photo;
 
   @override
-  _UploadPhotoState createState() => _UploadPhotoState(image);
+  _UploadPhotoState createState() => _UploadPhotoState(image, photo);
 }
 
 enum typeValidator { NAME, DESCRIPTION }
 
 class _UploadPhotoState extends State<UploadPhoto> {
-  _UploadPhotoState(this._image);
+  _UploadPhotoState(this._image, this.photo);
 
+  final PhotoModel photo;
   final _formKey = GlobalKey<FormState>();
 
   final File _image;
@@ -35,8 +38,8 @@ class _UploadPhotoState extends State<UploadPhoto> {
 
   @override
   void initState() {
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
+    _nameController = TextEditingController(text: photo?.name ?? '');
+    _descriptionController = TextEditingController(text: photo?.description ?? '');
     typeNew = true;
     typePopular = false;
     super.initState();
@@ -48,7 +51,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
     _descriptionController.dispose();
     super.dispose();
   }
-  //TODO: edit photo
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -64,7 +67,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
             TextButton(
               onPressed: postPhoto,
               child: Text(
-                ('Add'),
+                (photo == null ? 'Add' : 'Edit'),
                 style: TextStyle(
                     color: AppColors.decorationColor,
                     fontWeight: FontWeight.w700,
@@ -73,7 +76,17 @@ class _UploadPhotoState extends State<UploadPhoto> {
             ),
           ],
         ),
-        body: BlocBuilder<AddPhotoBloc, AddPhotoState>(
+        body: BlocConsumer<AddPhotoBloc, AddPhotoState>(
+          listener: (context, state) {
+            if (state is ErrorPostPhoto){
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.err),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
           builder: (context, state) {
             if (state is LoadingPostPhoto) {
               return Scaffold(
@@ -84,8 +97,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
             if (state is CompletePost) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => Gallery()),
+                    MaterialPageRoute(builder: (context) => Gallery()),
                     (Route<dynamic> route) => false);
                 Fluttertoast.showToast(
                     msg: 'Publication has been moderated',
@@ -93,8 +105,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
                     gravity: ToastGravity.BOTTOM,
                     backgroundColor: AppColors.mainColorAccent,
                     textColor: Colors.white,
-                    fontSize: 16.0
-                );
+                    fontSize: 16.0);
               });
             }
             return Center(
@@ -112,7 +123,9 @@ class _UploadPhotoState extends State<UploadPhoto> {
                     width: MediaQuery.of(context).size.width,
                     child: Align(
                       alignment: Alignment.center,
-                      child: Image.file(_image),
+                      child: photo == null
+                          ? Image.file(_image)
+                          : Image.network(photo.getImage()),
                     ),
                   ),
                   Form(
@@ -161,7 +174,6 @@ class _UploadPhotoState extends State<UploadPhoto> {
                                         borderSide: BorderSide(
                                             color: AppColors.mainColorAccent)),
                                 enabledBorder: AppStyles.borderTextField,
-                                //),
                               ),
                             ),
                           ),
@@ -173,20 +185,18 @@ class _UploadPhotoState extends State<UploadPhoto> {
                                   label: Text(
                                     'New',
                                     style:
-                                        TextStyle(color: AppColors.mainColor),
+                                        TextStyle(color: AppColors.colorWhite),
                                   ),
                                   onPressed: () {},
-                                  backgroundColor: !typeNew
-                                      ? AppColors.mainColorAccent
-                                      : AppColors.decorationColor,
+                                  backgroundColor: AppColors.decorationColor,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 16),
                                   child: ActionChip(
                                     label: Text(
                                       'Popular',
-                                      style:
-                                          TextStyle(color: AppColors.mainColor),
+                                      style: TextStyle(
+                                          color: AppColors.colorWhite),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -216,10 +226,21 @@ class _UploadPhotoState extends State<UploadPhoto> {
 
   void postPhoto() {
     if (_formKey.currentState.validate()) {
-      context.read<AddPhotoBloc>().add(PostPhoto(
-          file: _image,
-          name: _nameController.text,
-          description: _descriptionController.text));
+      if (_image != null) {
+        context.read<AddPhotoBloc>().add(
+              PostPhoto(
+                  file: _image,
+                  name: _nameController.text,
+                  description: _descriptionController.text),
+            );
+      } else {
+        context.read<AddPhotoBloc>().add(
+          EditingPhoto(
+              photo: photo,
+              name: _nameController.text,
+              description: _descriptionController.text),
+        );
+      }
     }
   }
 }

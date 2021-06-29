@@ -1,3 +1,4 @@
+import 'package:alice/alice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,9 +6,16 @@ import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
-
 import 'authorization_bloc/authorization_bloc.dart';
 import 'enter_page.dart';
+
+Alice alice = Alice(
+    showNotification: true,
+    darkTheme: true,
+    maxCallsCount: 1000,
+    showInspectorOnShake: true,
+    notificationIcon: '@mipmap/ant',
+);
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key key}) : super(key: key);
@@ -15,9 +23,11 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: alice.getNavigatorKey(),
       theme: ThemeData(
         accentColor: AppColors.colorGreyAccent,
       ),
+      debugShowCheckedModeBanner: false,
       title: AppStrings.titleGallery,
       home: BlocBuilder<AuthorizationBloc, AuthorizationState>(
         builder: (context, state) {

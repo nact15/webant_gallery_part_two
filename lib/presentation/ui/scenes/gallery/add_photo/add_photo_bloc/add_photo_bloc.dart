@@ -14,30 +14,37 @@ part 'add_photo_state.dart';
 class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
   AddPhotoBloc() : super(AddPhotoInitial());
   PhotoModel photo;
-  //final GalleryBloc galleryBloc;
-  //StreamSubscription galleryBlocSubscription;
-
-  // @override
-  // Future<void> close() {
-  //   galleryBlocSubscription.cancel();
-  //   return super.close();
-  // }
+  HttpPostPhoto httpPostPhoto = HttpPostPhoto();
 
   @override
   Stream<AddPhotoState> mapEventToState(
     AddPhotoEvent event,
   ) async* {
     if (event is PostPhoto) {
-      yield LoadingPostPhoto();
-      photo =
-          await HttpPostPhoto().postPhoto(file: event.file, name: event.name);
-      yield CompletePost(photo);
+      try {
+        yield LoadingPostPhoto();
+        photo =
+            await httpPostPhoto.postPhoto(file: event.file, name: event.name);
+        yield CompletePost();
+      } on DioError catch (err) {
+        yield ErrorPostPhoto('Lost internet connection');
+      }
     }
     if (event is DeletingPhoto) {
       try {
-        await HttpPostPhoto().deletePhoto(event.photo);
+        await httpPostPhoto.deletePhoto(event.photo);
         yield DeletePhoto();
-      } on DioError {}
+      } on DioError catch (err) {
+        yield ErrorPostPhoto('Lost internet connection');
+      }
+    }
+    if (event is EditingPhoto) {
+      try {
+        httpPostPhoto.editPhoto(event.photo, event.name, event.description);
+        yield CompletePost();
+      } on DioError catch (err) {
+          yield ErrorPostPhoto('Lost internet connection');
+      }
     }
   }
 }

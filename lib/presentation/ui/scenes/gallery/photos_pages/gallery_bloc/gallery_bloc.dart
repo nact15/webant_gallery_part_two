@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
@@ -16,11 +17,12 @@ part 'gallery_state.dart';
 class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   GalleryBloc(this.photoGateway) : super(GalleryInitial());
   final PhotoGateway<T> photoGateway;
+  HttpUserGateway httpUserGateway = HttpUserGateway();
   Box photosBox;
   int _page = 1;
   BaseModel<T> baseModel;
 
-  @override
+@override
   Stream<GalleryState> mapEventToState(GalleryEvent event) async* {
     photosBox = Hive.box(photoGateway.enumToString());
     if (event is GalleryFetch) {
@@ -29,15 +31,15 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
     if (event is GalleryRefresh) {
       yield* _mapGalleryRefresh(event);
     }
+    if (event is GalleryLoading){
+      yield GalleryLoaded();
+    }
   }
 
   Stream<GalleryState> _mapGalleryFetch(GalleryFetch event) async* {
     try {
       if (photosBox.isEmpty) {
-        yield GalleryData(
-          isLoading: true,
-          isLastPage: false,
-        );
+        yield GalleryLoaded();
       }
       baseModel = await photoGateway.fetchPhotos(page: _page);
       if (photosBox.length < baseModel.totalItems) {
@@ -85,11 +87,15 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
       yield GalleryInternetLost();
   }
 
-  void _addToBox() {
+  void _addToBox()  {
     List<PhotoModel> basePhotoModel = baseModel.data as List<PhotoModel>;
     List<PhotoModel> boxPhotoModel =
         photosBox.values.toList().cast<PhotoModel>();
-    basePhotoModel.forEach((element) {
+    basePhotoModel.forEach((element) async {
+      if (element.user != null){
+        String userName = await httpUserGateway.getUserName(element.user);
+        element = element.copyWith(user: userName);
+      }
       if (boxPhotoModel.firstWhere(
             (elementB) => element.id == elementB.id,
             orElse: () => null,

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 
 import 'http_oauth_gateway.dart';
 import 'http_oauth_interceptor.dart';
@@ -17,11 +18,19 @@ class HttpUserGateway extends UserGateway {
         requestHeader: true,
         request: true,
         error: true))
-    ..options.baseUrl = HttpStrings.baseUrl;
+    ..options.baseUrl = HttpStrings.baseUrl
+    ..interceptors.add(alice.getDioInterceptor());
 
   @override
   Future<void> registration(UserModel userModel) async {
     await dio.post('/users', data: userModel.toJson());
+  }
+
+  @override
+  Future<String> getUserName(String userUrl) async {
+    Response user = await dio.get('http://gallery.dev.webant.ru$userUrl');
+    UserModel userModel = UserModel.fromJson(user.data);
+    return userModel.username;
   }
 
   @override
@@ -41,11 +50,10 @@ class HttpUserGateway extends UserGateway {
   }
 
   @override
-  Future<void> updatePasswordUser(UserModel userModel, String oldPassword, String newPassword) async {
+  Future<void> updatePasswordUser(
+      UserModel userModel, String oldPassword, String newPassword) async {
     dio.interceptors.add(HttpOauthInterceptor(dio, HttpOauthGateway()));
-    await dio.put('/users/update_password/${userModel.id}', data: {
-      'oldPassword': oldPassword,
-      'newPassword': newPassword
-    });
+    await dio.put('/users/update_password/${userModel.id}',
+        data: {'oldPassword': oldPassword, 'newPassword': newPassword});
   }
 }

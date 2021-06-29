@@ -13,6 +13,7 @@ import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 
 part 'authorization_event.dart';
+
 part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
@@ -41,13 +42,13 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
 
   Stream<AuthorizationState> _mapLoginFetchToLoginData(
       LoginFetch event) async* {
-    yield LoginData(isLogin: true, isLoading: true);
+    yield LoginData(isLogin: false, isLoading: true);
     String _token = await _storage.read(key: HttpStrings.userAccessToken);
     if (_token != null ?? _token.isNotEmpty) {
       userBloc.add(UserFetch());
       yield LoginData(isLogin: true, isLoading: false);
     } else {
-      yield AuthorizationInitial();
+      yield LoginData(isLogin: false, isLoading: false);
     }
   }
 

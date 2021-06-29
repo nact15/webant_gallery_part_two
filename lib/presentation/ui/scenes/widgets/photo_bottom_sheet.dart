@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/upload_photo.dart';
 
 class PhotoBottomSheet extends StatefulWidget {
   const PhotoBottomSheet({Key key, this.photo, this.index}) : super(key: key);
@@ -30,7 +31,12 @@ int index;
             style: TextStyle(color: AppColors.decorationColor),
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UploadPhoto(photo: photo),
+              ),
+            );
           },
         ),
         CupertinoActionSheetAction(

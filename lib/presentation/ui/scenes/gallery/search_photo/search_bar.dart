@@ -20,7 +20,6 @@ class _SearchBarState extends State<SearchBar> {
     return Container(
       height: 40,
       child: TextFormField(
-        //focusNode: node,
         cursorColor: AppColors.mainColorAccent,
         decoration: InputDecoration(
           filled: true,

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
+import 'package:webant_gallery_part_two/domain/usecases/validation.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
@@ -11,7 +12,6 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gall
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/password_inputs.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/user_text_fields.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/validation.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/widget_app_bar.dart';
 
 import 'authorization_bloc/authorization_bloc.dart';

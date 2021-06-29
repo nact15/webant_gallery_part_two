@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
-class Validation {
-  DateTime toDate(String birthday) {
-    DateTime date = DateFormat("dd.MM.yyyy").parseLoose(birthday);
-    return date;
-  }
+import 'date_formatter.dart';
 
+class Validation {
+
+  DateFormatter dateFormatter = DateFormatter();
   String confirmPassword;
 
   String selectUserValidator(
@@ -32,8 +30,8 @@ class Validation {
         break;
       case typeTextField.BIRTHDAY:
         try {
-          if (value.isNotEmpty && value.length <= 10) {
-            DateTime birthday = toDate(value);
+          if (value == null || value.isNotEmpty && value.length <= 10) {
+            DateTime birthday = dateFormatter.toDate(value);
             DateTime today = DateTime.now();
             int yearDiff = today.year - birthday.year;
             DateTime adultDate = DateTime(
@@ -48,6 +46,7 @@ class Validation {
             }
           }
         } catch (e) {
+          print(e.toString());
           return 'Invalid date';
         }
         return null;
@@ -66,13 +65,13 @@ class Validation {
       TextEditingController confirmPasswordController) {
     switch (typeField) {
       case typePasswordField.OLD_PASSWORD:
-        if (value.isEmpty) {
+        if (value == null || value.isEmpty) {
           return AppStrings.emptyPassword;
         }
         return null;
         break;
       case typePasswordField.NEW_PASSWORD:
-        if (value.isEmpty) {
+        if (value == null || value.isEmpty) {
           return AppStrings.emptyPassword;
         } else if (value.length < 8) {
           return AppStrings.passwordErrorLength;
@@ -82,7 +81,7 @@ class Validation {
         return null;
         break;
       case typePasswordField.CONFIRM_PASSWORD:
-        if (value.isEmpty) {
+        if (value == null || value.isEmpty) {
           return AppStrings.emptyPassword;
         } else if (value != confirmPasswordController.text) {
           return AppStrings.passwordMatch;

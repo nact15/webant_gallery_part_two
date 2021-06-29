@@ -6,9 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
+import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
@@ -20,6 +20,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_c
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/password_inputs.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/user_text_fields.dart';
 
+import '../widgets/choose_photo_bottom_sheet.dart';
 import 'delete_account_dialog.dart';
 
 class UserSettings extends StatefulWidget {
@@ -36,7 +37,6 @@ class _UserSettingsState extends State<UserSettings> {
   var passKey = GlobalKey<FormFieldState>();
   File _image;
   final picker = ImagePicker();
-  final dateFormatter = DateFormat('dd.MM.yyyy');
   TextEditingController _nameController;
   TextEditingController _birthdayController;
   TextEditingController _emailController;
@@ -46,6 +46,7 @@ class _UserSettingsState extends State<UserSettings> {
   String confirmPassword;
   String name;
   UserModel user;
+  DateFormatter dateFormatter;
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _UserSettingsState extends State<UserSettings> {
     _oldPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
+    dateFormatter = DateFormatter();
     _newPasswordController.addListener(() {
       setState(() {
         confirmPassword = _newPasswordController.text;
@@ -68,26 +70,19 @@ class _UserSettingsState extends State<UserSettings> {
     _nameController.dispose();
     _birthdayController.dispose();
     _emailController.dispose();
+    _oldPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
+  Future getImage(ImageSource source) async {
+    final pickedFile = await picker.getImage(source: source);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
       }
     });
-  }
-
-  DateTime toDate(String stringDate) {
-    return DateTime.parse(stringDate);
-  }
-
-  String fromDate(stringDate) {
-    var date = dateFormatter.format(DateTime.parse(stringDate));
-    return date.toString();
   }
 
   @override
@@ -139,13 +134,6 @@ class _UserSettingsState extends State<UserSettings> {
               ),
             );
           }
-        },
-        builder: (context, state) {
-          if (state is LoadingUpdate) {
-            return Center(
-              child: LoadingCircular(),
-            );
-          }
           if (state is UserUpdate) {
             Fluttertoast.showToast(
                 msg: 'User profile has been updated',
@@ -154,6 +142,13 @@ class _UserSettingsState extends State<UserSettings> {
                 backgroundColor: AppColors.mainColorAccent,
                 textColor: Colors.white,
                 fontSize: 16.0);
+          }
+        },
+        builder: (context, state) {
+          if (state is LoadingUpdate) {
+            return Center(
+              child: LoadingCircular(),
+            );
           }
           if (state is UserData) {
             user = state.user;
@@ -166,28 +161,33 @@ class _UserSettingsState extends State<UserSettings> {
                     padding: EdgeInsets.only(top: 21),
                     child: Center(
                       child: GestureDetector(
-                        onTap: getImage,
+                        onTap: () => showCupertinoModalPopup(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              ChoosePhotoBottomSheet(getImage),
+                        ),
                         child: Container(
                           decoration: BoxDecoration(
-                            border:
-                                Border.all(color: AppColors.mainColorAccent),
-                            borderRadius: BorderRadius.all(Radius.circular(90)),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.mainColorAccent,
+                            ),
                           ),
-                          child: _image == null
-                              ? Icon(
-                                  Icons.camera_alt,
-                                  size: 55,
-                                  color: AppColors.mainColorAccent,
-                                )
-                              : ClipOval(
-                                  child: Image.file(
-                                    _image,
-                                    scale: 0.5,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                          height: 100,
-                          width: 100,
+                          child: Center(
+                            child: CircleAvatar(
+                              child: _image == null
+                                  ? Icon(Icons.camera_alt,
+                                      size: 55,
+                                      color: AppColors.mainColorAccent)
+                                  : CircleAvatar(
+                                      backgroundImage: Image.file(_image).image,
+                                      radius: 55,
+                                      backgroundColor: AppColors.colorWhite,
+                                    ),
+                              radius: 50,
+                              backgroundColor: AppColors.colorWhite,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -195,7 +195,11 @@ class _UserSettingsState extends State<UserSettings> {
                   Center(
                     child: TextButton(
                       style: ButtonStyle(splashFactory: NoSplash.splashFactory),
-                      onPressed: getImage,
+                      onPressed: () => showCupertinoModalPopup(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            ChoosePhotoBottomSheet(getImage),
+                      ),
                       child: Text(
                         'Upload photo',
                         style: TextStyle(
@@ -219,7 +223,8 @@ class _UserSettingsState extends State<UserSettings> {
                     //name
                     padding: EdgeInsets.only(top: 10.0),
                     child: TextFormFields(
-                      controller: _nameController..text = user.username,
+                      controller: _nameController
+                        ..text = user.username,
                       hint: AppStrings.hintName,
                       typeField: typeTextField.USERNAME,
                       textInputType: TextInputType.name,
@@ -231,7 +236,7 @@ class _UserSettingsState extends State<UserSettings> {
                     padding: EdgeInsets.only(top: 29.0),
                     child: TextFormFields(
                       controller: _birthdayController
-                        ..text = fromDate(user.birthday),
+                        ..text = dateFormatter.fromDate(user.birthday),
                       hint: AppStrings.hintBirthday,
                       typeField: typeTextField.BIRTHDAY,
                       textInputType: TextInputType.number,
@@ -257,7 +262,8 @@ class _UserSettingsState extends State<UserSettings> {
                     //email
                     padding: EdgeInsets.only(top: 10.0),
                     child: TextFormFields(
-                      controller: _emailController..text = user.email,
+                      controller: _emailController
+                        ..text = user.email,
                       hint: AppStrings.hintEmail,
                       typeField: typeTextField.EMAIL,
                       textInputType: TextInputType.emailAddress,

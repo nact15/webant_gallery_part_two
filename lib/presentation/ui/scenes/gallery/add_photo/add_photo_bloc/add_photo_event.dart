@@ -17,5 +17,5 @@ class EditingPhoto extends AddPhotoEvent{
   final PhotoModel photo;
   final String name;
   final String description;
-  EditingPhoto(this.photo, this.name, this.description);
+  EditingPhoto({this.photo, this.name, this.description});
 }

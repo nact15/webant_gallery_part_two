@@ -1,5 +1,6 @@
 class AppStrings{
   static const String imageAnt = 'assets/ant.png';
+  static const String imageIntersect = 'assets/Intersect.png';
   static const String titleGallery = 'WebAnt Gallery';
   static const String buttonCreateAccount = 'Create an account';
   static const String buttonAlreadyHaveAccount = 'I already have an account';

@@ -8,7 +8,6 @@ import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart'
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_bloc/gallery_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_grid.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_bar.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_grid.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 
 class NewOrPopularPhotos extends StatefulWidget {
@@ -19,6 +18,7 @@ class NewOrPopularPhotos extends StatefulWidget {
 }
 
 enum typePhoto { NEW, POPULAR }
+enum typeGrid { PHOTOS, SEARCH }
 
 class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
   TextEditingController searchController;
@@ -78,8 +78,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
               elevation: 0,
               automaticallyImplyLeading: false,
               backgroundColor: AppColors.colorWhite,
-              bottom: //_search ? null :
-                  PreferredSize(
+              bottom: PreferredSize(
                 preferredSize: Size.fromHeight(kToolbarHeight),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -116,9 +115,10 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                   );
                 }
                 if (state is Search) {
-                  return SearchGrid(
+                  return GalleryGrid(
                     photos: state.photos,
                     queryText: queryText,
+                    type: typeGrid.SEARCH,
                   );
                 }
                 if (state is NotFound) {
@@ -127,15 +127,11 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                       padding: const EdgeInsets.only(top: 200),
                       child: Column(
                         children: [
-                          Icon(
-                            Icons.image_not_supported_outlined,
-                            color: AppColors.decorationColor,
-                            size: 75,
-                          ),
+                          Image.asset(AppStrings.imageIntersect),
                           Text(
                             'Image not found',
                             style: TextStyle(
-                                color: AppColors.mainColorAccent, fontSize: 25),
+                                color: AppColors.mainColorAccent, fontSize: 17),
                           ),
                         ],
                       ),
@@ -149,12 +145,16 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
                               HttpPhotoGateway(type: typePhoto.NEW))
                             ..add(GalleryFetch()),
-                          child: GalleryGrid()),
+                          child: GalleryGrid(
+                            type: typeGrid.PHOTOS,
+                          )),
                       BlocProvider<GalleryBloc>(
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
                               HttpPhotoGateway(type: typePhoto.POPULAR))
                             ..add(GalleryFetch()),
-                          child: GalleryGrid()),
+                          child: GalleryGrid(
+                            type: typeGrid.PHOTOS,
+                          )),
                     ],
                   );
                 }

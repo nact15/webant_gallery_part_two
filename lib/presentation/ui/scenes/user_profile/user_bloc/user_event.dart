@@ -24,3 +24,4 @@ class UserDelete extends UserEvent{
 
   UserDelete(this.user);
 }
+

@@ -20,6 +20,6 @@ class ErrorUpdate extends UserState{
   final String err;
 
   ErrorUpdate(this.err);
-
 }
 class UserUpdate extends UserState{}
+class ErrorData extends UserState{}

@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart' as Storage;
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_search_photo.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_search_photo_by_user.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
@@ -16,6 +17,7 @@ import 'package:webant_gallery_part_two/domain/repositories/oauth_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/search_photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -55,23 +57,34 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
   Stream<UserState> _mapLogOutToExit(LogOut event) async* {
     yield LoadingUpdate();
     await _storage.deleteAll();
+    Hive.box('new').clear();
+    Hive.box('popular').clear();
     yield Exit();
   }
 
   Stream<UserState> _mapUserFetchToUserData(UserFetch event) async* {
-    yield LoadingUpdate();
-    user = await oauthGateway.getUser();
-    baseModel = await photoGateway.fetchPhotos(queryText: user.id);
-    photos = baseModel.data as List<PhotoModel>;
-    int countOfPhotos = baseModel.totalItems;
-    yield UserData(user, photos, countOfPhotos, isUpdate);
+    try {
+      yield LoadingUpdate();
+      user = await oauthGateway.getUser();
+      baseModel = await photoGateway.fetchPhotos(queryText: user.id);
+      photos = baseModel.data as List<PhotoModel>;
+      int countOfPhotos = baseModel.totalItems;
+      yield UserData(user, photos, countOfPhotos, isUpdate);
+    } on DioError{
+      yield ErrorData();
+    }
   }
 
   Stream<UserState> _mapUpdateUserToUserFetch(UpdateUser event) async* {
-    yield LoadingUpdate();
-    await userGateway.updateUser(event.user);
-    isUpdate = true;
-    add(UserFetch());
+    try {
+      yield LoadingUpdate();
+      await userGateway.updateUser(event.user);
+      isUpdate = true;
+      add(UserFetch());
+      isUpdate = false;
+    } on DioError{
+      yield ErrorUpdate(AppStrings.error);
+    }
   }
 
   Stream<UserState> _mapUpdatePasswordToUserFetch(UpdatePassword event) async* {

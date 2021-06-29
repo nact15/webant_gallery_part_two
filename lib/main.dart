@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:alice/alice.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
@@ -11,11 +12,11 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
+import 'package:flutter/services.dart';
 
 import 'domain/models/photos_model/image_model.dart';
 import 'domain/models/photos_model/photo_model.dart';
 
-GetIt getIt = GetIt.instance;
 UserBloc userBloc = UserBloc();
 
 Future<void> main() async {
@@ -26,6 +27,10 @@ Future<void> main() async {
     ..registerAdapter(PhotoModelAdapter());
   await Hive.openBox('new');
   await Hive.openBox('popular');
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+  ));
   runZonedGuarded(() {
     runApp(MultiBlocProvider(providers: [
       BlocProvider(

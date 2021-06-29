@@ -23,13 +23,15 @@ class PhotoModelAdapter extends TypeAdapter<PhotoModel> {
       popularType: fields[3] as bool,
       description: fields[4] as String,
       image: fields[5] as ImageModel,
+      dateCreate: fields[6] as String,
+      user: fields[7] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, PhotoModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +43,11 @@ class PhotoModelAdapter extends TypeAdapter<PhotoModel> {
       ..writeByte(4)
       ..write(obj.description)
       ..writeByte(5)
-      ..write(obj.image);
+      ..write(obj.image)
+      ..writeByte(6)
+      ..write(obj.dateCreate)
+      ..writeByte(7)
+      ..write(obj.user);
   }
 
   @override
@@ -67,6 +73,8 @@ PhotoModel _$PhotoModelFromJson(Map<String, dynamic> json) {
     popularType: json['popular'] as bool,
     description: json['description'] as String,
     image: ImageModel.fromJson(json['image'] as Map<String, dynamic>),
+    dateCreate: json['dateCreate'] as String,
+    user: json['user'] as String,
   );
 }
 
@@ -78,4 +86,6 @@ Map<String, dynamic> _$PhotoModelToJson(PhotoModel instance) =>
       'popular': instance.popularType,
       'description': instance.description,
       'image': instance.image.toJson(),
+      'dateCreate': instance.dateCreate,
+      'user': instance.user,
     };
