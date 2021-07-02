@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bottom_sheet.dart';
 
 class ScreenInfo extends StatelessWidget {
@@ -51,19 +53,19 @@ class ScreenInfo extends StatelessWidget {
                           PhotoBottomSheet(photo: photo));
                 },
                 onTap: () {
-                   return Center(
-                     child: Hero(
+                  return Center(
+                    child: Hero(
                       tag: photo.id,
-                        child: CachedNetworkImage(
-                          imageUrl: photo.getImage(),
-                          fit: BoxFit.fill,
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height,
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                          alignment: Alignment.center,
-                        ),
-                  ),
-                   );
+                      child: CachedNetworkImage(
+                        imageUrl: photo.getImage(),
+                        fit: BoxFit.fill,
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  );
                 }),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
@@ -83,12 +85,19 @@ class ScreenInfo extends StatelessWidget {
                     flex: 1,
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        '999+', //и тут
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.mainColorAccent,
-                        ),
+                      child: BlocBuilder<AddPhotoBloc, AddPhotoState>(
+                        builder: (context, state) {
+                          if (state is CountOfViews){
+                            return Text(
+                              state.count.toString(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.mainColorAccent,
+                              ),
+                            );
+                          }
+                          return Text('-');
+                        },
                       ),
                     ),
                   ),

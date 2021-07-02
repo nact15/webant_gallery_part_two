@@ -15,16 +15,16 @@ part 'gallery_event.dart';
 part 'gallery_state.dart';
 
 class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
-  GalleryBloc(this.photoGateway) : super(GalleryInitial());
-  final PhotoGateway<T> photoGateway;
-  HttpUserGateway httpUserGateway = HttpUserGateway();
-  Box photosBox;
+  GalleryBloc(this._photoGateway, this._httpUserGateway) : super(GalleryInitial());
+  final PhotoGateway<T> _photoGateway;
+  final HttpUserGateway _httpUserGateway;
+  Box _photosBox;
   int _page = 1;
-  BaseModel<T> baseModel;
+  BaseModel<T> _baseModel;
 
 @override
   Stream<GalleryState> mapEventToState(GalleryEvent event) async* {
-    photosBox = Hive.box(photoGateway.enumToString());
+    _photosBox = Hive.box(_photoGateway.enumToString());
     if (event is GalleryFetch) {
       yield* _mapGalleryFetch(event);
     }
@@ -38,20 +38,20 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
 
   Stream<GalleryState> _mapGalleryFetch(GalleryFetch event) async* {
     try {
-      if (photosBox.isEmpty) {
+      if (_photosBox.isEmpty) {
         yield GalleryLoaded();
       }
-      baseModel = await photoGateway.fetchPhotos(page: _page);
-      if (photosBox.length < baseModel.totalItems) {
+      _baseModel = await _photoGateway.fetchPhotos(page: _page);
+      if (_photosBox.length < _baseModel.totalItems) {
         _addToBox(); //add photos to box
         _page++;
         yield GalleryData(
-            isLoading: false, isLastPage: false, photosBox: photosBox);
+            isLoading: false, isLastPage: false, photosBox: _photosBox);
       }else {
         yield GalleryData(
           isLastPage: true,
           isLoading: false,
-          photosBox: photosBox,
+          photosBox: _photosBox,
         );
      }
     } on DioError {
@@ -61,15 +61,15 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
 
   Stream<GalleryState> _mapGalleryRefresh(GalleryRefresh event) async* {
     try {
-      photosBox.clear();
+      _photosBox.clear();
       _page = 1;
-      baseModel = await photoGateway.fetchPhotos(page: _page);
+      _baseModel = await _photoGateway.fetchPhotos(page: _page);
       _addToBox(); //add items to box after refresh
       _page++;
       yield GalleryData(
         isLoading: false,
         isLastPage: false,
-        photosBox: photosBox,
+        photosBox: _photosBox,
       );
     } on DioError {
       yield* _internetError();
@@ -77,9 +77,9 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   }
 
   Stream<GalleryState> _internetError() async* {
-    if (photosBox.isNotEmpty) {
+    if (_photosBox.isNotEmpty) {
       yield GalleryData(
-        photosBox: photosBox,
+        photosBox: _photosBox,
         isLastPage: true,
         isLoading: false,
       );
@@ -88,12 +88,12 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   }
 
   void _addToBox()  {
-    List<PhotoModel> basePhotoModel = baseModel.data as List<PhotoModel>;
+    List<PhotoModel> basePhotoModel = _baseModel.data as List<PhotoModel>;
     List<PhotoModel> boxPhotoModel =
-        photosBox.values.toList().cast<PhotoModel>();
+        _photosBox.values.toList().cast<PhotoModel>();
     basePhotoModel.forEach((element) async {
       if (element.user != null){
-        String userName = await httpUserGateway.getUserName(element.user);
+        String userName = await _httpUserGateway.getUserName(element.user);
         element = element.copyWith(user: userName);
       }
       if (boxPhotoModel.firstWhere(
@@ -101,7 +101,7 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
             orElse: () => null,
           ) ==
           null) {
-        photosBox.add(element);
+        _photosBox.add(element);
       }
     });
   }

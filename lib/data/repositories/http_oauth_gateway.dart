@@ -66,7 +66,8 @@ class HttpOauthGateway extends OauthGateway {
 
   @override
   Future<UserModel> getUser() async {
-    dio.interceptors..add(HttpOauthInterceptor(dio, this));
+    dio.interceptors.clear();
+    dio.interceptors.add(HttpOauthInterceptor(dio, this));
     var user = await dio.get(HttpStrings.currentUser);
     userModel = UserModel.fromJson(user.data);
     return userModel;

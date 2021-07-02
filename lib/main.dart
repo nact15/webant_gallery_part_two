@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:alice/alice.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,15 +11,22 @@ import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/firestore_bloc/firestore_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:flutter/services.dart';
 
+import 'data/repositories/firesrore_repository.dart';
+import 'data/repositories/http_post_photo.dart';
 import 'domain/models/photos_model/image_model.dart';
 import 'domain/models/photos_model/photo_model.dart';
 
-UserBloc userBloc = UserBloc();
-
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirestoreBloc firestoreBloc =
+      FirestoreBloc(firestoreRepository: FirebaseFirestoreRepository());
+  UserBloc userBloc =
+      UserBloc(HttpOauthGateway(), HttpUserGateway(), firestoreBloc);
   var path = Directory.systemTemp.path;
   Hive
     ..init(path)
@@ -37,7 +44,10 @@ Future<void> main() async {
           create: (BuildContext context) =>
               AuthorizationBloc(HttpOauthGateway(), HttpUserGateway(), userBloc)
                 ..add(LoginFetch())),
-      BlocProvider(create: (BuildContext context) => AddPhotoBloc()),
+      BlocProvider(
+          create: (BuildContext context) => AddPhotoBloc(HttpPostPhoto(),
+              firestoreRepository: FirebaseFirestoreRepository())),
+      BlocProvider(create: (BuildContext context) => firestoreBloc),
       BlocProvider(create: (BuildContext context) => userBloc),
     ], child: WelcomeScreen()));
   }, (error, stackTrace) {});

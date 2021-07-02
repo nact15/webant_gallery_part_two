@@ -19,14 +19,13 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
 
   @override
   // ignore: missing_return
-  Future<BaseModel<PhotoModel>> fetchPhotos(
-      {int page, String queryText}) async {
+  Future<BaseModel<PhotoModel>> fetchPhotos({int page, var queryText}) async {
     try {
       final String url = HttpStrings.urlPhotos;
       final Map<String, dynamic> queryParameters = <String, dynamic>{
         'page': page,
         'limit': 10,
-        enumToString(): true,
+        enumToString(): queryText ?? true,
       };
       Response response = await dio.get(url, queryParameters: queryParameters);
       final statusCode = response.statusCode;
@@ -45,6 +44,12 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
         break;
       case typePhoto.POPULAR:
         return AppStrings.popularType.toLowerCase();
+        break;
+      case typePhoto.SEARCH_BY_USER:
+        return 'user.id';
+        break;
+      case typePhoto.SEARCH:
+        return 'name';
         break;
     }
     return AppStrings.titleGallery;

@@ -16,3 +16,8 @@ class DeletePhoto extends AddPhotoState{
 
   DeletePhoto({this.index});
 }
+class CountOfViews extends AddPhotoState{
+  final count;
+
+  CountOfViews(this.count);
+}

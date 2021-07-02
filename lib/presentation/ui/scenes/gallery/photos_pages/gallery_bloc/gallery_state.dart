@@ -20,3 +20,4 @@ class GalleryLoaded extends GalleryState {}
 class GalleryError extends GalleryState {}
 
 class GalleryInternetLost extends GalleryState {}
+

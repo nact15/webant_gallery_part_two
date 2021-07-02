@@ -8,4 +8,8 @@ class Searching extends SearchPhotoEvent{
   Searching({this.queryText, this.newQuery});
 }
 class NotSearching extends SearchPhotoEvent{}
-class SearchRefresh extends SearchPhotoEvent{}
+class SearchRefresh extends SearchPhotoEvent{
+  final queryText;
+
+  SearchRefresh(this.queryText);
+}

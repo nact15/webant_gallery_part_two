@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/image_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/post_photo_gateway.dart';
@@ -25,10 +28,8 @@ class HttpPostPhoto extends PostPhotoGateway {
     });
     Response response = await dio.post('/media_objects', data: formData);
     var mediaObject = ImageModel.fromJson(response.data);
-    String date = DateTime.now().toString();
     Response photo = await dio.post('/photos', data: {
       'name': name,
-      'dateCreate': date,
       'description': description,
       'new': true,
       'popular': false,
@@ -49,6 +50,23 @@ class HttpPostPhoto extends PostPhotoGateway {
     await dio.put('/photos/${photo.id}', data: {
       'name': name,
       'description': description,
+    });
+  }
+
+  Future<void> incrementViewsCount(PhotoModel photo) async {
+    int count = 1;
+    CollectionReference counter =
+        FirebaseFirestore.instance.collection('photos');
+    var photoRef = counter.doc(photo.id.toString());
+    await photoRef.get().then((DocumentSnapshot doc) {
+      if (doc.exists) {
+        doc.reference.update({'viewsCount': FieldValue.increment(1)});
+      } else {
+        photoRef.set(photo.toJson());
+        photoRef.update({'viewsCount': count});
+      }
+    }).catchError((onError) {
+      return 0;
     });
   }
 }

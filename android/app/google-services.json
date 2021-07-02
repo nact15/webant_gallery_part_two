@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "318259703497",
+    "project_id": "webant-gallery-part-two",
+    "storage_bucket": "webant-gallery-part-two.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:318259703497:android:fede1dcb9237f65ad1e718",
+        "android_client_info": {
+          "package_name": "com.example.webant_gallery_part_two"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "318259703497-gmjf5thmp1b0t68j7ubpsi3t114rnr3v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCM-8M5IVBOJRGOBu7LigF_z0uNWX7dIrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "318259703497-gmjf5thmp1b0t68j7ubpsi3t114rnr3v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

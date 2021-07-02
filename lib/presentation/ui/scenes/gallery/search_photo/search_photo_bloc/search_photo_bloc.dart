@@ -6,18 +6,20 @@ import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
-import 'package:webant_gallery_part_two/domain/repositories/search_photo_gateway.dart';
+import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
+import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 
 part 'search_photo_event.dart';
+
 part 'search_photo_state.dart';
 
 class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
-  SearchPhotoBloc(this.photoGateway) : super(SearchPhotoInitial());
-  final SearchPhotoGateway photoGateway;
-  List<PhotoModel> photos = [];
-  BaseModel<T> baseModel;
-  HttpUserGateway httpUserGateway = HttpUserGateway();
-  int page = 1;
+  SearchPhotoBloc(this._photoGateway, this._httpUserGateway) : super(SearchPhotoInitial());
+  final PhotoGateway _photoGateway;
+  List<PhotoModel> _photos = [];
+  BaseModel<T> _baseModel;
+  final UserGateway _httpUserGateway;
+  int _page = 1;
 
   @override
   Stream<SearchPhotoState> mapEventToState(
@@ -26,23 +28,31 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
     if (event is Searching) {
       try {
         if (event.newQuery) {
-          photos.clear();
-          page = 1;
+          _photos.clear();
+          _page = 1;
         }
-        if (photos.isEmpty) {
+        if (_photos.isEmpty) {
           yield Loading();
         }
-        baseModel = await photoGateway.fetchPhotos(
-            queryText: event.queryText, page: page);
-        List<PhotoModel> basePhotoModel = baseModel.data as List<PhotoModel>;
-        if (page <= baseModel.countOfPages) {
-          photos.addAll(basePhotoModel);
-          page++;
-          yield Search(photos, false);
+        _baseModel = await _photoGateway.fetchPhotos(
+            queryText: event.queryText, page: _page);
+
+        if (_page <= _baseModel.countOfPages) {
+          String userName;
+          List<PhotoModel> basePhotoModel = _baseModel.data as List<PhotoModel>;
+          for (PhotoModel element in basePhotoModel) {
+            if (element.user != null) {
+              userName = await _httpUserGateway.getUserName(element.user);
+              element = element.copyWith(user: userName);
+            }
+            _photos.add(element);
+          }
+          _page++;
+          yield Search(_photos, false);
         } else {
-          yield Search(photos, true);
+          yield Search(_photos, true);
         }
-        if (photos.isEmpty) {
+        if (_photos.isEmpty) {
           yield NotFound();
         }
       } on DioError {

@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
+import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
@@ -120,7 +122,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (BuildContext context) => BlocProvider<AddPhotoBloc>(
-            create: (BuildContext context) => AddPhotoBloc(),
+            create: (BuildContext context) => AddPhotoBloc(HttpPostPhoto()),
             child: UploadPhoto(
               image: _image,
             ),

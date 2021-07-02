@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/single_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
@@ -18,15 +19,17 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bot
 import 'gallery_bloc/gallery_bloc.dart';
 
 class GalleryGrid extends StatefulWidget {
-  const GalleryGrid({Key key, this.type, this.queryText, this.photos})
+  const GalleryGrid(
+      {Key key, this.type, this.queryText, this.photos, this.crossCount})
       : super(key: key);
   final queryText;
   final typeGrid type;
+  final int crossCount;
   final List<PhotoModel> photos;
 
   @override
-  _GalleryGridState createState() =>
-      _GalleryGridState(type: type, queryText: queryText, photos: photos);
+  _GalleryGridState createState() => _GalleryGridState(
+      type: type, queryText: queryText, photos: photos, crossCount: crossCount);
 }
 
 class _GalleryGridState extends State<GalleryGrid> {
@@ -34,10 +37,11 @@ class _GalleryGridState extends State<GalleryGrid> {
   Completer<void> _reFresh;
   final typeGrid type;
   var queryText;
+  int crossCount;
   bool _isLastPage = false;
   List<PhotoModel> photos;
 
-  _GalleryGridState({this.type, this.queryText, this.photos});
+  _GalleryGridState({this.type, this.queryText, this.photos, this.crossCount});
 
   _scrollListener() {
     if (!_isLastPage) {
@@ -102,7 +106,7 @@ class _GalleryGridState extends State<GalleryGrid> {
               childCount: photos?.length ?? 0,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: crossCount ?? 2,
               childAspectRatio: 1,
               mainAxisSpacing: 9,
               crossAxisSpacing: 9,
@@ -156,6 +160,10 @@ class _GalleryGridState extends State<GalleryGrid> {
               )
             : BlocListener<SearchPhotoBloc, SearchPhotoState>(
                 listener: (context, state) {
+                  setState(() {
+                    _reFresh?.complete();
+                    _reFresh = Completer();
+                  });
                   if (state is Search) {
                     if (state.isLastPage) {
                       setState(() {
@@ -173,7 +181,9 @@ class _GalleryGridState extends State<GalleryGrid> {
         onRefresh: () async {
           type == typeGrid.PHOTOS
               ? context.read<GalleryBloc>().add(GalleryRefresh())
-              : context.read<SearchPhotoBloc>().add(SearchRefresh());
+              : context
+                  .read<SearchPhotoBloc>()
+                  .add(Searching(queryText: queryText, newQuery: true));
           return _reFresh.future;
         },
         child: type == typeGrid.SEARCH
@@ -212,7 +222,8 @@ class _GalleryGridState extends State<GalleryGrid> {
                               ),
                               Text(
                                 'There is no pictures. \nPlease come back later.',
-                                style: TextStyle(color: AppColors.mainColorAccent),
+                                style:
+                                    TextStyle(color: AppColors.mainColorAccent),
                                 textAlign: TextAlign.center,
                               )
                             ],
@@ -229,6 +240,7 @@ class _GalleryGridState extends State<GalleryGrid> {
   }
 
   void _toScreenInfo(PhotoModel photo) {
+    context.read<AddPhotoBloc>().add(ViewsCounter(photo));
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ScreenInfo(photo: photo),

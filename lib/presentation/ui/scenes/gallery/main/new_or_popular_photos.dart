@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
@@ -17,7 +18,7 @@ class NewOrPopularPhotos extends StatefulWidget {
   _NewOrPopularPhotosState createState() => _NewOrPopularPhotosState();
 }
 
-enum typePhoto { NEW, POPULAR }
+enum typePhoto { NEW, POPULAR, SEARCH_BY_USER, SEARCH }
 enum typeGrid { PHOTOS, SEARCH }
 
 class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
@@ -143,14 +144,14 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                     children: <Widget>[
                       BlocProvider<GalleryBloc>(
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                              HttpPhotoGateway(type: typePhoto.NEW))
+                              HttpPhotoGateway(type: typePhoto.NEW), HttpUserGateway())
                             ..add(GalleryFetch()),
                           child: GalleryGrid(
                             type: typeGrid.PHOTOS,
                           )),
                       BlocProvider<GalleryBloc>(
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                              HttpPhotoGateway(type: typePhoto.POPULAR))
+                              HttpPhotoGateway(type: typePhoto.POPULAR), HttpUserGateway())
                             ..add(GalleryFetch()),
                           child: GalleryGrid(
                             type: typeGrid.PHOTOS,

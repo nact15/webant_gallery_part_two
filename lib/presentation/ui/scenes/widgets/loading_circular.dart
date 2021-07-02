@@ -16,9 +16,12 @@ class LoadingCircular extends StatelessWidget {
               color: AppColors.mainColorAccent,
               strokeWidth: 2.0,
             ),
-            Text(
-              AppStrings.loading,
-              style: TextStyle(color: AppColors.mainColorAccent),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text(
+                AppStrings.loading,
+                style: TextStyle(color: AppColors.mainColorAccent),
+              ),
             ),
           ],
       ),

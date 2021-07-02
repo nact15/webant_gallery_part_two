@@ -19,3 +19,13 @@ class EditingPhoto extends AddPhotoEvent{
   final String description;
   EditingPhoto({this.photo, this.name, this.description});
 }
+class ViewsCounter extends AddPhotoEvent{
+  final PhotoModel photo;
+
+  ViewsCounter(this.photo);
+}
+class CountUpdated extends AddPhotoEvent{
+  final count;
+
+  CountUpdated(this.count);
+}
