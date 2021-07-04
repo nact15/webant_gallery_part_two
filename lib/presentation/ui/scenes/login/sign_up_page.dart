@@ -27,34 +27,34 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController nameController;
-  TextEditingController birthdayController;
-  TextEditingController emailController;
-  TextEditingController passwordController;
-  TextEditingController phoneController;
-  TextEditingController confirmPasswordController;
-  bool buttonColor;
+  TextEditingController _nameController;
+  TextEditingController _birthdayController;
+  TextEditingController _emailController;
+  TextEditingController _passwordController;
+  TextEditingController _phoneController;
+  TextEditingController _confirmPasswordController;
+  bool _buttonColor;
 
   @override
   void initState() {
-    nameController = TextEditingController();
-    birthdayController = TextEditingController();
-    emailController = TextEditingController();
-    passwordController = TextEditingController();
-    phoneController = TextEditingController();
-    confirmPasswordController = TextEditingController();
-    buttonColor = true;
+    _nameController = TextEditingController();
+    _birthdayController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _phoneController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+    _buttonColor = true;
     super.initState();
   }
 
   @override
   void dispose() {
-    nameController.dispose();
-    birthdayController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    phoneController.dispose();
+    _nameController.dispose();
+    _birthdayController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -65,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return BlocConsumer<AuthorizationBloc, AuthorizationState>(
       listener: (context, state) {
         if (state is ErrorAuthorization) {
-          setState(() => buttonColor = true);
+          setState(() => _buttonColor = true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.err),
@@ -96,7 +96,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   //user name
                   padding: const EdgeInsets.only(top: 40),
                   child: TextFormFields(
-                    controller: nameController,
+                    controller: _nameController,
                     hint: AppStrings.hintName,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
@@ -107,7 +107,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   //birthday
                   padding: const EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: birthdayController,
+                    controller: _birthdayController,
                     hint: AppStrings.hintBirthday,
                     typeField: typeTextField.BIRTHDAY,
                     textInputType: TextInputType.number,
@@ -123,7 +123,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   //email
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: emailController,
+                    controller: _emailController,
                     hint: AppStrings.hintEmail,
                     typeField: typeTextField.EMAIL,
                     textInputType: TextInputType.emailAddress,
@@ -134,7 +134,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   //phone
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
-                    controller: phoneController,
+                    controller: _phoneController,
                     hint: AppStrings.hintPhone,
                     typeField: typeTextField.PHONE,
                     textInputType: TextInputType.phone,
@@ -151,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: EdgeInsets.only(top: 29),
                   child: PasswordInputs(
                     typeField: typePasswordField.NEW_PASSWORD,
-                    controller: passwordController,
+                    controller: _passwordController,
                     hint: 'Password',
                     node: node,
                     validation: Validation(),
@@ -162,10 +162,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: EdgeInsets.only(top: 29),
                   child: PasswordInputs(
                     typeField: typePasswordField.CONFIRM_PASSWORD,
-                    controller: confirmPasswordController,
+                    controller: _confirmPasswordController,
                     hint: 'Confirm password',
                     node: node,
-                    confirmPasswordController: passwordController,
+                    confirmPasswordController: _passwordController,
                     callBack: addSignUpEvent,
                     validation: Validation(),
                   ),
@@ -183,7 +183,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           shadowColor: AppColors.colorWhite,
                           splashFactory: NoSplash.splashFactory,
                           primary:
-                              buttonColor ? AppColors.mainColor : Colors.white,
+                              _buttonColor ? AppColors.mainColor : Colors.white,
                         ),
                         onPressed: () {
                           node.unfocus();
@@ -228,12 +228,12 @@ class _SignUpPageState extends State<SignUpPage> {
     if (_formKey.currentState.validate()) {
       context.read<AuthorizationBloc>().add(
             SignUpEvent(
-              name: nameController.text,
-              password: passwordController.text,
-              email: emailController.text,
-              phone: phoneController.text,
-              birthday: birthdayController.text.isNotEmpty
-                  ? birthdayController.text
+              name: _nameController.text,
+              password: _passwordController.text,
+              email: _emailController.text,
+              phone: _phoneController.text,
+              birthday: _birthdayController.text.isNotEmpty
+                  ? _birthdayController.text
                   : DateTime.now().toString(),
             ),
           );
@@ -245,7 +245,7 @@ class _SignUpPageState extends State<SignUpPage> {
         builder: (context, state) {
       if (state is LoadingAuthorization) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          setState(() => buttonColor = false);
+          setState(() => _buttonColor = false);
         });
         return CircularProgressIndicator(
           color: AppColors.mainColorAccent,

@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 
 part 'search_photo_event.dart';
-
 part 'search_photo_state.dart';
 
 class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
@@ -27,16 +25,15 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
   ) async* {
     if (event is Searching) {
       try {
+        if (_photos.isEmpty) {
+          yield Loading();
+        }
         if (event.newQuery) {
           _photos.clear();
           _page = 1;
         }
-        if (_photos.isEmpty) {
-          yield Loading();
-        }
         _baseModel = await _photoGateway.fetchPhotos(
             queryText: event.queryText, page: _page);
-
         if (_page <= _baseModel.countOfPages) {
           String userName;
           List<PhotoModel> basePhotoModel = _baseModel.data as List<PhotoModel>;
@@ -48,7 +45,8 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
             _photos.add(element);
           }
           _page++;
-          yield Search(_photos, false);
+          int _countOfPhotos = _baseModel.totalItems;
+          yield Search(_photos, _countOfPhotos == _photos.length ? true : false);
         } else {
           yield Search(_photos, true);
         }

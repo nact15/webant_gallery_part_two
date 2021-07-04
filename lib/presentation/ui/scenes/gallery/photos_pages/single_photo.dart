@@ -12,7 +12,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bot
 class ScreenInfo extends StatelessWidget {
   ScreenInfo({Key key, this.photo}) : super(key: key);
   final PhotoModel photo;
-  final DateFormatter dateFormatter = DateFormatter();
+  final DateFormatter _dateFormatter = DateFormatter();
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +130,7 @@ class ScreenInfo extends StatelessWidget {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        dateFormatter.fromDate(photo.dateCreate),
+                        _dateFormatter.fromDate(photo.dateCreate),
                         style: TextStyle(
                           color: AppColors.mainColorAccent,
                         ),

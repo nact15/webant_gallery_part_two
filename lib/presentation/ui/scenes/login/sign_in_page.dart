@@ -27,24 +27,25 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
 
-  double heightFields = 36.0;
-  double widthButton = 120.0;
-  TextEditingController nameController;
-  TextEditingController passwordController;
-  HttpOauthGateway httpOauthGateway = HttpOauthGateway();
-  bool buttonColor = true;
+  double _heightFields = 36.0;
+  double _widthButton = 120.0;
+  TextEditingController _nameController;
+  TextEditingController _passwordController;
+  HttpOauthGateway oauthGateway = HttpOauthGateway();
+  bool _buttonColor = true;
 
   @override
   void initState() {
-    nameController = TextEditingController();
-    passwordController = TextEditingController();
+    oauthGateway = HttpOauthGateway();
+    _nameController = TextEditingController();
+    _passwordController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    nameController.dispose();
-    passwordController.dispose();
+    _nameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -54,7 +55,7 @@ class _SignInPageState extends State<SignInPage> {
     return BlocConsumer<AuthorizationBloc, AuthorizationState>(
       listener: (context, state) {
         if (state is ErrorAuthorization) {
-          setState(() => buttonColor = true);
+          setState(() => _buttonColor = true);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.err),
@@ -84,7 +85,7 @@ class _SignInPageState extends State<SignInPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 50),
                   child: TextFormFields(
-                    controller: nameController,
+                    controller: _nameController,
                     hint: AppStrings.hintName,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
@@ -95,7 +96,7 @@ class _SignInPageState extends State<SignInPage> {
                   padding: const EdgeInsets.only(top: 29),
                   child: PasswordInputs(
                     typeField: typePasswordField.OLD_PASSWORD,
-                    controller: passwordController,
+                    controller: _passwordController,
                     hint: 'Password',
                     node: node,
                     callBack: addLoginEvent,
@@ -121,15 +122,15 @@ class _SignInPageState extends State<SignInPage> {
                     //sign in
                     padding: EdgeInsets.only(top: 50),
                     child: SizedBox(
-                      height: heightFields,
-                      width: widthButton,
+                      height: _heightFields,
+                      width: _widthButton,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
                           shadowColor: AppColors.colorWhite,
                           splashFactory: NoSplash.splashFactory,
                           primary:
-                              buttonColor ? AppColors.mainColor : Colors.white,
+                              _buttonColor ? AppColors.mainColor : Colors.white,
                         ),
                         onPressed: () {
                           node.unfocus();
@@ -145,8 +146,8 @@ class _SignInPageState extends State<SignInPage> {
                     //sign up
                     padding: EdgeInsets.only(top: 10),
                     child: SizedBox(
-                      height: heightFields,
-                      width: widthButton,
+                      height: _heightFields,
+                      width: _widthButton,
                       child: TextButton(
                         style:
                             ButtonStyle(splashFactory: NoSplash.splashFactory),
@@ -171,7 +172,7 @@ class _SignInPageState extends State<SignInPage> {
     if (_formKey.currentState.validate()) {
       context
           .read<AuthorizationBloc>()
-          .add(SignInEvent(nameController.text, passwordController.text));
+          .add(SignInEvent(_nameController.text, _passwordController.text));
     }
   }
 
@@ -180,7 +181,7 @@ class _SignInPageState extends State<SignInPage> {
         builder: (context, state) {
       if (state is LoadingAuthorization) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          setState(() => buttonColor = false);
+          setState(() => _buttonColor = false);
         });
         return CircularProgressIndicator(
           color: AppColors.mainColorAccent,

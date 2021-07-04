@@ -5,7 +5,6 @@ import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dar
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_bloc/gallery_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_grid.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_bar.dart';
@@ -22,30 +21,32 @@ enum typePhoto { NEW, POPULAR, SEARCH_BY_USER, SEARCH }
 enum typeGrid { PHOTOS, SEARCH }
 
 class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
-  TextEditingController searchController;
+  TextEditingController _searchController;
   bool _search;
-  String queryText;
-  SearchPhotoBloc searchPhotoBloc;
+  String _queryText;
 
   @override
   void initState() {
     _search = false;
-    searchController = TextEditingController();
-    searchController.addListener(_searchListener);
+    _searchController = TextEditingController();
+    _searchController.addListener(_searchListener);
     super.initState();
   }
 
   _searchListener() {
-    String searchText = searchController.text;
-    if (searchController.text.isEmpty) {
-      queryText = '';
-      context.read<SearchPhotoBloc>().add(NotSearching());
-    } else if (searchText != queryText) {
+    String searchText = _searchController.text;
+    if (_searchController.text.isEmpty) {
+      _queryText = '';
       setState(() {
-        queryText = searchController.text;
+        _search = true;
+      });
+    } else if (searchText != _queryText) {
+      setState(() {
+        _search = false;
+        _queryText = _searchController.text;
         context
             .read<SearchPhotoBloc>()
-            .add(Searching(queryText: queryText, newQuery: true));
+            .add(Searching(queryText: _queryText, newQuery: true));
       });
     }
   }
@@ -55,7 +56,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
     return BlocListener<SearchPhotoBloc, SearchPhotoState>(
       listener: (context, state) {
         if (state is! NothingToSearch) {
-          setState(() {
+          setState(() {//TODO DELETE
             _search = true;
           });
         } else
@@ -74,7 +75,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
             backgroundColor: AppColors.colorWhite,
             appBar: AppBar(
               title: SearchBar(
-                searchController: searchController,
+                searchController: _searchController,
               ),
               elevation: 0,
               automaticallyImplyLeading: false,
@@ -96,72 +97,28 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                 ),
               ),
             ),
-            body: BlocBuilder<SearchPhotoBloc, SearchPhotoState>(
-              builder: (context, state) {
-                if (state is Loading) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        CircularProgressIndicator(
-                          color: AppColors.mainColorAccent,
-                          strokeWidth: 2.0,
-                        ),
-                        Text(
-                          AppStrings.loading,
-                          style: TextStyle(color: AppColors.mainColorAccent),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                if (state is Search) {
-                  return GalleryGrid(
-                    photos: state.photos,
-                    queryText: queryText,
-                    type: typeGrid.SEARCH,
-                  );
-                }
-                if (state is NotFound) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 200),
-                      child: Column(
-                        children: [
-                          Image.asset(AppStrings.imageIntersect),
-                          Text(
-                            'Image not found',
-                            style: TextStyle(
-                                color: AppColors.mainColorAccent, fontSize: 17),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-                if (state is NothingToSearch || !_search) {
-                  return TabBarView(
+            body: !_search
+                ? TabBarView(
                     children: <Widget>[
                       BlocProvider<GalleryBloc>(
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                              HttpPhotoGateway(type: typePhoto.NEW), HttpUserGateway())
+                              HttpPhotoGateway(type: typePhoto.NEW),
+                              HttpUserGateway())
                             ..add(GalleryFetch()),
                           child: GalleryGrid(
                             type: typeGrid.PHOTOS,
                           )),
                       BlocProvider<GalleryBloc>(
                           create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                              HttpPhotoGateway(type: typePhoto.POPULAR), HttpUserGateway())
+                              HttpPhotoGateway(type: typePhoto.POPULAR),
+                              HttpUserGateway())
                             ..add(GalleryFetch()),
                           child: GalleryGrid(
                             type: typeGrid.PHOTOS,
                           )),
                     ],
-                  );
-                }
-                return Text('');
-              },
-            ),
+                  )
+                : GalleryGrid(type: typeGrid.SEARCH, queryText: _queryText),
           ),
         ),
       ),

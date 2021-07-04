@@ -32,6 +32,15 @@ class TextFormFields extends StatefulWidget {
 }
 
 class _TextFormFieldsState extends State<TextFormFields> {
+
+  TextEditingController controller;
+  String label;
+  typeTextField typeField;
+  TextInputType textInputType;
+  List<TextInputFormatter> textInputFormatter;
+  var node;
+  Validation _validation = Validation();
+
   _TextFormFieldsState(
       this.controller,
       this.label,
@@ -39,14 +48,6 @@ class _TextFormFieldsState extends State<TextFormFields> {
       this.textInputType,
       this.textInputFormatter,
       this.node);
-
-  TextEditingController controller;
-  String label;
-  typeTextField typeField;
-  TextInputType textInputType;
-  var node;
-  List<TextInputFormatter> textInputFormatter;
-  Validation validation = Validation();
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +84,7 @@ class _TextFormFieldsState extends State<TextFormFields> {
           prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
           suffixIcon: InputIcons(typeField: typeField),
         ),
-        validator: (value) => validation.selectUserValidator(value: value, typeField: typeField),
+        validator: (value) => _validation.selectUserValidator(value: value, typeField: typeField),
         textInputAction: TextInputAction.next,
         onEditingComplete: () => node.nextFocus(),
     );

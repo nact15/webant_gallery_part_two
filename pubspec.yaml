@@ -32,13 +32,10 @@ dependencies:
   json_serializable: ^4.1.3
   json_annotation: ^4.0.1
   mask_text_input_formatter: ^2.0.0
-  date_text_masked: ^1.0.0
   bloc: ^7.0.0
   dio: ^4.0.0
   hive: ^2.0.4
   flutter_svg: ^0.22.0
-  cached_network_image: ^3.0.0
-  material_floating_search_bar: ^0.3.4
   build_runner: ^2.0.4
   hive_generator: ^1.1.0
   flutter_secure_storage: ^4.2.0
@@ -94,6 +91,9 @@ flutter:
         - asset: fonts/Roboto-Regular.ttf
         - asset: fonts/Roboto-Thin.ttf
           style: italic
+    - family: GalleryIcons
+      fonts:
+        - asset: fonts/GalleryIcons.ttf
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

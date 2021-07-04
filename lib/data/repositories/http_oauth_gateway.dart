@@ -14,7 +14,7 @@ class HttpOauthGateway extends OauthGateway {
   HttpOauthGateway();
 
   final _storage = Storage.FlutterSecureStorage();
-  final Dio dio = Dio()
+  final Dio _dio = Dio()
     ..interceptors
         .add(LogInterceptor(responseBody: true, requestBody: true, error: true))
     ..interceptors.add(alice.getDioInterceptor());
@@ -25,12 +25,12 @@ class HttpOauthGateway extends OauthGateway {
   @override
   // ignore: missing_return
   Future<UserModel> authorization(String username, String password) async {
-    dio
+    _dio
       ..interceptors.clear()
       ..interceptors.add(
           LogInterceptor(responseBody: true, requestBody: true, error: true))
       ..interceptors.add(alice.getDioInterceptor());
-    Response client = await dio.post(HttpStrings.urlClients, data: {
+    Response client = await _dio.post(HttpStrings.urlClients, data: {
       AppStrings.name: username,
       HttpStrings.allowedGrantTypes: [
         HttpStrings.password,
@@ -46,7 +46,7 @@ class HttpOauthGateway extends OauthGateway {
         HttpStrings.password: password,
         HttpStrings.clientSecret: oauthModel.secret,
       };
-      var getToken = await dio.get(HttpStrings.tokenEndpoint,
+      var getToken = await _dio.get(HttpStrings.tokenEndpoint,
           queryParameters: queryParameters);
       if (getToken.statusCode == 200) {
         String accessToken = getToken.data[AppStrings.accessToken];
@@ -66,9 +66,9 @@ class HttpOauthGateway extends OauthGateway {
 
   @override
   Future<UserModel> getUser() async {
-    dio.interceptors.clear();
-    dio.interceptors.add(HttpOauthInterceptor(dio, this));
-    var user = await dio.get(HttpStrings.currentUser);
+    _dio.interceptors.clear();
+    _dio.interceptors.add(HttpOauthInterceptor(_dio, this));
+    var user = await _dio.get(HttpStrings.currentUser);
     userModel = UserModel.fromJson(user.data);
     return userModel;
   }
@@ -85,17 +85,17 @@ class HttpOauthGateway extends OauthGateway {
       AppStrings.refreshToken: refreshToken,
       HttpStrings.clientSecret: secret,
     };
-    var getToken = await dio.get(HttpStrings.tokenEndpoint,
+    var getToken = await _dio.get(HttpStrings.tokenEndpoint,
         queryParameters: queryParameters);
     if (getToken.statusCode == 200) {
-      String token = getToken.data[AppStrings.accessToken];
+      String accessToken = getToken.data[AppStrings.accessToken];
       String refreshToken = getToken.data[AppStrings.refreshToken];
       _writeTokens(
-          accessToken: token,
+          accessToken: accessToken,
           refreshToken: refreshToken,
           id: id,
           secret: secret);
-      return token;
+      return accessToken;
     }
     return AppStrings.error;
   }

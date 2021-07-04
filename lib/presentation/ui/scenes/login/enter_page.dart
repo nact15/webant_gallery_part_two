@@ -10,7 +10,7 @@ enum typePasswordField { OLD_PASSWORD, NEW_PASSWORD, CONFIRM_PASSWORD }
 
 class EnterPage extends StatelessWidget {
   const EnterPage({Key key}) : super(key: key);
-  final double heightButton = 36;
+  final double _heightButton = 36;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +46,7 @@ class EnterPage extends StatelessWidget {
     double widthButton = MediaQuery.of(context).size.width ;
     return SizedBox(
       width: widthButton,
-      height: heightButton,
+      height: _heightButton,
       child: ElevatedButton(
         style: styleButton,
         child: text,

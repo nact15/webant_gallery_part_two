@@ -5,7 +5,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 
 showSignOutDialog(BuildContext context) {
-  // set up the buttons
+
   Widget cancelButton = ElevatedButton(
     child: Text("Cancel"),
     style: ElevatedButton.styleFrom(

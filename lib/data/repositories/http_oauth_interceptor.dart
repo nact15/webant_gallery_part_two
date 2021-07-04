@@ -4,11 +4,11 @@ import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dar
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 
 class HttpOauthInterceptor extends Interceptor {
-  final Dio dio;
+  final Dio _dio;
   final _storage = Storage.FlutterSecureStorage();
-  final HttpOauthGateway httpOauthGateway;
+  final HttpOauthGateway _httpOauthGateway;
 
-  HttpOauthInterceptor(this.dio, this.httpOauthGateway);
+  HttpOauthInterceptor(this._dio, this._httpOauthGateway);
 
   @override
   void onRequest(
@@ -16,7 +16,6 @@ class HttpOauthInterceptor extends Interceptor {
     String accessToken = await _storage.read(key: HttpStrings.userAccessToken);
     if (accessToken.isNotEmpty || accessToken != null) {
       options.headers = {HttpStrings.authorization: 'Bearer $accessToken'};
-      print(accessToken);
     }
     return handler.next(options);
   }
@@ -24,16 +23,18 @@ class HttpOauthInterceptor extends Interceptor {
   @override
   Future onError(DioError err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      String accessToken = await httpOauthGateway.refreshToken();
+      String accessToken = await _httpOauthGateway.refreshToken();
       if (accessToken != null) {
         err.requestOptions.headers =
             ({HttpStrings.authorization: 'Bearer $accessToken'});
-        dio.fetch(err.requestOptions).then(
+        _dio.fetch(err.requestOptions).then(
               (r) => handler.resolve(r),
             );
+      } else {
+        handler.next(err);
       }
-      return handler.next(err);
+    } else {
+      handler.next(err);
     }
-    return handler.next(err);
   }
 }

@@ -34,19 +34,16 @@ class _UserSettingsState extends State<UserSettings> {
   _UserSettingsState();
 
   final _formKey = GlobalKey<FormState>();
-  var passKey = GlobalKey<FormFieldState>();
   File _image;
-  final picker = ImagePicker();
+  final _picker = ImagePicker();
   TextEditingController _nameController;
   TextEditingController _birthdayController;
   TextEditingController _emailController;
   TextEditingController _oldPasswordController;
   TextEditingController _newPasswordController;
   TextEditingController _confirmPasswordController;
-  String confirmPassword;
-  String name;
-  UserModel user;
-  DateFormatter dateFormatter;
+  UserModel _user;
+  DateFormatter _dateFormatter;
 
   @override
   void initState() {
@@ -56,12 +53,7 @@ class _UserSettingsState extends State<UserSettings> {
     _oldPasswordController = TextEditingController();
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
-    dateFormatter = DateFormatter();
-    _newPasswordController.addListener(() {
-      setState(() {
-        confirmPassword = _newPasswordController.text;
-      });
-    });
+    _dateFormatter = DateFormatter();
     super.initState();
   }
 
@@ -77,7 +69,7 @@ class _UserSettingsState extends State<UserSettings> {
   }
 
   Future getImage(ImageSource source) async {
-    final pickedFile = await picker.getImage(source: source);
+    final pickedFile = await _picker.getImage(source: source);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
@@ -151,7 +143,7 @@ class _UserSettingsState extends State<UserSettings> {
             );
           }
           if (state is UserData) {
-            user = state.user;
+            _user = state.user;
             return Form(
               key: _formKey,
               child: ListView(
@@ -224,7 +216,7 @@ class _UserSettingsState extends State<UserSettings> {
                     padding: EdgeInsets.only(top: 10.0),
                     child: TextFormFields(
                       controller: _nameController
-                        ..text = user.username,
+                        ..text = _user.username,
                       hint: AppStrings.hintName,
                       typeField: typeTextField.USERNAME,
                       textInputType: TextInputType.name,
@@ -236,7 +228,7 @@ class _UserSettingsState extends State<UserSettings> {
                     padding: EdgeInsets.only(top: 29.0),
                     child: TextFormFields(
                       controller: _birthdayController
-                        ..text = dateFormatter.fromDate(user.birthday),
+                        ..text = _dateFormatter.fromDate(_user.birthday),
                       hint: AppStrings.hintBirthday,
                       typeField: typeTextField.BIRTHDAY,
                       textInputType: TextInputType.number,
@@ -263,7 +255,7 @@ class _UserSettingsState extends State<UserSettings> {
                     padding: EdgeInsets.only(top: 10.0),
                     child: TextFormFields(
                       controller: _emailController
-                        ..text = user.email,
+                        ..text = _user.email,
                       hint: AppStrings.hintEmail,
                       typeField: typeTextField.EMAIL,
                       textInputType: TextInputType.emailAddress,
@@ -318,7 +310,7 @@ class _UserSettingsState extends State<UserSettings> {
                         Text('You can'),
                         TextButton(
                           onPressed: () =>
-                              showDeleteAccountDialog(context, user),
+                              showDeleteAccountDialog(context, _user),
                           style: ButtonStyle(
                               splashFactory: NoSplash.splashFactory),
                           child: Text(
@@ -352,15 +344,15 @@ class _UserSettingsState extends State<UserSettings> {
 
   void updateUser() {
     if (_formKey.currentState.validate()) {
-      user = user.copyWith(
+      _user = _user.copyWith(
           email: _emailController.text,
           username: _nameController.text,
           birthday: _birthdayController.text);
-      context.read<UserBloc>().add(UpdateUser(user: user));
+      context.read<UserBloc>().add(UpdateUser(user: _user));
       if (_oldPasswordController.text.isNotEmpty &&
           _newPasswordController.text.isNotEmpty) {
         context.read<UserBloc>().add(UpdatePassword(
-            user, _oldPasswordController.text, _newPasswordController.text));
+            _user, _oldPasswordController.text, _newPasswordController.text));
       }
     }
   }

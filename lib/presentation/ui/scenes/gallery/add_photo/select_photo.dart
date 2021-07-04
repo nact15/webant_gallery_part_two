@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
-import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
@@ -23,10 +22,10 @@ class SelectPhoto extends StatefulWidget {
 
 class _SelectPhotoState extends State<SelectPhoto> {
   File _image;
-  final picker = ImagePicker();
+  final _picker = ImagePicker();
 
   Future getImage(ImageSource imageSource) async {
-    final pickedFile = await picker.getImage(source: imageSource);
+    final pickedFile = await _picker.getImage(source: imageSource);
 
     setState(() {
       if (pickedFile != null) {

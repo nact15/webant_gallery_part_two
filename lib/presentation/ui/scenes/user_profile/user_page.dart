@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
@@ -11,7 +12,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_grid.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/single_photo.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_settings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
@@ -26,15 +27,15 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  UserModel user;
+  UserModel _user;
   List<PhotoModel> photos;
-  DateFormatter dateFormatter;
+  DateFormatter _dateFormatter;
   Completer<void> _reFresh;
   int _viewsCount;
 
   @override
   void initState() {
-    dateFormatter = DateFormatter();
+    _dateFormatter = DateFormatter();
     _reFresh = Completer<void>();
     super.initState();
   }
@@ -50,11 +51,10 @@ class _UserPageState extends State<UserPage> {
           IconButton(
             icon: Icon(Icons.settings),
             color: Colors.black,
-            onPressed: () =>
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => UserSettings()),
-                ),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => UserSettings()),
+            ),
             alignment: Alignment.centerRight,
           ),
         ],
@@ -62,6 +62,15 @@ class _UserPageState extends State<UserPage> {
       ),
       body: MultiBlocListener(
         listeners: [
+          BlocListener<FirestoreBloc, FirestoreState>(
+            listener: (context, state) {
+              if (state is CountOfUserViews) {
+                setState(() {
+                  _viewsCount = state.count;
+                });
+              }
+            },
+          ),
           BlocListener<UserBloc, UserState>(
             listener: (context, state) {
               setState(() {
@@ -120,8 +129,7 @@ class _UserPageState extends State<UserPage> {
               );
             }
             if (state is UserData) {
-              photos = state.usersPhotos;
-              user = state.user;
+              _user = state.user;
               return Column(
                 children: [
                   RefreshIndicator(
@@ -149,21 +157,21 @@ class _UserPageState extends State<UserPage> {
                                 ),
                                 child: Center(
                                     child: CircleAvatar(
-                                      child: Icon(
-                                        Icons.camera_alt,
-                                        size: 55,
-                                        color: AppColors.mainColorAccent,
-                                      ),
-                                      radius: 50,
-                                      backgroundColor: AppColors.colorWhite,
-                                    )),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    size: 55,
+                                    color: AppColors.mainColorAccent,
+                                  ),
+                                  radius: 50,
+                                  backgroundColor: AppColors.colorWhite,
+                                )),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 10),
                               child: Center(
                                 child: Text(
-                                  user.username,
+                                  _user.username,
                                   style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w400),
@@ -174,7 +182,7 @@ class _UserPageState extends State<UserPage> {
                               padding: EdgeInsets.only(top: 10),
                               child: Center(
                                 child: Text(
-                                  dateFormatter.fromDate(user.birthday),
+                                  _dateFormatter.fromDate(_user.birthday),
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.mainColorAccent),
@@ -186,15 +194,7 @@ class _UserPageState extends State<UserPage> {
                               padding: const EdgeInsets.fromLTRB(16, 27, 0, 0),
                               child: Row(
                                 children: [
-                                  BlocBuilder<FirestoreBloc, FirestoreState>(
-                                    builder: (context, fireState) {
-                                      if (fireState is CountOfUserViews){
-                                        return Text(
-                                            'Views: ${fireState.count}');
-                                      }
-                                      return Text('');
-                                    },
-                                  ),
+                                  Text('Views: $_viewsCount'),
                                   Padding(
                                       padding: EdgeInsets.only(left: 16),
                                       child: Text(
@@ -217,11 +217,16 @@ class _UserPageState extends State<UserPage> {
                     ),
                   ),
                   Expanded(
-                    child: GalleryGrid(
-                      queryText: user.id,
-                      type: typeGrid.SEARCH,
-                      photos: photos,
-                      crossCount: 4,
+                    child: BlocProvider(
+                      create: (context) => SearchPhotoBloc(
+                          HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER),
+                          HttpUserGateway())
+                        ..add(Searching(queryText: _user.id, newQuery: false)),
+                      child: GalleryGrid(
+                        type: typeGrid.SEARCH,
+                        crossCount: 4,
+                        queryText: _user.id,
+                      ),
                     ),
                   ),
                 ],
@@ -230,14 +235,6 @@ class _UserPageState extends State<UserPage> {
             return Container();
           },
         ),
-      ),
-    );
-  }
-
-  void _toScreenInfo(PhotoModel photo) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ScreenInfo(photo: photo),
       ),
     );
   }

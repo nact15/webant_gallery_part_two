@@ -10,7 +10,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_scr
 class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
   HttpPhotoGateway({this.type});
 
-  Dio dio = Dio()
+  Dio _dio = Dio()
     ..interceptors.add(LogInterceptor(
       responseBody: true,
     ))
@@ -27,7 +27,7 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
         'limit': 10,
         enumToString(): queryText ?? true,
       };
-      Response response = await dio.get(url, queryParameters: queryParameters);
+      Response response = await _dio.get(url, queryParameters: queryParameters);
       final statusCode = response.statusCode;
       if (statusCode == 200) {
         return BaseModel.fromJson(response.data);

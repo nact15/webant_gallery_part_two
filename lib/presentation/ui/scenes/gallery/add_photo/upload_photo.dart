@@ -12,6 +12,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/back_widg
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
 
 import 'add_photo_bloc/add_photo_bloc.dart';
+import 'input_tags.dart';
 
 class UploadPhoto extends StatefulWidget {
   const UploadPhoto({Key key, this.image, this.photo}) : super(key: key);
@@ -25,23 +26,21 @@ class UploadPhoto extends StatefulWidget {
 enum typeValidator { NAME, DESCRIPTION }
 
 class _UploadPhotoState extends State<UploadPhoto> {
-  _UploadPhotoState(this._image, this.photo);
+  _UploadPhotoState(this._image, this._photo);
 
-  final PhotoModel photo;
+  final PhotoModel _photo;
   final _formKey = GlobalKey<FormState>();
 
   final File _image;
   TextEditingController _nameController;
   TextEditingController _descriptionController;
-  bool typeNew;
-  bool typePopular;
+  List<String> _tags = [];
 
   @override
   void initState() {
-    _nameController = TextEditingController(text: photo?.name ?? '');
-    _descriptionController = TextEditingController(text: photo?.description ?? '');
-    typeNew = true;
-    typePopular = false;
+    _nameController = TextEditingController(text: _photo?.name ?? '');
+    _descriptionController =
+        TextEditingController(text: _photo?.description ?? '');
     super.initState();
   }
 
@@ -65,9 +64,9 @@ class _UploadPhotoState extends State<UploadPhoto> {
           elevation: 1,
           actions: [
             TextButton(
-              onPressed: postPhoto,
+              onPressed: _postPhoto,
               child: Text(
-                (photo == null ? 'Add' : 'Edit'),
+                (_photo == null ? 'Add' : 'Edit'),
                 style: TextStyle(
                     color: AppColors.decorationColor,
                     fontWeight: FontWeight.w700,
@@ -78,7 +77,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
         ),
         body: BlocConsumer<AddPhotoBloc, AddPhotoState>(
           listener: (context, state) {
-            if (state is ErrorPostPhoto){
+            if (state is ErrorPostPhoto) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.err),
@@ -108,8 +107,8 @@ class _UploadPhotoState extends State<UploadPhoto> {
                     fontSize: 16.0);
               });
             }
-            return Center(
-              child: ListView(
+            return SingleChildScrollView(
+              child: Column(
                 children: <Widget>[
                   Container(
                     decoration: BoxDecoration(
@@ -123,9 +122,9 @@ class _UploadPhotoState extends State<UploadPhoto> {
                     width: MediaQuery.of(context).size.width,
                     child: Align(
                       alignment: Alignment.center,
-                      child: photo == null
+                      child: _photo == null
                           ? Image.file(_image)
-                          : Image.network(photo.getImage()),
+                          : Image.network(_photo.getImage()),
                     ),
                   ),
                   Form(
@@ -178,43 +177,13 @@ class _UploadPhotoState extends State<UploadPhoto> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: <Widget>[
-                                ActionChip(
-                                  label: Text(
-                                    'New',
-                                    style:
-                                        TextStyle(color: AppColors.colorWhite),
-                                  ),
-                                  onPressed: () {},
-                                  backgroundColor: AppColors.decorationColor,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  child: ActionChip(
-                                    label: Text(
-                                      'Popular',
-                                      style: TextStyle(
-                                          color: AppColors.colorWhite),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        typePopular = !typePopular;
-                                      });
-                                    },
-                                    backgroundColor: !typePopular
-                                        ? AppColors.mainColorAccent
-                                        : AppColors.decorationColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: InputTags(tags: _tags),
+                          ),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             );
@@ -224,7 +193,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
     );
   }
 
-  void postPhoto() {
+  void _postPhoto() {
     if (_formKey.currentState.validate()) {
       if (_image != null) {
         context.read<AddPhotoBloc>().add(
@@ -235,11 +204,11 @@ class _UploadPhotoState extends State<UploadPhoto> {
             );
       } else {
         context.read<AddPhotoBloc>().add(
-          EditingPhoto(
-              photo: photo,
-              name: _nameController.text,
-              description: _descriptionController.text),
-        );
+              EditingPhoto(
+                  photo: _photo,
+                  name: _nameController.text,
+                  description: _descriptionController.text),
+            );
       }
     }
   }

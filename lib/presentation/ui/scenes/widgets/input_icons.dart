@@ -3,22 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
-class InputIcons extends StatefulWidget {
+class InputIcons extends StatelessWidget {
   const InputIcons({Key key, this.typeField, this.passwordVisible})
       : super(key: key);
   final typeTextField typeField;
   final bool passwordVisible;
-
-  @override
-  _InputIconsState createState() =>
-      _InputIconsState(typeField, passwordVisible);
-}
-
-class _InputIconsState extends State<InputIcons> {
-  final typeTextField typeField;
-  bool passwordVisible;
-
-  _InputIconsState(this.typeField, this.passwordVisible);
 
   @override
   Widget build(BuildContext context) {

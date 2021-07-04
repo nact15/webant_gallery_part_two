@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
-import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 
 part 'add_photo_event.dart';
@@ -31,14 +30,6 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
     if (event is CountUpdated) {
       yield CountOfViews(event.count);
     }
-    if (event is ViewsCounter) {
-      add(CountUpdated(''));
-      _countSubscription?.cancel();
-      await _firestoreRepository.incrementViewsCount(event.photo);
-      _countSubscription = _firestoreRepository.getCount(event.photo).listen(
-            (count) => add(CountUpdated(count)),
-          );
-    }
     if (event is PostPhoto) {
       yield* _mapPostPhotoToCompletePost(event);
     }
@@ -48,6 +39,19 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
     if (event is EditingPhoto) {
       yield* _mapEditingPhotoToCompletePost(event);
     }
+    if (event is ViewsCounter) {
+      yield* _mapViewsCounterToCountUpdated(event);
+    }
+  }
+
+  Stream<AddPhotoState> _mapViewsCounterToCountUpdated(
+      ViewsCounter event) async* {
+    _countSubscription?.cancel();
+    add(CountUpdated(''));
+    await _firestoreRepository.incrementViewsCount(event.photo);
+    _countSubscription = _firestoreRepository.getCount(event.photo).listen(
+          (count) => add(CountUpdated(count)),
+        );
   }
 
   Stream<AddPhotoState> _mapEditingPhotoToCompletePost(
@@ -73,7 +77,8 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
   Stream<AddPhotoState> _mapPostPhotoToCompletePost(PostPhoto event) async* {
     try {
       yield LoadingPostPhoto();
-      photo = await _httpPostPhoto.postPhoto(file: event.file, name: event.name);
+      photo =
+          await _httpPostPhoto.postPhoto(file: event.file, name: event.name);
       yield CompletePost();
     } on DioError {
       yield ErrorPostPhoto('Lost internet connection');

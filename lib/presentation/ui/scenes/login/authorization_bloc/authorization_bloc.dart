@@ -13,16 +13,15 @@ import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 
 part 'authorization_event.dart';
-
 part 'authorization_state.dart';
 
 class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
-  AuthorizationBloc(this.oauthGateway, this.userGateway, this.userBloc)
+  AuthorizationBloc(this._oauthGateway, this._userGateway, this._userBloc)
       : super(AuthorizationInitial());
-  final UserBloc userBloc;
-  UserModel user;
-  final HttpOauthGateway oauthGateway;
-  final HttpUserGateway userGateway;
+  final UserBloc _userBloc;
+  UserModel _user;
+  final HttpOauthGateway _oauthGateway;
+  final HttpUserGateway _userGateway;
   final _storage = Storage.FlutterSecureStorage();
 
   @override
@@ -45,7 +44,8 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     yield LoginData(isLogin: false, isLoading: true);
     String _token = await _storage.read(key: HttpStrings.userAccessToken);
     if (_token != null ?? _token.isNotEmpty) {
-      userBloc.add(UserFetch());
+      await _storage.write(key: HttpStrings.userAccessToken, value: '111');
+      _userBloc.add(UserFetch());
       yield LoginData(isLogin: true, isLoading: false);
     } else {
       yield LoginData(isLogin: false, isLoading: false);
@@ -55,16 +55,16 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   Stream<AuthorizationState> _mapSignUpEventToAccess(SignUpEvent event) async* {
     try {
       yield LoadingAuthorization();
-      user = UserModel(
+      _user = UserModel(
           username: event.name,
           birthday: event.birthday,
           email: event.email,
           phone: event.phone,
           password: event.password,
           roles: [AppStrings.roleUser]);
-      await userGateway.registration(user);
-      await oauthGateway.authorization(event.name, event.password);
-      userBloc.add(UserFetch());
+      await _userGateway.registration(_user);
+      await _oauthGateway.authorization(event.name, event.password);
+      _userBloc.add(UserFetch());
       yield AccessAuthorization();
     } on DioError catch (err) {
       if (err?.response?.statusCode == 400) {
@@ -78,8 +78,8 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
   Stream<AuthorizationState> _mapSignInEventToAccess(SignInEvent event) async* {
     try {
       yield LoadingAuthorization();
-      await oauthGateway.authorization(event.name, event.password); //!!!
-      userBloc.add(UserFetch());
+      await _oauthGateway.authorization(event.name, event.password); //!!!
+      _userBloc.add(UserFetch());
       yield AccessAuthorization();
     } on DioError catch (err) {
       if (err?.response?.statusCode == 400) {

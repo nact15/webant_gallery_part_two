@@ -6,8 +6,8 @@ import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 
 
 class ChoosePhotoBottomSheet extends StatelessWidget {
-  ChoosePhotoBottomSheet(this.callBack);
-  final void Function(ImageSource) callBack;
+  ChoosePhotoBottomSheet(this._callBack);
+  final void Function(ImageSource) _callBack;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class ChoosePhotoBottomSheet extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.pop(context);
-            callBack(ImageSource.camera);
+            _callBack(ImageSource.camera);
           },
         ),
         CupertinoActionSheetAction(
@@ -36,7 +36,7 @@ class ChoosePhotoBottomSheet extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.pop(context);
-            callBack(ImageSource.gallery);
+            _callBack(ImageSource.gallery);
           },
         ),
       ],
