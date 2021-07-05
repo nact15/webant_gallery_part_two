@@ -6,9 +6,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
+import 'package:webant_gallery_part_two/data/repositories/firesrore_repository.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
+import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
 
 part 'gallery_event.dart';
@@ -21,6 +23,7 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
   Box _photosBox;
   int _page = 1;
   BaseModel<T> _baseModel;
+  FirestoreRepository _firestoreRepository = FirebaseFirestoreRepository();
 
 @override
   Stream<GalleryState> mapEventToState(GalleryEvent event) async* {

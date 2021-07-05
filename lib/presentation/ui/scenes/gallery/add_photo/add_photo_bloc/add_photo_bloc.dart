@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
+import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 
@@ -18,6 +19,7 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
   final HttpPostPhoto _httpPostPhoto;
   final FirestoreRepository _firestoreRepository;
   StreamSubscription _countSubscription;
+  final _httpUserGateway = HttpUserGateway();
 
   AddPhotoBloc(this._httpPostPhoto, {FirestoreRepository firestoreRepository})
       : _firestoreRepository = firestoreRepository,
@@ -46,13 +48,14 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
 
   Stream<AddPhotoState> _mapViewsCounterToCountUpdated(
       ViewsCounter event) async* {
-    _countSubscription?.cancel();
-    add(CountUpdated(''));
+    yield CountOfViews('');
     await _firestoreRepository.incrementViewsCount(event.photo);
+    _countSubscription?.cancel();
     _countSubscription = _firestoreRepository.getCount(event.photo).listen(
           (count) => add(CountUpdated(count)),
         );
   }
+
 
   Stream<AddPhotoState> _mapEditingPhotoToCompletePost(
       EditingPhoto event) async* {
@@ -79,6 +82,7 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
       yield LoadingPostPhoto();
       photo =
           await _httpPostPhoto.postPhoto(file: event.file, name: event.name);
+      await _firestoreRepository.createPhoto(photo, event.tags);
       yield CompletePost();
     } on DioError {
       yield ErrorPostPhoto('Lost internet connection');

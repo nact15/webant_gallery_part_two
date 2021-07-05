@@ -54,13 +54,7 @@ class _GalleryState extends State<Gallery> {
                 HttpPhotoGateway(type: typePhoto.SEARCH), HttpUserGateway()),
             child: NewOrPopularPhotos()),
         SelectPhoto(),
-        BlocProvider(
-          create: (context) => FirestoreBloc(
-              firestoreRepository: FirebaseFirestoreRepository(),
-              oauthGateway: HttpOauthGateway())
-            ..add(UserViewsCounter()),
-          child: UserPage(),
-        ),
+        UserPage(),
       ],
     );
   }
@@ -69,7 +63,7 @@ class _GalleryState extends State<Gallery> {
     setState(() {
       _bottomSelectedIndex = index;
       _pageController.animateToPage(index,
-          duration: const Duration(milliseconds: 500), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 500), curve: Curves.easeInCirc);
     });
   }
 

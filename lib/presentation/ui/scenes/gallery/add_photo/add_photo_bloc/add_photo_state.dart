@@ -26,3 +26,4 @@ class CountOfViews extends AddPhotoState {
 
   CountOfViews(this.count);
 }
+

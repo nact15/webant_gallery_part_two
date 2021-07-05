@@ -24,7 +24,7 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
       final String url = HttpStrings.urlPhotos;
       final Map<String, dynamic> queryParameters = <String, dynamic>{
         'page': page,
-        'limit': 10,
+        'limit': type == typePhoto.SEARCH_BY_USER ? 16 : 10,
         enumToString(): queryText ?? true,
       };
       Response response = await _dio.get(url, queryParameters: queryParameters);

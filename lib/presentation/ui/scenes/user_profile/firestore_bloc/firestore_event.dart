@@ -8,3 +8,8 @@ class UserCountUpdated extends FirestoreEvent{
 
   UserCountUpdated(this.count);
 }
+class GetTags extends FirestoreEvent{
+  final PhotoModel photo;
+
+  GetTags(this.photo);
+}

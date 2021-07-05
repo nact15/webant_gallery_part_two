@@ -7,8 +7,9 @@ class PostPhoto extends AddPhotoEvent {
   final String name;
   final String description;
   final File file;
+  final List<String> tags;
 
-  PostPhoto({this.name, this.description, this.file});
+  PostPhoto({this.name, this.description, this.file, this.tags});
 }
 
 class DeletingPhoto extends AddPhotoEvent {
@@ -21,8 +22,9 @@ class EditingPhoto extends AddPhotoEvent {
   final PhotoModel photo;
   final String name;
   final String description;
+  final List<String> tags;
 
-  EditingPhoto({this.photo, this.name, this.description});
+  EditingPhoto({this.photo, this.name, this.description, this.tags});
 }
 
 class ViewsCounter extends AddPhotoEvent {
@@ -36,3 +38,4 @@ class CountUpdated extends AddPhotoEvent {
 
   CountUpdated(this.count);
 }
+

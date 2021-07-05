@@ -200,6 +200,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
               PostPhoto(
                   file: _image,
                   name: _nameController.text,
+                  tags: _tags,
                   description: _descriptionController.text),
             );
       } else {
@@ -207,6 +208,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
               EditingPhoto(
                   photo: _photo,
                   name: _nameController.text,
+                  tags: _tags,
                   description: _descriptionController.text),
             );
       }

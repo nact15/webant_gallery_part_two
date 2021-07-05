@@ -11,6 +11,7 @@ import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/authorization_bloc/authorization_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/firestore_bloc/firestore_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:flutter/services.dart';
 
@@ -45,6 +46,11 @@ Future<void> main() async {
           create: (BuildContext context) => AddPhotoBloc(HttpPostPhoto(),
               firestoreRepository: FirebaseFirestoreRepository())),
       BlocProvider(create: (BuildContext context) => userBloc),
+      BlocProvider(
+        create: (context) => FirestoreBloc(
+            HttpUserGateway(), HttpOauthGateway(),
+            firestoreRepository: FirebaseFirestoreRepository()),
+      ),
     ], child: WelcomeScreen()));
   }, (error, stackTrace) {});
 }

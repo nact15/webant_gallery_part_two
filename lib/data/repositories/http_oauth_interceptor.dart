@@ -25,6 +25,7 @@ class HttpOauthInterceptor extends Interceptor {
     if (err.response?.statusCode == 401) {
       String accessToken = await _httpOauthGateway.refreshToken();
       if (accessToken != null) {
+        print(accessToken);
         err.requestOptions.headers =
             ({HttpStrings.authorization: 'Bearer $accessToken'});
         _dio.fetch(err.requestOptions).then(

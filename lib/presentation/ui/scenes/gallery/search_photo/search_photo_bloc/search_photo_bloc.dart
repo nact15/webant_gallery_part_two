@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
+import 'package:webant_gallery_part_two/data/repositories/firesrore_repository.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
+import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 
@@ -18,6 +20,7 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
   BaseModel<T> _baseModel;
   final UserGateway _httpUserGateway;
   int _page = 1;
+  FirestoreRepository _firestoreRepository = FirebaseFirestoreRepository();
 
   @override
   Stream<SearchPhotoState> mapEventToState(
@@ -38,10 +41,6 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
           String userName;
           List<PhotoModel> basePhotoModel = _baseModel.data as List<PhotoModel>;
           for (PhotoModel element in basePhotoModel) {
-            if (element.user != null) {
-              userName = await _httpUserGateway.getUserName(element.user);
-              element = element.copyWith(user: userName);
-            }
             _photos.add(element);
           }
           _page++;

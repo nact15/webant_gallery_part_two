@@ -17,25 +17,58 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
   }
 
   @override
-  Stream<int> getViewsCountOfUserPhoto(UserModel user){
-    return _photos.where('user', isEqualTo: user.username).snapshots().map((event) => event.docs.fold(
-        0, (prev, next) => prev + next['viewsCount']));
+  Stream<int> getViewsCountOfUserPhoto(UserModel user) {
+    return _photos.where('user', isEqualTo: user.username).snapshots().map(
+        (event) =>
+            event.docs.fold(0, (prev, next) => prev + next['viewsCount']));
+  }
+
+  @override
+  Future<void> createPhoto(PhotoModel photo, List<String> tags) async {
+    Map<String, dynamic> data = photo.toJson();
+    data.addAll({
+      'tags': tags,
+      'viewsCount': 0,
+    });
+    _photos.doc(photo.id.toString()).set(data);
   }
 
   @override
   Future<void> incrementViewsCount(PhotoModel photo) async {
     var photoRef = _photos.doc(photo.id.toString());
-    await photoRef.get().then((DocumentSnapshot doc) {
-      if (!doc.exists) {
-        photoRef.set(photo.toJson());
+    await photoRef
+        .get()
+        .then((DocumentSnapshot doc) {
+          if (!doc.exists) {
+            Map<String, dynamic> data = photo.toJson();
+            data.addAll({
+              'viewsCount': 0,
+            });
+            photoRef.set(data);
+          }
+        })
+        .whenComplete(
+            () => photoRef.update({'viewsCount': FieldValue.increment(1)}))
+        .catchError((onError) {
+          return 0;
+        });
+  }
+
+  @override
+  Future<List<dynamic>> getTags(PhotoModel photo) async {
+    DocumentSnapshot doc = await _photos.doc(photo.id.toString()).get();
+    if (doc.exists) {
+      try {
+        List<dynamic> tags = doc['tags'];
+        if (tags.isNotEmpty || tags != null) {
+          return tags;
+        } else {
+          return [];
+        }
+      } catch (e){
+        return [];
       }
-    }).catchError((onError) {
-      return 0;
-    });
-    await photoRef.get().then((DocumentSnapshot doc) {
-      doc.reference.update({'viewsCount': FieldValue.increment(1)});
-    }).catchError((onError) {
-      return 0;
-    });
+    }
+    return [];
   }
 }

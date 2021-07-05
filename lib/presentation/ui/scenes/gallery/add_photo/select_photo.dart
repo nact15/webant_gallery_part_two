@@ -120,11 +120,8 @@ class _SelectPhotoState extends State<SelectPhoto> {
     } else {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (BuildContext context) => BlocProvider<AddPhotoBloc>(
-            create: (BuildContext context) => AddPhotoBloc(HttpPostPhoto()),
-            child: UploadPhoto(
-              image: _image,
-            ),
+          builder: (BuildContext context) => UploadPhoto(
+            image: _image,
           ),
         ),
       );

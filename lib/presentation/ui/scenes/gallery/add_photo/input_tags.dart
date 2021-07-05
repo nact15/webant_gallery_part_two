@@ -35,7 +35,7 @@ class _InputTagsState extends State<InputTags> {
           for (String tag in tags) _buildInputChips(tag),
           Container(
             margin: EdgeInsets.only(top: 6.0),
-            width: 80.0,
+            width: 100.0,
             height: 36,
             child: TextField(
               cursorColor: AppColors.mainColorAccent,
@@ -43,7 +43,7 @@ class _InputTagsState extends State<InputTags> {
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.all(8),
                 hintText: 'Add',
-                hintStyle: TextStyle(color: AppColors.mainColorAccent),
+                hintStyle: TextStyle(color: AppColors.mainColorAccent,),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25),
                   borderSide: BorderSide(

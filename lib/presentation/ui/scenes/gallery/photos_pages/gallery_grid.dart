@@ -13,6 +13,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/single_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
+import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/firestore_bloc/firestore_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bottom_sheet.dart';
 
@@ -33,14 +34,22 @@ class GalleryGrid extends StatefulWidget {
 class _GalleryGridState extends State<GalleryGrid> {
   ScrollController _controller;
   Completer<void> _reFresh;
-  final typeGrid type;
-  var queryText;
-  int crossCount;
-  bool _isLastPage = false;
   List<PhotoModel> _photos;
+  bool _isLastPage;
+  final typeGrid type;
+  final queryText;
+  final int crossCount;
 
   _GalleryGridState({this.type, this.crossCount, this.queryText});
 
+  @override
+  void initState() {
+    _reFresh = Completer<void>();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+    _isLastPage = false;
+    super.initState();
+  }
   _scrollListener() {
     if (!_isLastPage) {
       if (_controller.offset >= _controller.position.maxScrollExtent &&
@@ -55,14 +64,6 @@ class _GalleryGridState extends State<GalleryGrid> {
         }
       }
     }
-  }
-
-  @override
-  void initState() {
-    _reFresh = Completer<void>();
-    _controller = ScrollController();
-    _controller.addListener(_scrollListener);
-    super.initState();
   }
 
   @override
@@ -274,6 +275,7 @@ class _GalleryGridState extends State<GalleryGrid> {
 
   void _toScreenInfo(PhotoModel photo) {
     context.read<AddPhotoBloc>().add(ViewsCounter(photo));
+    context.read<FirestoreBloc>().add(GetTags(photo));
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ScreenInfo(photo: photo),
