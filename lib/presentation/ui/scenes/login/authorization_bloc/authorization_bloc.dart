@@ -8,7 +8,6 @@ import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 
@@ -44,7 +43,6 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
     yield LoginData(isLogin: false, isLoading: true);
     String _token = await _storage.read(key: HttpStrings.userAccessToken);
     if (_token != null ?? _token.isNotEmpty) {
-      await _storage.write(key: HttpStrings.userAccessToken, value: '111');
       _userBloc.add(UserFetch());
       yield LoginData(isLogin: true, isLoading: false);
     } else {
@@ -61,7 +59,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
           email: event.email,
           phone: event.phone,
           password: event.password,
-          roles: [AppStrings.roleUser]);
+          roles: [HttpStrings.roleUser]);
       await _userGateway.registration(_user);
       await _oauthGateway.authorization(event.name, event.password);
       _userBloc.add(UserFetch());
@@ -70,7 +68,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
       if (err?.response?.statusCode == 400) {
         yield ErrorAuthorization(jsonDecode(err?.response?.data)['detail']);
       } else {
-        yield ErrorAuthorization(AppStrings.noInternet);
+        yield ErrorAuthorization('error');
       }
     }
   }
@@ -85,7 +83,7 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
       if (err?.response?.statusCode == 400) {
         yield ErrorAuthorization(err?.response?.data['error_description']);
       } else {
-        yield ErrorAuthorization(AppStrings.noInternet);
+        yield ErrorAuthorization('error');
       }
     }
   }

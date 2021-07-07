@@ -9,25 +9,28 @@ import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
+import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 import 'package:webant_gallery_part_two/domain/repositories/oauth_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc<T> extends Bloc<UserEvent, UserState> {
-  UserBloc(this._oauthGateway, this._userGateway)
+  UserBloc(this._oauthGateway, this._userGateway, this._firestoreRepository)
       : super(UserInitial());
   final _storage = Storage.FlutterSecureStorage();
   final UserGateway _userGateway;
   final OauthGateway _oauthGateway;
+  final FirestoreRepository _firestoreRepository;
+  StreamSubscription _countUserSubscription;
   PhotoGateway _photoGateway = HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER);
   UserModel _user;
   BaseModel<T> _baseModel;
   bool _isUpdate = false;
+  var userData;
 
   @override
   Stream<UserState> mapEventToState(
@@ -48,6 +51,9 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
     if (event is UserDelete) {
       _mapUserDeleteToExit(event);
     }
+    if (event is CountOfViews) {
+      yield userData.copyWith(countOfViews: event.count);
+    }
   }
 
   Stream<UserState> _mapUserFetchToUserData(UserFetch event) async* {
@@ -57,9 +63,17 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
       _baseModel =
       await _photoGateway.fetchPhotos(page: 1, queryText: _user.id);
       int countOfPhotos = _baseModel.totalItems;
-      yield UserData(user: _user, countOfPhotos: countOfPhotos, isUpdate: _isUpdate);
+      userData = UserData(user: _user, countOfPhotos: countOfPhotos, isUpdate: _isUpdate);
+      yield userData;
+      _isUpdate = false;
+      _countUserSubscription?.cancel();
+      _countUserSubscription =
+          _firestoreRepository.getViewsCountOfUserPhoto(_user).listen(
+                (count) => add(CountOfViews(count)),
+          );
     } on DioError {
       yield ErrorData();
+
     }
   }
 
@@ -69,9 +83,9 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
       await _userGateway.updateUser(event.user);
       _isUpdate = true;
       add(UserFetch());
-      _isUpdate = false;
-    } on DioError {
-      yield ErrorUpdate(AppStrings.error);
+    } on DioError catch (err){
+      if (err.type == DioErrorType.other) yield ErrorData();
+      else yield ErrorUpdate('error');
     }
   }
 
@@ -80,13 +94,14 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
       yield LoadingUpdate();
       await _userGateway.updatePasswordUser(
           event.user, event.oldPassword, event.newPassword);
+      _isUpdate = true;
       add(UserFetch());
     } on DioError catch (err) {
       _isUpdate = false;
       if (err?.response?.statusCode == 400) {
         yield ErrorUpdate(jsonDecode(err?.response?.data)['detail']);
       } else {
-        yield ErrorUpdate(AppStrings.error);
+        yield ErrorUpdate('error');
       }
       add(UserFetch());
     }

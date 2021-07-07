@@ -18,7 +18,7 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
 
   @override
   Stream<int> getViewsCountOfUserPhoto(UserModel user) {
-    return _photos.where('user', isEqualTo: user.username).snapshots().map(
+    return _photos.where('user', isEqualTo: '/api/users/${user.id}').snapshots().map(
         (event) =>
             event.docs.fold(0, (prev, next) => prev + next['viewsCount']));
   }
@@ -30,28 +30,29 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
       'tags': tags,
       'viewsCount': 0,
     });
-    _photos.doc(photo.id.toString()).set(data);
+    _photos
+        .doc(photo.id.toString())
+        .set(data)
+        .onError((error, stackTrace) => null);
   }
 
   @override
   Future<void> incrementViewsCount(PhotoModel photo) async {
     var photoRef = _photos.doc(photo.id.toString());
-    await photoRef
-        .get()
-        .then((DocumentSnapshot doc) {
-          if (!doc.exists) {
-            Map<String, dynamic> data = photo.toJson();
-            data.addAll({
-              'viewsCount': 0,
-            });
-            photoRef.set(data);
-          }
-        })
-        .whenComplete(
-            () => photoRef.update({'viewsCount': FieldValue.increment(1)}))
-        .catchError((onError) {
-          return 0;
+    await photoRef.get().then((DocumentSnapshot doc) {
+      if (!doc.exists) {
+        Map<String, dynamic> data = photo.toJson();
+        data.addAll({
+          'viewsCount': 0,
         });
+        photoRef.set(data);
+      }
+    }).catchError((onError) {
+      return;
+    });
+    await photoRef.get().then((DocumentSnapshot doc) {
+      photoRef.update({'viewsCount': FieldValue.increment(1)});
+    });
   }
 
   @override
@@ -65,7 +66,7 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
         } else {
           return [];
         }
-      } catch (e){
+      } catch (e) {
         return [];
       }
     }

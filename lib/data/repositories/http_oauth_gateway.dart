@@ -1,12 +1,9 @@
-import 'package:alice/alice.dart';
-import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as Storage;
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_interceptor.dart';
 import 'package:webant_gallery_part_two/domain/models/oauth/oauth_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/oauth_gateway.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 
@@ -31,10 +28,10 @@ class HttpOauthGateway extends OauthGateway {
           LogInterceptor(responseBody: true, requestBody: true, error: true))
       ..interceptors.add(alice.getDioInterceptor());
     Response client = await _dio.post(HttpStrings.urlClients, data: {
-      AppStrings.name: username,
+      HttpStrings.name: username,
       HttpStrings.allowedGrantTypes: [
         HttpStrings.password,
-        AppStrings.refreshToken
+        HttpStrings.refreshToken
       ]
     });
     if (client.statusCode == 201) {
@@ -49,8 +46,8 @@ class HttpOauthGateway extends OauthGateway {
       var getToken = await _dio.get(HttpStrings.tokenEndpoint,
           queryParameters: queryParameters);
       if (getToken.statusCode == 200) {
-        String accessToken = getToken.data[AppStrings.accessToken];
-        String refreshToken = getToken.data[AppStrings.refreshToken];
+        String accessToken = getToken.data[HttpStrings.accessToken];
+        String refreshToken = getToken.data[HttpStrings.refreshToken];
         String secret = oauthModel.secret;
         String id = '${oauthModel.id}_${oauthModel.randomId}';
         _writeTokens(
@@ -67,7 +64,9 @@ class HttpOauthGateway extends OauthGateway {
   @override
   Future<UserModel> getUser() async {
     _dio.interceptors.clear();
-    _dio.interceptors.add(HttpOauthInterceptor(_dio, this));
+    _dio.interceptors
+      ..add(HttpOauthInterceptor(_dio, this))
+      ..add(alice.getDioInterceptor());
     var user = await _dio.get(HttpStrings.currentUser);
     userModel = UserModel.fromJson(user.data);
     return userModel;
@@ -81,15 +80,15 @@ class HttpOauthGateway extends OauthGateway {
     final secret = await _storage.read(key: HttpStrings.userSecret);
     final Map<String, dynamic> queryParameters = <String, dynamic>{
       HttpStrings.clientId: id,
-      HttpStrings.grantType: AppStrings.refreshToken,
-      AppStrings.refreshToken: refreshToken,
+      HttpStrings.grantType: HttpStrings.refreshToken,
+      HttpStrings.refreshToken: refreshToken,
       HttpStrings.clientSecret: secret,
     };
     var getToken = await _dio.get(HttpStrings.tokenEndpoint,
         queryParameters: queryParameters);
     if (getToken.statusCode == 200) {
-      String accessToken = getToken.data[AppStrings.accessToken];
-      String refreshToken = getToken.data[AppStrings.refreshToken];
+      String accessToken = getToken.data[HttpStrings.accessToken];
+      String refreshToken = getToken.data[HttpStrings.refreshToken];
       _writeTokens(
           accessToken: accessToken,
           refreshToken: refreshToken,
@@ -97,7 +96,7 @@ class HttpOauthGateway extends OauthGateway {
           secret: secret);
       return accessToken;
     }
-    return AppStrings.error;
+    return '';
   }
 
   void _writeTokens(

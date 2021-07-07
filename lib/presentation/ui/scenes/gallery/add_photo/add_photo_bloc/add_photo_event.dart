@@ -39,3 +39,5 @@ class CountUpdated extends AddPhotoEvent {
   CountUpdated(this.count);
 }
 
+class InitialEvent extends AddPhotoEvent {}
+

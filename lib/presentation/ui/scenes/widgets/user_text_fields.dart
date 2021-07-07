@@ -12,81 +12,68 @@ class TextFormFields extends StatefulWidget {
   const TextFormFields(
       {Key key,
       this.controller,
-      this.hint,
+      this.label,
       this.typeField,
       this.textInputType,
       this.textInputFormatter,
-      this.scrollController, this.node})
+      this.scrollController,
+      this.node})
       : super(key: key);
   final TextEditingController controller;
   final ScrollController scrollController;
-  final String hint;
+  final String label;
   final typeTextField typeField;
   final TextInputType textInputType;
   final List<TextInputFormatter> textInputFormatter;
   final node;
 
   @override
-  _TextFormFieldsState createState() => _TextFormFieldsState(controller, hint,
-      typeField, textInputType, textInputFormatter, node);
+  _TextFormFieldsState createState() => _TextFormFieldsState();
 }
 
 class _TextFormFieldsState extends State<TextFormFields> {
-
-  TextEditingController controller;
-  String label;
-  typeTextField typeField;
-  TextInputType textInputType;
-  List<TextInputFormatter> textInputFormatter;
-  var node;
   Validation _validation = Validation();
-
-  _TextFormFieldsState(
-      this.controller,
-      this.label,
-      this.typeField,
-      this.textInputType,
-      this.textInputFormatter,
-      this.node);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        cursorColor: AppColors.mainColorAccent,
-        cursorHeight: 20,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        controller: controller,
-        keyboardType: textInputType,
-        inputFormatters: textInputFormatter,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(6),
-          focusedBorder: AppStyles.borderTextField.copyWith(
-              borderSide: BorderSide(color: AppColors.decorationColor)),
-          enabledBorder: AppStyles.borderTextField,
-          focusedErrorBorder: AppStyles.borderTextField,
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.red,
-            ),
+      cursorColor: AppColors.mainColorAccent,
+      cursorHeight: 20,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      controller: widget.controller,
+      keyboardType: widget.textInputType,
+      inputFormatters: widget.textInputFormatter,
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.all(6),
+        focusedBorder: AppStyles.borderTextField
+            .copyWith(borderSide: BorderSide(color: AppColors.decorationColor)),
+        enabledBorder: AppStyles.borderTextField,
+        focusedErrorBorder: AppStyles.borderTextField,
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
           ),
-          labelText: label,
-          labelStyle: TextStyle(
-            color: AppColors.mainColorAccent,
-          ),
-          prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 5, bottom: 2),
-              child: typeField == typeTextField.PHONE
-                  ? Text('+7 ',
-                      style: TextStyle(
-                          fontSize: 17, color: AppColors.mainColorAccent),
-                    )
-                  : null),
-          prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
-          suffixIcon: InputIcons(typeField: typeField),
         ),
-        validator: (value) => _validation.selectUserValidator(value: value, typeField: typeField),
-        textInputAction: TextInputAction.next,
-        onEditingComplete: () => node.nextFocus(),
+        labelText: widget.label,
+        labelStyle: TextStyle(
+          color: AppColors.mainColorAccent,
+        ),
+        prefixIcon: Padding(
+            padding: EdgeInsets.only(left: 5, bottom: 2),
+            child: widget.typeField == typeTextField.PHONE
+                ? Text(
+                    '+7 ',
+                    style: TextStyle(
+                        fontSize: 17, color: AppColors.mainColorAccent),
+                  )
+                : null),
+        prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
+        suffixIcon: InputIcons(typeField: widget.typeField),
+      ),
+      validator: (value) => _validation.selectUserValidator(
+          value: value, typeField: widget.typeField, context: context),
+      textInputAction: TextInputAction.next,
+      onEditingComplete: () => widget.node.nextFocus(),
     );
   }
 }

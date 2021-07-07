@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:webant_gallery_part_two/domain/usecases/validation.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
@@ -89,7 +90,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 30),
-                    child: Text(AppStrings.signUp, style: AppStyles.styleSign),
+                    child: Text(S.of(context).buttonSignUp, style: AppStyles.styleSign),
                   ),
                 ),
                 Padding(
@@ -97,7 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: const EdgeInsets.only(top: 40),
                   child: TextFormFields(
                     controller: _nameController,
-                    hint: AppStrings.hintName,
+                    label: S.of(context).labelUsername,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
                     node: node,
@@ -108,7 +109,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: const EdgeInsets.only(top: 29),
                   child: TextFormFields(
                     controller: _birthdayController,
-                    hint: AppStrings.hintBirthday,
+                    label: S.of(context).labelBirthday,
                     typeField: typeTextField.BIRTHDAY,
                     textInputType: TextInputType.number,
                     textInputFormatter: <TextInputFormatter>[
@@ -124,7 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
                     controller: _emailController,
-                    hint: AppStrings.hintEmail,
+                    label: S.of(context).labelEmail,
                     typeField: typeTextField.EMAIL,
                     textInputType: TextInputType.emailAddress,
                     node: node,
@@ -135,7 +136,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: EdgeInsets.only(top: 29),
                   child: TextFormFields(
                     controller: _phoneController,
-                    hint: AppStrings.hintPhone,
+                    label: S.of(context).labelPhone,
                     typeField: typeTextField.PHONE,
                     textInputType: TextInputType.phone,
                     textInputFormatter: <TextInputFormatter>[
@@ -152,7 +153,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: PasswordInputs(
                     typeField: typePasswordField.NEW_PASSWORD,
                     controller: _passwordController,
-                    hint: 'Password',
+                    label: S.of(context).labelPassword,
                     node: node,
                     validation: Validation(),
                   ),
@@ -163,9 +164,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: PasswordInputs(
                     typeField: typePasswordField.CONFIRM_PASSWORD,
                     controller: _confirmPasswordController,
-                    hint: 'Confirm password',
+                    label: S.of(context).labelConfirmPassword,
                     node: node,
-                    confirmPasswordController: _passwordController,
+                    confirmPassword: _passwordController,
                     callBack: addSignUpEvent,
                     validation: Validation(),
                   ),
@@ -176,7 +177,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: EdgeInsets.only(top: 29),
                     child: SizedBox(
                       height: 36,
-                      width: 120,
+                      width: 150,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
@@ -200,13 +201,13 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: EdgeInsets.only(top: 10),
                     child: SizedBox(
                       height: 36,
-                      width: 120,
+                      width: 150,
                       child: TextButton(
                         style:
                             ButtonStyle(splashFactory: NoSplash.splashFactory),
                         onPressed: signIn, //to SignInPage
                         child: Text(
-                          AppStrings.signIn,
+                          S.of(context).buttonSignIn,
                           style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w400,
@@ -262,7 +263,7 @@ class _SignUpPageState extends State<SignUpPage> {
         });
       }
       return Text(
-        AppStrings.signIn,
+        S.of(context).buttonSignUp,
         style: AppStyles.signInButtonMain,
       );
     });

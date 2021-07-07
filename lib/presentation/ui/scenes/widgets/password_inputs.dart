@@ -8,50 +8,26 @@ class PasswordInputs extends StatefulWidget {
   const PasswordInputs(
       {Key key,
       this.controller,
-      this.confirmPasswordController,
-      this.hint,
-      this.typeField,
-      this.callBack,
-      this.node,
-      this.validation})
-      : super(key: key);
-  final TextEditingController controller;
-  final TextEditingController confirmPasswordController;
-  final String hint;
-  final typePasswordField typeField;
-  final VoidCallback callBack;
-  final node;
-  final validation;
-
-  @override
-  _PasswordInputsState createState() => _PasswordInputsState(
-      controller: controller,
-      confirmPasswordController: confirmPasswordController,
-      label: hint,
-      typeField: typeField,
-      callBack: callBack,
-      node: node,
-      validation: validation);
-}
-
-class _PasswordInputsState extends State<PasswordInputs> {
-  TextEditingController controller;
-  TextEditingController confirmPasswordController;
-  String label;
-  typePasswordField typeField;
-  VoidCallback callBack;
-  var validation;
-  var node;
-
-  _PasswordInputsState(
-      {this.controller,
-      this.confirmPasswordController,
       this.label,
       this.typeField,
       this.callBack,
       this.node,
-      this.validation});
+      this.validation,
+      this.confirmPassword})
+      : super(key: key);
+  final TextEditingController controller;
+  final String label;
+  final typePasswordField typeField;
+  final VoidCallback callBack;
+  final node;
+  final validation;
+  final TextEditingController confirmPassword;
 
+  @override
+  _PasswordInputsState createState() => _PasswordInputsState();
+}
+
+class _PasswordInputsState extends State<PasswordInputs> {
   bool _passwordVisible;
 
   @override
@@ -66,7 +42,7 @@ class _PasswordInputsState extends State<PasswordInputs> {
       cursorColor: AppColors.mainColorAccent,
       cursorHeight: 20,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      controller: controller,
+      controller: widget.controller,
       keyboardType: TextInputType.visiblePassword,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.all(6),
@@ -79,7 +55,7 @@ class _PasswordInputsState extends State<PasswordInputs> {
             color: Colors.red,
           ),
         ),
-        labelText: label,
+        labelText: widget.label,
         labelStyle: TextStyle(
           color: AppColors.mainColorAccent,
         ),
@@ -95,16 +71,16 @@ class _PasswordInputsState extends State<PasswordInputs> {
       ),
       obscureText: !_passwordVisible,
       obscuringCharacter: '*',
-      validator: (value) => validation.selectPasswordValidator(
-          value, typeField, confirmPasswordController),
+      validator: (value) => widget.validation.selectPasswordValidator(
+          context, value, widget.typeField, widget.confirmPassword),
       textInputAction:
-          callBack != null ? TextInputAction.go : TextInputAction.next,
+          widget.callBack != null ? TextInputAction.go : TextInputAction.next,
       onEditingComplete: () {
-        if (callBack != null) {
-          callBack();
-          node.unfocus();
+        if (widget.callBack != null) {
+          widget.callBack();
+          widget.node.unfocus();
         } else {
-          node.nextFocus();
+          widget.node.nextFocus();
         }
       },
     );

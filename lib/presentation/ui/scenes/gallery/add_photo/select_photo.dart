@@ -2,16 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/upload_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/choose_photo_bottom_sheet.dart';
-
-import 'add_photo_bloc/add_photo_bloc.dart';
 
 class SelectPhoto extends StatefulWidget {
   const SelectPhoto({Key key}) : super(key: key);
@@ -45,8 +42,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
         actions: [
           TextButton(
             onPressed: nextPage,
-            child: Text(
-              ('Next'),
+            child: Text(S.of(context).buttonNext,
               style: TextStyle(
                 fontSize: 17,
                 color: AppColors.decorationColor,
@@ -95,7 +91,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
                       ),
                       style: AppStyles.styleButtonAlreadyHaveAccount,
                       child: Text(
-                        'Select photo',
+                        S.of(context).buttonSelectPhoto,
                         style: TextStyle(color: AppColors.mainColor),
                       ),
                     ),
@@ -113,7 +109,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
     if (_image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No image selected'),
+          content: Text(S.of(context).errorNoImage),
           backgroundColor: Colors.red,
         ),
       );

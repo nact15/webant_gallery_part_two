@@ -46,12 +46,10 @@ class ScreenInfo extends StatelessWidget {
                     child: selectPhoto(context),
                   ),
                 ),
-                onLongPress: () {
-                  showCupertinoModalPopup(
-                      context: context,
-                      builder: (BuildContext context) =>
-                          PhotoBottomSheet(photo: photo));
-                },
+                onLongPress: () => showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        PhotoBottomSheet(photo: photo)),
                 onTap: () {
                   return Center(
                     child: Hero(
@@ -120,14 +118,15 @@ class ScreenInfo extends StatelessWidget {
                     flex: 1,
                     child: BlocBuilder<FirestoreBloc, FirestoreState>(
                       builder: (context, state) {
-                        if (state is ShowTags){
+                        if (state is ShowTags) {
                           return Text(
                             state.userName ?? 'no user',
                             style: TextStyle(
                               color: AppColors.mainColorAccent,
                             ),
                           );
-                        } return Text('');
+                        }
+                        return Text('');
                       },
                     ),
                   ),

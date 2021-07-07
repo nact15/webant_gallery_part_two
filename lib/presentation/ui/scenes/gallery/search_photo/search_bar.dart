@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 
 class SearchBar extends StatefulWidget {
@@ -25,7 +26,7 @@ class _SearchBarState extends State<SearchBar> {
           filled: true,
           fillColor: AppColors.colorOfSearchBar,
           contentPadding: EdgeInsets.all(8),
-          hintText: 'Search',
+          hintText: S.of(context).hintSearch,
           hintStyle: TextStyle(
             fontSize: 17,
             color: AppColors.mainColorAccent,

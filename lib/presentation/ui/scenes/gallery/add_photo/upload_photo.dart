@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
@@ -66,7 +67,9 @@ class _UploadPhotoState extends State<UploadPhoto> {
             TextButton(
               onPressed: _postPhoto,
               child: Text(
-                (_photo == null ? 'Add' : 'Edit'),
+                (_photo == null
+                    ? S.of(context).buttonAddPhoto
+                    : S.of(context).buttonEditPhoto),
                 style: TextStyle(
                     color: AppColors.decorationColor,
                     fontWeight: FontWeight.w700,
@@ -95,98 +98,103 @@ class _UploadPhotoState extends State<UploadPhoto> {
             }
             if (state is CompletePost) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
+                context.read<AddPhotoBloc>().add(InitialEvent());
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => Gallery()),
                     (Route<dynamic> route) => false);
                 Fluttertoast.showToast(
-                    msg: 'Publication has been moderated',
+                    msg: S.of(context).msgPhotoModerated,
                     toastLength: Toast.LENGTH_LONG,
                     gravity: ToastGravity.BOTTOM,
                     backgroundColor: AppColors.mainColorAccent,
                     textColor: Colors.white,
                     fontSize: 16.0);
               });
-            }
-            return SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.colorOfSearchBar,
-                      border: Border(
-                        bottom: BorderSide(
-                            color: AppColors.mainColorAccent, width: 1.0),
+            } else
+              return SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.colorOfSearchBar,
+                        border: Border(
+                          bottom: BorderSide(
+                              color: AppColors.mainColorAccent, width: 1.0),
+                        ),
+                      ),
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      width: MediaQuery.of(context).size.width,
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: _photo == null
+                            ? Image.file(_image)
+                            : Image.network(_photo.getImage()),
                       ),
                     ),
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    width: MediaQuery.of(context).size.width,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: _photo == null
-                          ? Image.file(_image)
-                          : Image.network(_photo.getImage()),
-                    ),
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Center(
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                            child: TextFormField(
-                                controller: _nameController,
+                    Form(
+                      key: _formKey,
+                      child: Center(
+                        child: Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                              child: TextFormField(
+                                  controller: _nameController,
+                                  decoration: InputDecoration(
+                                    hintText: S.of(context).labelPhotoName,
+                                    contentPadding: EdgeInsets.all(8.0),
+                                    focusedBorder: AppStyles.borderTextField
+                                        .copyWith(
+                                            borderSide: BorderSide(
+                                                color:
+                                                    AppColors.decorationColor)),
+                                    enabledBorder: AppStyles.borderTextField,
+                                    focusedErrorBorder:
+                                        AppStyles.borderTextField,
+                                    errorBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return S.of(context).errorEmptyPhotoName;
+                                    }
+                                    return null;
+                                  }),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                              height: 100,
+                              child: TextFormField(
+                                controller: _descriptionController,
+                                maxLines: 5,
                                 decoration: InputDecoration(
-                                  hintText: 'Name',
+                                  hintText: S.of(context).labelDescription,
                                   contentPadding: EdgeInsets.all(8.0),
                                   focusedBorder: AppStyles.borderTextField
                                       .copyWith(
                                           borderSide: BorderSide(
                                               color:
-                                                  AppColors.decorationColor)),
+                                                  AppColors.mainColorAccent)),
                                   enabledBorder: AppStyles.borderTextField,
-                                  focusedErrorBorder: AppStyles.borderTextField,
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Colors.red,
-                                    ),
-                                  ),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please input name';
-                                  }
-                                  return null;
-                                }),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-                            height: 100,
-                            child: TextFormField(
-                              controller: _descriptionController,
-                              maxLines: 5,
-                              decoration: InputDecoration(
-                                hintText: 'Description',
-                                contentPadding: EdgeInsets.all(8.0),
-                                focusedBorder: AppStyles.borderTextField
-                                    .copyWith(
-                                        borderSide: BorderSide(
-                                            color: AppColors.mainColorAccent)),
-                                enabledBorder: AppStyles.borderTextField,
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: InputTags(tags: _tags),
-                          ),
-                        ],
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 20.0),
+                              child: InputTags(tags: _tags),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
+                  ],
+                ),
+              );
+            return Container();
           },
         ),
       ),

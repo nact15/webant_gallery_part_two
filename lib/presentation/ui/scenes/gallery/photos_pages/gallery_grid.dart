@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
@@ -20,27 +21,22 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bot
 import 'gallery_bloc/gallery_bloc.dart';
 
 class GalleryGrid extends StatefulWidget {
-  const GalleryGrid({Key key, this.type, this.crossCount, this.queryText})
+  GalleryGrid({Key key, this.type, this.crossCount, this.queryText})
       : super(key: key);
   final typeGrid type;
   final int crossCount;
   final queryText;
 
   @override
-  _GalleryGridState createState() => _GalleryGridState(
-      type: type, crossCount: crossCount, queryText: queryText);
+  _GalleryGridState createState() => _GalleryGridState();
 }
 
-class _GalleryGridState extends State<GalleryGrid> {
+class _GalleryGridState extends State<GalleryGrid>
+    with AutomaticKeepAliveClientMixin {
   ScrollController _controller;
   Completer<void> _reFresh;
   List<PhotoModel> _photos;
   bool _isLastPage;
-  final typeGrid type;
-  final queryText;
-  final int crossCount;
-
-  _GalleryGridState({this.type, this.crossCount, this.queryText});
 
   @override
   void initState() {
@@ -50,17 +46,18 @@ class _GalleryGridState extends State<GalleryGrid> {
     _isLastPage = false;
     super.initState();
   }
+
   _scrollListener() {
     if (!_isLastPage) {
       if (_controller.offset >= _controller.position.maxScrollExtent &&
           !_controller.position.outOfRange) {
-        if (type == typeGrid.PHOTOS) {
+        if (widget.type == typeGrid.PHOTOS) {
           context.read<GalleryBloc>().add(GalleryFetch());
         }
-        if (type == typeGrid.SEARCH) {
+        if (widget.type == typeGrid.SEARCH) {
           context
               .read<SearchPhotoBloc>()
-              .add(Searching(queryText: queryText, newQuery: false));
+              .add(Searching(queryText: widget.queryText, newQuery: false));
         }
       }
     }
@@ -106,7 +103,7 @@ class _GalleryGridState extends State<GalleryGrid> {
               childCount: photos?.length ?? 0,
             ),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossCount ?? 2,
+              crossAxisCount: widget.crossCount ?? 2,
               childAspectRatio: 1,
               mainAxisSpacing: 9,
               crossAxisSpacing: 9,
@@ -138,7 +135,7 @@ class _GalleryGridState extends State<GalleryGrid> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        type == typeGrid.PHOTOS
+        widget.type == typeGrid.PHOTOS
             ? BlocListener<GalleryBloc, GalleryState>(
                 listener: (context, state) {
                   setState(() {
@@ -170,6 +167,10 @@ class _GalleryGridState extends State<GalleryGrid> {
                       setState(() {
                         _isLastPage = true;
                       });
+                    } else {
+                      setState(() {
+                        _isLastPage = false;
+                      });
                     }
                   }
                 },
@@ -180,13 +181,13 @@ class _GalleryGridState extends State<GalleryGrid> {
         backgroundColor: AppColors.colorWhite,
         strokeWidth: 2.0,
         onRefresh: () async {
-          if (type == typeGrid.PHOTOS) {
+          if (widget.type == typeGrid.PHOTOS) {
             context.read<GalleryBloc>().add(GalleryRefresh());
           }
-          if (type == typeGrid.SEARCH) {
+          if (widget.type == typeGrid.SEARCH) {
             context
                 .read<SearchPhotoBloc>()
-                .add(Searching(queryText: queryText, newQuery: true));
+                .add(Searching(queryText: widget.queryText, newQuery: true));
           }
         },
         child: _selectBloc(),
@@ -195,7 +196,7 @@ class _GalleryGridState extends State<GalleryGrid> {
   }
 
   Widget _selectBloc() {
-    if (type == typeGrid.SEARCH) {
+    if (widget.type == typeGrid.SEARCH) {
       return BlocBuilder<SearchPhotoBloc, SearchPhotoState>(
         builder: (context, state) {
           if (state is Loading) {
@@ -212,7 +213,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                   children: [
                     Image.asset(AppStrings.imageIntersect),
                     Text(
-                      'Image not found',
+                      S.of(context).errorFoundImage,
                       style: TextStyle(
                           color: AppColors.mainColorAccent, fontSize: 17),
                     ),
@@ -225,7 +226,7 @@ class _GalleryGridState extends State<GalleryGrid> {
         },
       );
     }
-    if (type == typeGrid.PHOTOS) {
+    if (widget.type == typeGrid.PHOTOS) {
       return BlocBuilder<GalleryBloc, GalleryState>(builder: (context, state) {
         if (state is GalleryLoaded) {
           return LoadingCircular();
@@ -249,7 +250,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        'Sorry!',
+                        S.of(context).errorSorry,
                         style: TextStyle(
                             fontSize: 25,
                             color: AppColors.mainColorAccent,
@@ -257,7 +258,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                       ),
                     ),
                     Text(
-                      'There is no pictures. \nPlease come back later.',
+                      S.of(context).errorLoadedPhoto,
                       style: TextStyle(color: AppColors.mainColorAccent),
                       textAlign: TextAlign.center,
                     )
@@ -282,4 +283,7 @@ class _GalleryGridState extends State<GalleryGrid> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

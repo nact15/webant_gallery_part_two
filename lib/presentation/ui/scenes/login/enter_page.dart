@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
+import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/sign_in_page.dart';
@@ -8,32 +10,85 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/login/sign_up_pag
 enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PHONE }
 enum typePasswordField { OLD_PASSWORD, NEW_PASSWORD, CONFIRM_PASSWORD }
 
-class EnterPage extends StatelessWidget {
+class EnterPage extends StatefulWidget {
   const EnterPage({Key key}) : super(key: key);
+
+  @override
+  _EnterPageState createState() => _EnterPageState();
+}
+
+class _EnterPageState extends State<EnterPage> {
   final double _heightButton = 36;
+  List<String> locales = ['en', 'ru'];
+
+  void setLocale(String value) {
+    setState(() {
+      S.load(Locale.fromSubtags(languageCode: '$value'));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.colorWhite,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: AppColors.colorWhite,
+        elevation: 0,
+        actions: <Widget>[
+          PopupMenuButton(
+            icon: Icon(Icons.language, color: AppColors.mainColorAccent),
+            onSelected: setLocale,
+            padding: EdgeInsets.zero,
+            itemBuilder: (BuildContext context) {
+              return locales.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(0, 208, 0, 40),
+              padding: const EdgeInsets.fromLTRB(0, 150, 0, 40),
               child: Image.asset(AppStrings.imageAnt),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 18),
-              child: AppStyles.textWelcome,
+              child: Text(
+                S.of(context).welcomeTitle,
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.mainColor,
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
               child: buttons(context, AppStyles.styleButtonCreateAccount,
-                  AppStyles.textCreateAccount, SignUpPage()),
+                  Text(//buttonCreateAccount
+                    S.of(context).buttonCreateAccount,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14),
+                  ), SignUpPage()),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: buttons(context, AppStyles.styleButtonAlreadyHaveAccount,
-                  AppStyles.textAlreadyHaveAccount, SignInPage()),
+                  Text(
+                    S.of(context).buttonAlreadyHaveAccount,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
+                  ), SignInPage()),
             ),
           ],
         ),
@@ -43,7 +98,7 @@ class EnterPage extends StatelessWidget {
 
   Widget buttons(
       BuildContext context, ButtonStyle styleButton, Text text, page) {
-    double widthButton = MediaQuery.of(context).size.width ;
+    double widthButton = MediaQuery.of(context).size.width;
     return SizedBox(
       width: widthButton,
       height: _heightButton,
@@ -52,8 +107,7 @@ class EnterPage extends StatelessWidget {
         child: text,
         onPressed: () {
           Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext context) => page),
+            MaterialPageRoute(builder: (BuildContext context) => page),
           );
         },
       ),

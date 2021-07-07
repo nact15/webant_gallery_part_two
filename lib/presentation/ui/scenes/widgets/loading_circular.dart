@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 
@@ -19,7 +20,7 @@ class LoadingCircular extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
               child: Text(
-                AppStrings.loading,
+                S.of(context).labelLoadingIndicator,
                 style: TextStyle(color: AppColors.mainColorAccent),
               ),
             ),

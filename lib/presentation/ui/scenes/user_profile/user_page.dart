@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
@@ -16,8 +16,6 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_ph
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_settings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
-
-import 'firestore_bloc/firestore_bloc.dart';
 
 class UserPage extends StatefulWidget {
   UserPage({Key key}) : super(key: key);
@@ -31,7 +29,7 @@ class _UserPageState extends State<UserPage> {
   List<PhotoModel> photos;
   DateFormatter _dateFormatter;
   Completer<void> _reFresh;
-  int _viewsCount;
+  List<String> locales = ['en', 'ru'];
 
   @override
   void initState() {
@@ -41,15 +39,42 @@ class _UserPageState extends State<UserPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void setLocale(String lang) {
+    setState(() {
+      S.load(Locale.fromSubtags(languageCode: '$lang'));
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.colorWhite,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        actions: [
+        actions: <Widget>[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: PopupMenuButton(
+              icon: Icon(Icons.language, color: AppColors.mainColorAccent),
+              onSelected: setLocale,
+              padding: EdgeInsets.zero,
+              itemBuilder: (BuildContext context) {
+                return locales.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              },
+            ),
+          ),
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings, color: AppColors.mainColor),
             color: Colors.black,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
@@ -62,15 +87,6 @@ class _UserPageState extends State<UserPage> {
       ),
       body: MultiBlocListener(
         listeners: [
-          BlocListener<FirestoreBloc, FirestoreState>(
-            listener: (context, state) {
-              if (state is CountOfUserViews) {
-                setState(() {
-                  _viewsCount = state.count;
-                });
-              }
-            },
-          ),
           BlocListener<UserBloc, UserState>(
             listener: (context, state) {
               setState(() {
@@ -194,11 +210,13 @@ class _UserPageState extends State<UserPage> {
                               padding: const EdgeInsets.fromLTRB(16, 27, 0, 0),
                               child: Row(
                                 children: [
-                                  Text('Views: $_viewsCount'),
+                                  Text(S.of(context).countOfViews +
+                                      state.countOfViews.toString()),
                                   Padding(
-                                      padding: EdgeInsets.only(left: 16),
-                                      child: Text(
-                                          'Loaded: ${state.countOfPhotos}')),
+                                    padding: EdgeInsets.only(left: 16),
+                                    child: Text(S.of(context).countOfLoaded +
+                                        state.countOfPhotos.toString()),
+                                  ),
                                 ],
                               ),
                             ),
@@ -219,8 +237,7 @@ class _UserPageState extends State<UserPage> {
                   Expanded(
                     child: BlocProvider(
                       create: (context) => SearchPhotoBloc(
-                          HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER),
-                          HttpUserGateway())
+                          HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER))
                         ..add(Searching(queryText: _user.id, newQuery: false)),
                       child: GalleryGrid(
                         type: typeGrid.SEARCH,

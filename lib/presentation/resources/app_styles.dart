@@ -9,32 +9,9 @@ class AppStyles {
       primary: AppColors.colorWhite,
       side: BorderSide(color: AppColors.mainColor));
 
-  static const Text textAlreadyHaveAccount = Text(
-    AppStrings.buttonAlreadyHaveAccount,
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      fontSize: 14,
-      color: Colors.black,
-    ),
-  );
-
-  static const Text textCreateAccount = Text(
-    AppStrings.buttonCreateAccount,
-    textAlign: TextAlign.center,
-    style: TextStyle(fontSize: 14),
-  );
-
   static ButtonStyle styleButtonCreateAccount =
       ElevatedButton.styleFrom(primary: AppColors.mainColor);
 
-  static const Text textWelcome = Text(
-    AppStrings.welcome,
-    style: TextStyle(
-      fontSize: 25,
-      fontWeight: FontWeight.w700,
-      color: AppColors.mainColor,
-    ),
-  );
 
   static const TextStyle styleSign = TextStyle(
     fontSize: 30,
@@ -44,11 +21,6 @@ class AppStyles {
     decoration: TextDecoration.underline,
     decorationColor: AppColors.decorationColor,
     decorationThickness: 2,
-  );
-
-  static const textCancel = Text(
-    'Cancel',
-    style: TextStyle(color: AppColors.textTitleCancel, fontSize: 15),
   );
 
   static OutlineInputBorder borderTextField = OutlineInputBorder(

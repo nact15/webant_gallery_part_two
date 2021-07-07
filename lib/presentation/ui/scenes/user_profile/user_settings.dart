@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -9,11 +10,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/sign_out_dialog.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/update_validation.dart';
+import 'package:webant_gallery_part_two/domain/usecases/update_validation.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/back_widget.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
@@ -31,9 +33,8 @@ class UserSettings extends StatefulWidget {
 }
 
 class _UserSettingsState extends State<UserSettings> {
-  _UserSettingsState();
-
-  final _formKey = GlobalKey<FormState>();
+  final _formUserKey = GlobalKey<FormState>();
+  final _formPasswordKey = GlobalKey<FormState>();
   File _image;
   final _picker = ImagePicker();
   TextEditingController _nameController;
@@ -44,6 +45,7 @@ class _UserSettingsState extends State<UserSettings> {
   TextEditingController _confirmPasswordController;
   UserModel _user;
   DateFormatter _dateFormatter;
+  Completer<void> _reFresh;
 
   @override
   void initState() {
@@ -54,6 +56,7 @@ class _UserSettingsState extends State<UserSettings> {
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _dateFormatter = DateFormatter();
+    _reFresh = Completer<void>();
     super.initState();
   }
 
@@ -89,30 +92,26 @@ class _UserSettingsState extends State<UserSettings> {
         elevation: 1,
         leading: BackWidget(),
         actions: [
-          TextButton(
-            onPressed: () => updateUser(),
-            child: Text(
-              'Save',
-              style: TextStyle(
-                  color: AppColors.decorationColor,
-                  fontWeight: FontWeight.w700),
-            ),
+          BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              if (state is! ErrorData && state is! LoadingUpdate) {
+                return TextButton(
+                  onPressed: () => updateUser(),
+                  child: Text(
+                    S.of(context).buttonSave,
+                    style: TextStyle(
+                        color: AppColors.decorationColor,
+                        fontWeight: FontWeight.w700),
+                  ),
+                );
+              }
+              return Text('');
+            },
           ),
         ],
       ),
       body: BlocConsumer<UserBloc, UserState>(
         listener: (context, state) {
-          if (state is UserData) {
-            if (state.isUpdate) {
-              Fluttertoast.showToast(
-                  msg: 'User profile has been updated',
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.BOTTOM,
-                  backgroundColor: AppColors.mainColorAccent,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-            }
-          }
           if (state is Exit) {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => EnterPage()),
@@ -126,15 +125,6 @@ class _UserSettingsState extends State<UserSettings> {
               ),
             );
           }
-          if (state is UserUpdate) {
-            Fluttertoast.showToast(
-                msg: 'User profile has been updated',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.BOTTOM,
-                backgroundColor: AppColors.mainColorAccent,
-                textColor: Colors.white,
-                fontSize: 16.0);
-          }
         },
         builder: (context, state) {
           if (state is LoadingUpdate) {
@@ -142,198 +132,258 @@ class _UserSettingsState extends State<UserSettings> {
               child: LoadingCircular(),
             );
           }
-          if (state is UserData) {
-            _user = state.user;
-            return Form(
-              key: _formKey,
-              child: ListView(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 21),
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () => showCupertinoModalPopup(
-                          context: context,
-                          builder: (BuildContext context) =>
-                              ChoosePhotoBottomSheet(getImage),
+          if (state is ErrorData) {
+            return RefreshIndicator(
+              color: AppColors.mainColorAccent,
+              backgroundColor: AppColors.colorWhite,
+              strokeWidth: 2.0,
+              onRefresh: () async {
+                context.read<UserBloc>().add(UserFetch());
+                return _reFresh.future;
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Container(
+                  color: AppColors.colorWhite,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0.0, 220, 0, 8),
+                          child: Image.asset(AppStrings.imageIntersect),
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.mainColorAccent,
-                            ),
-                          ),
-                          child: Center(
-                            child: CircleAvatar(
-                              child: _image == null
-                                  ? Icon(Icons.camera_alt,
-                                      size: 55,
-                                      color: AppColors.mainColorAccent)
-                                  : CircleAvatar(
-                                      backgroundImage: Image.file(_image).image,
-                                      radius: 55,
-                                      backgroundColor: AppColors.colorWhite,
-                                    ),
-                              radius: 50,
-                              backgroundColor: AppColors.colorWhite,
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            S.of(context).errorSorry,
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: AppColors.mainColorAccent,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),
+                        Text(
+                          S.of(context).errorLostInternetConnection,
+                          style: TextStyle(color: AppColors.mainColorAccent),
+                          textAlign: TextAlign.center,
+                        )
+                      ],
                     ),
                   ),
-                  Center(
-                    child: TextButton(
-                      style: ButtonStyle(splashFactory: NoSplash.splashFactory),
-                      onPressed: () => showCupertinoModalPopup(
+                ),
+              ),
+            );
+          }
+          if (state is UserData) {
+            _user = state.user;
+            if (state.isUpdate){
+              Fluttertoast.showToast(
+                  msg: S.of(context).msgProfileUpdated,
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: AppColors.mainColorAccent,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+            return ListView(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 21),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () => showCupertinoModalPopup(
                         context: context,
                         builder: (BuildContext context) =>
                             ChoosePhotoBottomSheet(getImage),
                       ),
-                      child: Text(
-                        'Upload photo',
-                        style: TextStyle(
-                          color: AppColors.mainColorAccent,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        AppStrings.personalData,
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    //name
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: TextFormFields(
-                      controller: _nameController
-                        ..text = _user.username,
-                      hint: AppStrings.hintName,
-                      typeField: typeTextField.USERNAME,
-                      textInputType: TextInputType.name,
-                      node: node,
-                    ),
-                  ),
-                  Padding(
-                    //birthday
-                    padding: EdgeInsets.only(top: 29.0),
-                    child: TextFormFields(
-                      controller: _birthdayController
-                        ..text = _dateFormatter.fromDate(_user.birthday),
-                      hint: AppStrings.hintBirthday,
-                      typeField: typeTextField.BIRTHDAY,
-                      textInputType: TextInputType.number,
-                      node: node,
-                      textInputFormatter: <TextInputFormatter>[
-                        MaskTextInputFormatter(
-                            mask: (AppStrings.dateMask),
-                            filter: {"#": RegExp(r'[0-9]')})
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 39.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'E-mail address',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    //email
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: TextFormFields(
-                      controller: _emailController
-                        ..text = _user.email,
-                      hint: AppStrings.hintEmail,
-                      typeField: typeTextField.EMAIL,
-                      textInputType: TextInputType.emailAddress,
-                      node: node,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 39.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Password',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: PasswordInputs(
-                      typeField: typePasswordField.OLD_PASSWORD,
-                      controller: _oldPasswordController,
-                      hint: 'Old password',
-                      node: node,
-                      validation: UpdateValidation(),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 29.0),
-                    child: PasswordInputs(
-                      typeField: typePasswordField.NEW_PASSWORD,
-                      controller: _newPasswordController,
-                      hint: 'New password',
-                      node: node,
-                      validation: UpdateValidation(),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 29.0),
-                    child: PasswordInputs(
-                      typeField: typePasswordField.CONFIRM_PASSWORD,
-                      controller: _confirmPasswordController,
-                      hint: 'Confirm password',
-                      confirmPasswordController: _newPasswordController,
-                      node: node,
-                      validation: UpdateValidation(),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 25.0, left: 6.0),
-                    child: Row(
-                      children: <Widget>[
-                        Text('You can'),
-                        TextButton(
-                          onPressed: () =>
-                              showDeleteAccountDialog(context, _user),
-                          style: ButtonStyle(
-                              splashFactory: NoSplash.splashFactory),
-                          child: Text(
-                            'delete you account',
-                            style: TextStyle(color: AppColors.decorationColor),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.mainColorAccent,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      onPressed: () => showSignOutDialog(context),
-                      style: ButtonStyle(splashFactory: NoSplash.splashFactory),
-                      child: Text(
-                        'Sign out',
-                        style: TextStyle(color: AppColors.decorationColor),
+                        child: Center(
+                          child: CircleAvatar(
+                            child: _image == null
+                                ? Icon(Icons.camera_alt,
+                                    size: 55, color: AppColors.mainColorAccent)
+                                : CircleAvatar(
+                                    backgroundImage: Image.file(_image).image,
+                                    radius: 55,
+                                    backgroundColor: AppColors.colorWhite,
+                                  ),
+                            radius: 50,
+                            backgroundColor: AppColors.colorWhite,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Center(
+                  child: TextButton(
+                    style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                    onPressed: () => showCupertinoModalPopup(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          ChoosePhotoBottomSheet(getImage),
+                    ),
+                    child: Text(
+                      S.of(context).buttonUploadPhoto,
+                      style: TextStyle(
+                        color: AppColors.mainColorAccent,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      S.of(context).titlePersonalData,
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ),
+                Form(
+                  key: _formUserKey,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        //name
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: TextFormFields(
+                          controller: _nameController..text = _user.username,
+                          label: S.of(context).labelUsername,
+                          typeField: typeTextField.USERNAME,
+                          textInputType: TextInputType.name,
+                          node: node,
+                        ),
+                      ),
+                      Padding(
+                        //birthday
+                        padding: EdgeInsets.only(top: 29.0),
+                        child: TextFormFields(
+                          controller: _birthdayController
+                            ..text = _dateFormatter.fromDate(_user.birthday),
+                          label: S.of(context).labelBirthday,
+                          typeField: typeTextField.BIRTHDAY,
+                          textInputType: TextInputType.number,
+                          node: node,
+                          textInputFormatter: <TextInputFormatter>[
+                            MaskTextInputFormatter(
+                                mask: (AppStrings.dateMask),
+                                filter: {"#": RegExp(r'[0-9]')})
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 39.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            S.of(context).labelEmail,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        //email
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: TextFormFields(
+                          controller: _emailController..text = _user.email,
+                          label: S.of(context).labelEmail,
+                          typeField: typeTextField.EMAIL,
+                          textInputType: TextInputType.emailAddress,
+                          node: node,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 39.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            S.of(context).labelPassword,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Form(
+                  key: _formPasswordKey,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: PasswordInputs(
+                          typeField: typePasswordField.OLD_PASSWORD,
+                          controller: _oldPasswordController,
+                          label: S.of(context).labelOldPassword,
+                          node: node,
+                          validation: UpdateValidation(),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 29.0),
+                        child: PasswordInputs(
+                          typeField: typePasswordField.NEW_PASSWORD,
+                          controller: _newPasswordController,
+                          label: S.of(context).labelNewPassword,
+                          node: node,
+                          validation: UpdateValidation(),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 29.0),
+                        child: PasswordInputs(
+                          typeField: typePasswordField.CONFIRM_PASSWORD,
+                          controller: _confirmPasswordController,
+                          label: S.of(context).labelConfirmPassword,
+                          confirmPassword: _newPasswordController,
+                          node: node,
+                          validation: UpdateValidation(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 25.0, left: 6.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text(S.of(context).textYouCan),
+                      TextButton(
+                        onPressed: () =>
+                            showDeleteAccountDialog(context, _user),
+                        style:
+                            ButtonStyle(splashFactory: NoSplash.splashFactory),
+                        child: Text(
+                          S.of(context).textDeleteAccount,
+                          style: TextStyle(color: AppColors.decorationColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () => showSignOutDialog(context),
+                    style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                    child: Text(
+                      S.of(context).alertDialogSignOut,
+                      style: TextStyle(color: AppColors.decorationColor),
+                    ),
+                  ),
+                ),
+              ],
             );
           }
           return Container();
@@ -342,18 +392,40 @@ class _UserSettingsState extends State<UserSettings> {
     );
   }
 
+  Future<bool> toast() {
+    return Fluttertoast.showToast(
+        msg: S.of(context).msgNothingToUpdate,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColors.mainColorAccent,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
   void updateUser() {
-    if (_formKey.currentState.validate()) {
-      _user = _user.copyWith(
-          email: _emailController.text,
-          username: _nameController.text,
-          birthday: _birthdayController.text);
-      context.read<UserBloc>().add(UpdateUser(user: _user));
-      if (_oldPasswordController.text.isNotEmpty &&
-          _newPasswordController.text.isNotEmpty) {
+    bool nothingToUpdate = false;
+    if (_emailController.text != _user.email ||
+        _nameController.text != _user.username ||
+        _birthdayController.text != _dateFormatter.fromDate(_user.birthday)) {
+      if (_formUserKey.currentState.validate()) {
+        _user = _user.copyWith(
+            email: _emailController.text,
+            username: _nameController.text,
+            birthday: _birthdayController.text);
+        context.read<UserBloc>().add(UpdateUser(user: _user));
+      }
+    } else {
+      nothingToUpdate = true;
+    }
+    if (_oldPasswordController.text.isNotEmpty &&
+        _newPasswordController.text.isNotEmpty) {
+      nothingToUpdate = false;
+      if (_formPasswordKey.currentState.validate()) {
         context.read<UserBloc>().add(UpdatePassword(
             _user, _oldPasswordController.text, _newPasswordController.text));
       }
+    } else if (nothingToUpdate) {
+      toast();
     }
   }
 }

@@ -10,9 +10,8 @@ class GalleryData extends GalleryState {
   final bool isLoading;
   final bool isLastPage;
   final Box photosBox;
-  final List photos;
 
-  GalleryData({this.isLoading, this.isLastPage, this.photosBox, this.photos});
+  GalleryData({this.isLoading, this.isLastPage, this.photosBox});
 }
 
 class GalleryLoaded extends GalleryState {}

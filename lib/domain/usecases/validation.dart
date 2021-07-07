@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
@@ -10,21 +11,21 @@ class Validation {
   String confirmPassword;
 
   String selectUserValidator(
-      {String value, typeTextField typeField, String confirmPassword}) {
+      {BuildContext context, String value, typeTextField typeField, String confirmPassword}) {
     switch (typeField) {
       case typeTextField.USERNAME:
         if (value == null || value.isEmpty) {
-          return AppStrings.emptyName;
+          return S.of(context).errorEmptyUserName;
         }
         return null;
         break;
       case typeTextField.EMAIL:
         if (value == null || value.isEmpty) {
-          return AppStrings.emptyEmail;
+          return S.of(context).errorEmptyEmail;
         } else if (!value.contains('@') ||
             value.length < 3 ||
             !value.contains('.')) {
-          return AppStrings.incorrectEmail;
+          return S.of(context).errorIncorrectEmail;
         }
         return null;
         break;
@@ -40,51 +41,51 @@ class Validation {
               birthday.day,
             );
             if (adultDate.isAfter(today)) {
-              return AppStrings.tooYoung;
+              return S.of(context).errorAgeDisclaimer;
             } else if (yearDiff > 100) {
-              return 'You are too old!';
+              return S.of(context).errorDateTooOld;
             }
           }
         } catch (e) {
           print(e.toString());
-          return 'Invalid date';
+          return S.of(context).errorInvalidDate;
         }
         return null;
       case typeTextField.PHONE:
         if (value.isEmpty || value == null) {
-          return 'Please enter a phone number';
+          return S.of(context).errorEmptyPhone;
         } else if (value.length < 15) {
-          return 'Phone number is too short';
+          return S.of(context).errorShortPhone;
         }
         return null;
     }
-    return AppStrings.error;
+    return S.of(context).error;
   }
 
-  String selectPasswordValidator(String value, typePasswordField typeField,
-      TextEditingController confirmPasswordController) {
+  String selectPasswordValidator(BuildContext context, String value, typePasswordField typeField,
+      TextEditingController confirmPassword) {
     switch (typeField) {
       case typePasswordField.OLD_PASSWORD:
         if (value == null || value.isEmpty) {
-          return AppStrings.emptyPassword;
+          return S.of(context).errorEmptyPassword;
         }
         return null;
         break;
       case typePasswordField.NEW_PASSWORD:
         if (value == null || value.isEmpty) {
-          return AppStrings.emptyPassword;
+          return S.of(context).errorEmptyPassword;
         } else if (value.length < 8) {
-          return AppStrings.passwordErrorLength;
+          return S.of(context).errorShortPassword;
         } else if (!value.contains(RegExp('[A-Z]'))) {
-          return AppStrings.passwordOneLetter;
+          return S.of(context).errorUppercaseLetter;
         }
         return null;
         break;
       case typePasswordField.CONFIRM_PASSWORD:
         if (value == null || value.isEmpty) {
-          return AppStrings.emptyPassword;
-        } else if (value != confirmPasswordController.text) {
-          return AppStrings.passwordMatch;
+          return S.of(context).errorEmptyPassword;
+        } else if (value != confirmPassword.text) {
+          return S.of(context).errorPasswordDoNotMatch;
         }
         return null;
         break;

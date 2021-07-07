@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
@@ -13,7 +14,6 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/login/authorizati
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/firestore_bloc/firestore_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_bloc/user_bloc.dart';
-import 'package:flutter/services.dart';
 
 import 'data/repositories/firesrore_repository.dart';
 import 'data/repositories/http_post_photo.dart';
@@ -24,7 +24,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   UserBloc userBloc =
-      UserBloc(HttpOauthGateway(), HttpUserGateway());
+      UserBloc(HttpOauthGateway(), HttpUserGateway(), FirebaseFirestoreRepository());
   var path = Directory.systemTemp.path;
   Hive
     ..init(path)
@@ -48,7 +48,7 @@ Future<void> main() async {
       BlocProvider(create: (BuildContext context) => userBloc),
       BlocProvider(
         create: (context) => FirestoreBloc(
-            HttpUserGateway(), HttpOauthGateway(),
+            HttpUserGateway(),
             firestoreRepository: FirebaseFirestoreRepository()),
       ),
     ], child: WelcomeScreen()));

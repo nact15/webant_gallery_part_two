@@ -9,15 +9,11 @@ class InputTags extends StatefulWidget {
   final List<String> tags;
 
   @override
-  _InputTagsState createState() => _InputTagsState(tags);
+  _InputTagsState createState() => _InputTagsState();
 }
 
 class _InputTagsState extends State<InputTags> {
   TextEditingController _controller;
-  List<String> tags;
-
-  _InputTagsState(this.tags);
-
   @override
   void initState() {
     _controller = TextEditingController();
@@ -32,7 +28,7 @@ class _InputTagsState extends State<InputTags> {
       child: Wrap(
         spacing: 6.0,
         children: <Widget>[
-          for (String tag in tags) _buildInputChips(tag),
+          for (String tag in widget.tags) _buildInputChips(tag),
           Container(
             margin: EdgeInsets.only(top: 6.0),
             width: 100.0,
@@ -67,7 +63,7 @@ class _InputTagsState extends State<InputTags> {
                 {
                   setState(() {
                     if (_controller.text.isNotEmpty) {
-                      tags.add(_controller.text);
+                      widget.tags.add(_controller.text);
                     }
                   });
                 }
@@ -94,7 +90,7 @@ class _InputTagsState extends State<InputTags> {
       backgroundColor: AppColors.decorationColor,
       onDeleted: () {
         setState(() {
-          tags.remove(tag);
+          widget.tags.remove(tag);
         });
       },
     );

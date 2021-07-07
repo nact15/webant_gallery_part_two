@@ -24,4 +24,8 @@ class UserDelete extends UserEvent{
 
   UserDelete(this.user);
 }
+class CountOfViews extends UserEvent{
+  final int count;
+  CountOfViews(this.count);
+}
 

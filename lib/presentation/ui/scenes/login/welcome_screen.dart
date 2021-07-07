@@ -2,11 +2,11 @@ import 'package:alice/alice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/loading_circular.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'authorization_bloc/authorization_bloc.dart';
 import 'enter_page.dart';
 
@@ -28,8 +28,17 @@ class WelcomeScreen extends StatelessWidget {
       theme: ThemeData(
         accentColor: AppColors.colorGreyAccent,
       ),
+      localizationsDelegates: [
+        // 1
+        S.delegate,
+        // 2
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.delegate.supportedLocales,
       debugShowCheckedModeBanner: false,
-      title: AppStrings.titleGallery,
+      title: 'WebAnt Gallery',
       home: BlocBuilder<AuthorizationBloc, AuthorizationState>(
         builder: (context, state) {
           if (state is LoginData) {
@@ -46,7 +55,9 @@ class WelcomeScreen extends StatelessWidget {
             }
           }
           if (state is AuthorizationInitial) {
-            return EnterPage();
+            return Scaffold(
+              body: LoadingCircular(),
+            );
           }
           return Container();
         },

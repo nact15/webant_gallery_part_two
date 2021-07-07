@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_oauth_gateway.dart';
 import 'package:webant_gallery_part_two/domain/usecases/validation.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/gallery.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
@@ -27,16 +26,14 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
 
-  double _heightFields = 36.0;
-  double _widthButton = 120.0;
+  final double _heightFields = 36.0;
+  final double _widthButton = 150.0;
   TextEditingController _nameController;
   TextEditingController _passwordController;
-  HttpOauthGateway oauthGateway = HttpOauthGateway();
   bool _buttonColor = true;
 
   @override
   void initState() {
-    oauthGateway = HttpOauthGateway();
     _nameController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
@@ -60,7 +57,6 @@ class _SignInPageState extends State<SignInPage> {
             SnackBar(
               content: Text(state.err),
               backgroundColor: Colors.red,
-              //duration: Duration(seconds: 3),
             ),
           );
         }
@@ -79,14 +75,14 @@ class _SignInPageState extends State<SignInPage> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 100),
-                    child: Text(AppStrings.signIn, style: AppStyles.styleSign),
+                    child: Text(S.of(context).buttonSignIn, style: AppStyles.styleSign),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 50),
                   child: TextFormFields(
                     controller: _nameController,
-                    hint: AppStrings.hintName,
+                    label: S.of(context).labelUsername,
                     typeField: typeTextField.USERNAME,
                     textInputType: TextInputType.name,
                     node: node,
@@ -97,7 +93,7 @@ class _SignInPageState extends State<SignInPage> {
                   child: PasswordInputs(
                     typeField: typePasswordField.OLD_PASSWORD,
                     controller: _passwordController,
-                    hint: 'Password',
+                    label: S.of(context).labelPassword,
                     node: node,
                     callBack: addLoginEvent,
                     validation: Validation(),
@@ -109,7 +105,7 @@ class _SignInPageState extends State<SignInPage> {
                     padding: EdgeInsets.only(right: 8.0),
                     child: TextButton(
                       child: Text(
-                        AppStrings.forgotPassOrEmail,
+                        S.of(context).buttonForgotPassword,
                         style: TextStyle(color: AppColors.mainColorAccent),
                       ),
                       onPressed: () {},
@@ -153,7 +149,7 @@ class _SignInPageState extends State<SignInPage> {
                             ButtonStyle(splashFactory: NoSplash.splashFactory),
                         onPressed: signup, //to SignUpPage
                         child: Text(
-                          AppStrings.signUp,
+                          S.of(context).buttonSignUp,
                           style: AppStyles.signUpButtonSecondary,
                         ),
                       ),
@@ -198,7 +194,7 @@ class _SignInPageState extends State<SignInPage> {
         });
       }
       return Text(
-        AppStrings.signIn,
+        S.of(context).buttonSignIn,
         style: AppStyles.signInButtonMain,
       );
     });

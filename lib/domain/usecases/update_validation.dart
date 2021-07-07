@@ -1,24 +1,27 @@
 import 'package:flutter/cupertino.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
 class UpdateValidation {
-  String selectPasswordValidator(String value, typePasswordField typeField,
-      TextEditingController confirmPasswordController) {
+  String selectPasswordValidator(BuildContext context,
+      String value, typePasswordField typeField, TextEditingController confirmPassword) {
     switch (typeField) {
       case typePasswordField.NEW_PASSWORD:
         if (value.isNotEmpty) {
           if (value.length < 8) {
-            return AppStrings.passwordErrorLength;
+            return S.of(context).errorShortPassword;
           } else if (!value.contains(RegExp('[A-Z]'))) {
-            return AppStrings.passwordOneLetter;
+            return S.of(context).errorUppercaseLetter;
           }
         }
         return null;
         break;
       case typePasswordField.CONFIRM_PASSWORD:
-        if (value.isNotEmpty && value != confirmPasswordController.text) {
-          return AppStrings.passwordMatch;
+        if (confirmPassword.text.isNotEmpty) {
+          if (value != confirmPassword.text) {
+            return S.of(context).errorPasswordDoNotMatch;
+          } else
+            return null;
         }
         return null;
         break;

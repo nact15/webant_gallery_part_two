@@ -6,12 +6,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:meta/meta.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_post_photo.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
 
 part 'add_photo_event.dart';
-
 part 'add_photo_state.dart';
 
 class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
@@ -19,7 +17,6 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
   final HttpPostPhoto _httpPostPhoto;
   final FirestoreRepository _firestoreRepository;
   StreamSubscription _countSubscription;
-  final _httpUserGateway = HttpUserGateway();
 
   AddPhotoBloc(this._httpPostPhoto, {FirestoreRepository firestoreRepository})
       : _firestoreRepository = firestoreRepository,
@@ -43,6 +40,9 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
     }
     if (event is ViewsCounter) {
       yield* _mapViewsCounterToCountUpdated(event);
+    }
+    if (event is InitialEvent){
+      yield AddPhotoInitial();
     }
   }
 
