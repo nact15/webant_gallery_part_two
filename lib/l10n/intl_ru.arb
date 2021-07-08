@@ -69,5 +69,6 @@
   "buttonAddPhoto": "Добавить",
   "buttonEditPhoto": "Изменить",
   "errorLoadedPhoto": "Здесь нет фотографии. \nПожалуйста, возвращайтесь позднее",
-  "errorFoundImage": "Фото не найдено"
+  "errorFoundImage": "Фото не найдено",
+  "titleCamera": "Фото"
 }

@@ -3,13 +3,12 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/select_photo.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 
 class Camera extends StatefulWidget {
   final CameraDescription camera;
-  File image;
 
-  Camera({Key key, this.camera, this.image}) : super(key: key);
+  Camera({Key key, this.camera}) : super(key: key);
 
   @override
   CameraState createState() => CameraState();
@@ -23,10 +22,8 @@ class CameraState extends State<Camera> {
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.high,
-    );
+    _controller = CameraController(widget.camera, ResolutionPreset.max,
+        enableAudio: false);
     _initializeControllerFuture = _controller.initialize();
   }
 
@@ -47,8 +44,8 @@ class CameraState extends State<Camera> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: 36,
-              width: 36,
+              height: 30,
+              width: 30,
               decoration: BoxDecoration(
                 color: Colors.black26,
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -63,25 +60,25 @@ class CameraState extends State<Camera> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black26,
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   ),
-                  height: 36,
+                  height: 30,
                   child: Center(
                     child: Text(
-                      'Photo',
-                      style: TextStyle(fontSize: 17),
+                      S.of(context).titleCamera,
+                      style: TextStyle(fontSize: 15),
                     ),
                   ),
                 ),
               ),
             ),
             Container(
-              height: 36,
-              width: 36,
+              height: 30,
+              width: 30,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -90,11 +87,11 @@ class CameraState extends State<Camera> {
                 onPressed: () async {
                   setState(() => flashOn = !flashOn);
                   await _controller
-                      .setFlashMode(flashOn ? FlashMode.torch : FlashMode.off);
+                      .setFlashMode(flashOn ? FlashMode.always : FlashMode.off);
                 },
                 icon: Icon(
                   flashOn ? Icons.flash_on : Icons.flash_off,
-                  size: 22,
+                  size: 20,
                   color: Colors.yellow,
                 ),
               ),
@@ -125,23 +122,31 @@ class CameraState extends State<Camera> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
-            final _image = await _controller.takePicture();
-            widget.image = File(_image.path);
-            Navigator.of(context).pop(context);
-          } catch (e) {
-            print(e);
-          }
-        },
-        child: const Icon(
-          Icons.circle,
-          color: Colors.white,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 25.0),
+        child: OutlinedButton(
+          onPressed: () async {
+            try {
+              await _initializeControllerFuture;
+              final _image = await _controller.takePicture();
+              final File image = File(_image.path);
+              Navigator.of(context).pop(image);
+            } catch (e) {
+              print(e);
+            }
+          },
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(width: 3.0, color: Colors.white),
+            shape: CircleBorder(),
+          ),
+          child: const Icon(
+            Icons.circle,
+            size: 60,
+            color: Colors.white,
+          ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

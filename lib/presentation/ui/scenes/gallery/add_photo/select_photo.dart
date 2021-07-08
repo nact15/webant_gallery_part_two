@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
@@ -26,7 +27,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
 
   Future getImage(ImageSource imageSource) async {
     if (imageSource == ImageSource.camera) {
-      selectCamera();
+      _takeAPicture();
     } else {
       final pickedFile = await _picker.getImage(source: imageSource);
       setState(() {
@@ -131,17 +132,20 @@ class _SelectPhotoState extends State<SelectPhoto> {
     }
   }
 
-  Future<CameraDescription> takePicture() async {
+  Future<CameraDescription> _selectCamera() async {
     final cameras = await availableCameras();
     return cameras.first;
   }
 
-  void selectCamera() async {
-    final firstCamera = await takePicture();
-    Navigator.of(context).push(
-      MaterialPageRoute(
-          builder: (BuildContext context) =>
-              Camera(camera: firstCamera, image: image)),
-    );
+  void _takeAPicture() async {
+    var status = await Permission.camera.request();
+    if (status.isGranted) {
+      final firstCamera = await _selectCamera();
+      final cameraImage = await Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (BuildContext context) => Camera(camera: firstCamera)),
+      );
+      setState(() => image = cameraImage);
+    }
   }
 }
