@@ -125,7 +125,7 @@ class _UserPageState extends State<UserPage> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Text(
-                              'Sorry!',
+                              S.of(context).errorSorry,
                               style: TextStyle(
                                   fontSize: 25,
                                   color: AppColors.mainColorAccent,
@@ -133,7 +133,7 @@ class _UserPageState extends State<UserPage> {
                             ),
                           ),
                           Text(
-                            'There is no internet connection.',
+                            S.of(context).errorLostInternetConnection,
                             style: TextStyle(color: AppColors.mainColorAccent),
                             textAlign: TextAlign.center,
                           )

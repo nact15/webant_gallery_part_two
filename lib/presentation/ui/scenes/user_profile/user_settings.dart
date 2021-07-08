@@ -144,32 +144,44 @@ class _UserSettingsState extends State<UserSettings> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
+                 // height: double.infinity,
                   color: AppColors.colorWhite,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(0.0, 220, 0, 8),
-                          child: Image.asset(AppStrings.imageIntersect),
+                  constraints: BoxConstraints.expand(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
+                        child: Image.asset(AppStrings.imageIntersect),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          S.of(context).errorSorry,
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: AppColors.mainColorAccent,
+                              fontWeight: FontWeight.bold),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                      ),
+                      Text(
+                        S.of(context).errorLostInternetConnection,
+                        style: TextStyle(color: AppColors.mainColorAccent),
+                        textAlign: TextAlign.center,
+                      ),
+                      Expanded(
+                        //alignment: Alignment.bottomLeft,
+                        child: TextButton(
+                          onPressed: () => showSignOutDialog(context),
+                          style: ButtonStyle(
+                              splashFactory: NoSplash.splashFactory),
                           child: Text(
-                            S.of(context).errorSorry,
-                            style: TextStyle(
-                                fontSize: 25,
-                                color: AppColors.mainColorAccent,
-                                fontWeight: FontWeight.bold),
+                            S.of(context).alertDialogSignOut,
+                            style: TextStyle(color: AppColors.decorationColor),
                           ),
                         ),
-                        Text(
-                          S.of(context).errorLostInternetConnection,
-                          style: TextStyle(color: AppColors.mainColorAccent),
-                          textAlign: TextAlign.center,
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -177,14 +189,8 @@ class _UserSettingsState extends State<UserSettings> {
           }
           if (state is UserData) {
             _user = state.user;
-            if (state.isUpdate){
-              Fluttertoast.showToast(
-                  msg: S.of(context).msgProfileUpdated,
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.BOTTOM,
-                  backgroundColor: AppColors.mainColorAccent,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
+            if (state.isUpdate) {
+              toast(S.of(context).msgProfileUpdated);
             }
             return ListView(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -392,9 +398,9 @@ class _UserSettingsState extends State<UserSettings> {
     );
   }
 
-  Future<bool> toast() {
+  Future<bool> toast(String msg) {
     return Fluttertoast.showToast(
-        msg: S.of(context).msgNothingToUpdate,
+        msg: msg,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: AppColors.mainColorAccent,
@@ -425,7 +431,7 @@ class _UserSettingsState extends State<UserSettings> {
             _user, _oldPasswordController.text, _newPasswordController.text));
       }
     } else if (nothingToUpdate) {
-      toast();
+      toast(S.of(context).msgNothingToUpdate);
     }
   }
 }

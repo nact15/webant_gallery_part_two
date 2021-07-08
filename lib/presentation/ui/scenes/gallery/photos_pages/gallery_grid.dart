@@ -212,12 +212,47 @@ class _GalleryGridState extends State<GalleryGrid>
                 child: Column(
                   children: [
                     Image.asset(AppStrings.imageIntersect),
-                    Text(
-                      S.of(context).errorFoundImage,
-                      style: TextStyle(
-                          color: AppColors.mainColorAccent, fontSize: 17),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 26.0),
+                      child: Text(
+                        S.of(context).errorFoundImage,
+                        style: TextStyle(
+                            color: AppColors.mainColorAccent, fontSize: 17),
+                      ),
                     ),
                   ],
+                ),
+              ),
+            );
+          }
+          if (state is InternetError){
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                color: AppColors.colorWhite,
+                width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
+                        child: Image.asset(AppStrings.imageIntersect),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          S.of(context).errorSorry,
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: AppColors.mainColorAccent,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Text(
+                        S.of(context).errorLoadedPhoto,
+                        style: TextStyle(color: AppColors.mainColorAccent),
+                        textAlign: TextAlign.center,
+                      )
+                    ],
                 ),
               ),
             );

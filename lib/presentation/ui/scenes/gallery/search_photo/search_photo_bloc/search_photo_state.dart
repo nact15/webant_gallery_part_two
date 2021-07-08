@@ -7,8 +7,6 @@ class SearchPhotoInitial extends SearchPhotoState {}
 
 class Loading extends SearchPhotoState {}
 
-class NothingToSearch extends SearchPhotoState {}
-
 class NotFound extends SearchPhotoState {}
 
 class Search extends SearchPhotoState {
@@ -17,3 +15,5 @@ class Search extends SearchPhotoState {
 
   Search(this.photos, this.isLastPage);
 }
+
+class InternetError extends SearchPhotoState {}

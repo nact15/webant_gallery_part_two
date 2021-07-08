@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +11,8 @@ import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/upload_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/choose_photo_bottom_sheet.dart';
 
+import 'camera.dart';
+
 class SelectPhoto extends StatefulWidget {
   const SelectPhoto({Key key}) : super(key: key);
 
@@ -18,17 +21,20 @@ class SelectPhoto extends StatefulWidget {
 }
 
 class _SelectPhotoState extends State<SelectPhoto> {
-  File _image;
+  File image;
   final _picker = ImagePicker();
 
   Future getImage(ImageSource imageSource) async {
-    final pickedFile = await _picker.getImage(source: imageSource);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      }
-    });
+    if (imageSource == ImageSource.camera) {
+      selectCamera();
+    } else {
+      final pickedFile = await _picker.getImage(source: imageSource);
+      setState(() {
+        if (pickedFile != null) {
+          image = File(pickedFile.path);
+        }
+      });
+    }
   }
 
   @override
@@ -42,7 +48,8 @@ class _SelectPhotoState extends State<SelectPhoto> {
         actions: [
           TextButton(
             onPressed: nextPage,
-            child: Text(S.of(context).buttonNext,
+            child: Text(
+              S.of(context).buttonNext,
               style: TextStyle(
                 fontSize: 17,
                 color: AppColors.decorationColor,
@@ -67,9 +74,9 @@ class _SelectPhotoState extends State<SelectPhoto> {
                 ),
                 child: Align(
                   alignment: Alignment.center,
-                  child: _image == null
+                  child: image == null
                       ? Image.asset(AppStrings.imageAnt)
-                      : Image.file(_image),
+                      : Image.file(image),
                 ),
               ),
             ),
@@ -106,7 +113,7 @@ class _SelectPhotoState extends State<SelectPhoto> {
   }
 
   void nextPage() {
-    if (_image == null) {
+    if (image == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(S.of(context).errorNoImage),
@@ -117,10 +124,24 @@ class _SelectPhotoState extends State<SelectPhoto> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (BuildContext context) => UploadPhoto(
-            image: _image,
+            image: image,
           ),
         ),
       );
     }
+  }
+
+  Future<CameraDescription> takePicture() async {
+    final cameras = await availableCameras();
+    return cameras.first;
+  }
+
+  void selectCamera() async {
+    final firstCamera = await takePicture();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (BuildContext context) =>
+              Camera(camera: firstCamera, image: image)),
+    );
   }
 }

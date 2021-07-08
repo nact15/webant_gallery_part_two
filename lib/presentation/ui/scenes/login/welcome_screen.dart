@@ -29,9 +29,7 @@ class WelcomeScreen extends StatelessWidget {
         accentColor: AppColors.colorGreyAccent,
       ),
       localizationsDelegates: [
-        // 1
         S.delegate,
-        // 2
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

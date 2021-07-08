@@ -10,8 +10,7 @@ class DateFormatter {
   }
 
   String fromDate(stringDate) {
-    var date = dateFormatter.format(DateTime.parse(stringDate));
+    var date = dateFormatter.format(DateTime.tryParse(stringDate).toLocal());
     return date.toString();
   }
-
 }

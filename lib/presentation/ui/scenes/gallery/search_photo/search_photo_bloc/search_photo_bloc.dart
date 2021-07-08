@@ -50,11 +50,8 @@ class SearchPhotoBloc<T> extends Bloc<SearchPhotoEvent, SearchPhotoState> {
           yield NotFound();
         }
       } on DioError {
-        yield NotFound();
+        yield InternetError();
       }
-    }
-    if (event is NotSearching) {
-      yield NothingToSearch();
     }
   }
 }
