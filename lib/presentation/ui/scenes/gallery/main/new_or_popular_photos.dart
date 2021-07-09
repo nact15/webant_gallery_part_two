@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_bloc/gallery_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/photos_pages/gallery_grid.dart';
+
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_bar.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 
@@ -25,9 +25,11 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
   TextEditingController _searchController;
   bool _search;
   String _queryText;
+  ScrollController _controller;
 
   @override
   void initState() {
+    _controller = ScrollController();
     _search = false;
     _searchController = TextEditingController();
     _searchController.addListener(_searchListener);
@@ -67,53 +69,80 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           backgroundColor: AppColors.colorWhite,
-          appBar: AppBar(
-            title: SearchBar(
-              searchController: _searchController,
-            ),
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            backgroundColor: AppColors.colorWhite,
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(kToolbarHeight),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TabBar(
-                  tabs: _search
-                      ? [Tab(text: S.of(context).tabBarTitleSearch)]
-                      : ([Tab(text: S.of(context).tabBarTitleNew), Tab(text: S.of(context).tabBarTitlePopular)]),
-                  indicatorColor: AppColors.decorationColor,
-                  labelColor: AppColors.mainColor,
-                  unselectedLabelColor: AppColors.mainColorAccent,
-                  labelStyle:
-                      TextStyle(fontWeight: FontWeight.w400, fontSize: 17),
+          body: NestedScrollView(
+            controller: _controller,
+            floatHeaderSlivers: true,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverOverlapAbsorber(
+                  handle:
+                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                  sliver: SliverAppBar(
+                    title: SearchBar(
+                      searchController: _searchController,
+                    ),
+                    floating: true,
+                    pinned: true,
+                    snap: true,
+                    forceElevated: innerBoxIsScrolled,
+                    elevation: 0,
+                    automaticallyImplyLeading: false,
+                    backgroundColor: AppColors.colorWhite,
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(48),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: TabBar(
+                          onTap: (i) => _controller.animateTo(
+                              _controller.position.maxScrollExtent,
+                              curve: Curves.easeInOut,
+                              duration: const Duration(milliseconds: 500)),
+                          tabs: _search
+                              ? [Tab(text: S.of(context).tabBarTitleSearch)]
+                              : ([
+                                  Tab(text: S.of(context).tabBarTitleNew),
+                                  Tab(text: S.of(context).tabBarTitlePopular)
+                                ]),
+                          indicatorColor: AppColors.decorationColor,
+                          labelColor: AppColors.mainColor,
+                          unselectedLabelColor: AppColors.mainColorAccent,
+                          labelStyle: TextStyle(
+                              fontWeight: FontWeight.w400, fontSize: 17),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+              ];
+            },
+            body: Builder(
+                builder: (BuildContext context) => _search
+                    ? GalleryGrid(
+                        type: typeGrid.SEARCH,
+                        queryText: getQueryText(),
+                      )
+                    : TabBarView(
+                        children: <Widget>[
+                          BlocProvider<GalleryBloc>(
+                              create: (context) => GalleryBloc<PhotoModel>(
+                                  HttpPhotoGateway(type: typePhoto.NEW))
+                                ..add(GalleryFetch()),
+                              child: GalleryGrid(
+                                type: typeGrid.PHOTOS,
+                              )),
+                          BlocProvider<GalleryBloc>(
+                              create: (context) => GalleryBloc<PhotoModel>(
+                                  HttpPhotoGateway(type: typePhoto.POPULAR))
+                                ..add(GalleryFetch()),
+                              child: GalleryGrid(
+                                type: typeGrid.PHOTOS,
+                              )),
+                        ],
+                      ),
               ),
             ),
           ),
-          body: _search
-              ? GalleryGrid(type: typeGrid.SEARCH, queryText: getQueryText())
-              : TabBarView(
-                  children: <Widget>[
-                    BlocProvider<GalleryBloc>(
-                        create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                            HttpPhotoGateway(type: typePhoto.NEW),
-                            HttpUserGateway())
-                          ..add(GalleryFetch()),
-                        child: GalleryGrid(
-                          type: typeGrid.PHOTOS,
-                        )),
-                    BlocProvider<GalleryBloc>(
-                        create: (BuildContext c) => GalleryBloc<PhotoModel>(
-                            HttpPhotoGateway(type: typePhoto.POPULAR),
-                            HttpUserGateway())
-                          ..add(GalleryFetch()),
-                        child: GalleryGrid(
-                          type: typeGrid.PHOTOS,
-                        )),
-                  ],
-                ),
-        ),
       ),
     );
   }

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/resources/http_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/welcome_screen.dart';

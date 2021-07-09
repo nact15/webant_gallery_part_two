@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
 import 'date_formatter.dart';

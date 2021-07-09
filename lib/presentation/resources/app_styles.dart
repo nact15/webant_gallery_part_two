@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 
-import 'app_strings.dart';
-
 class AppStyles {
   static ButtonStyle styleButtonAlreadyHaveAccount = ElevatedButton.styleFrom(
       primary: AppColors.colorWhite,

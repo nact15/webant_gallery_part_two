@@ -6,23 +6,23 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
-import 'package:webant_gallery_part_two/data/repositories/http_user_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
 
 part 'gallery_event.dart';
+
 part 'gallery_state.dart';
 
 class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
-  GalleryBloc(this._photoGateway, this._httpUserGateway) : super(GalleryInitial());
+  GalleryBloc(this._photoGateway)
+      : super(GalleryInitial());
   final PhotoGateway<T> _photoGateway;
-  final HttpUserGateway _httpUserGateway;
   Box _photosBox;
   int _page = 1;
   BaseModel<T> _baseModel;
 
-@override
+  @override
   Stream<GalleryState> mapEventToState(GalleryEvent event) async* {
     _photosBox = Hive.box(_photoGateway.enumToString());
     if (event is GalleryFetch) {
@@ -31,7 +31,7 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
     if (event is GalleryRefresh) {
       yield* _mapGalleryRefresh(event);
     }
-    if (event is GalleryLoading){
+    if (event is GalleryLoading) {
       yield GalleryLoaded();
     }
   }
@@ -47,13 +47,13 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
         _page++;
         yield GalleryData(
             isLoading: false, isLastPage: false, photosBox: _photosBox);
-      }else {
+      } else {
         yield GalleryData(
           isLastPage: true,
           isLoading: false,
           photosBox: _photosBox,
         );
-     }
+      }
     } on DioError {
       yield* _internetError();
     }
@@ -87,15 +87,11 @@ class GalleryBloc<T> extends Bloc<GalleryEvent, GalleryState> {
       yield GalleryInternetLost();
   }
 
-  void _addToBox()  {
+  void _addToBox() {
     List<PhotoModel> basePhotoModel = _baseModel.data as List<PhotoModel>;
     List<PhotoModel> boxPhotoModel =
         _photosBox.values.toList().cast<PhotoModel>();
-    basePhotoModel.forEach((element) async {
-      if (element.user != null){
-        String userName = await _httpUserGateway.getUserName(element.user);
-        element = element.copyWith(user: userName);
-      }
+    basePhotoModel.forEach((element) {
       if (boxPhotoModel.firstWhere(
             (elementB) => element.id == elementB.id,
             orElse: () => null,

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 
 class AppBarSign extends StatelessWidget implements PreferredSizeWidget {
   const AppBarSign({Key key}) : super(key: key);

@@ -132,22 +132,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
                 Padding(
-                  //phone
-                  padding: EdgeInsets.only(top: 29),
-                  child: TextFormFields(
-                    controller: _phoneController,
-                    label: S.of(context).labelPhone,
-                    typeField: typeTextField.PHONE,
-                    textInputType: TextInputType.phone,
-                    textInputFormatter: <TextInputFormatter>[
-                      MaskTextInputFormatter(
-                          mask: (AppStrings.phoneMask),
-                          filter: {"#": RegExp(r'[0-9]')}),
-                    ],
-                    node: node,
-                  ),
-                ),
-                Padding(
                   //password
                   padding: EdgeInsets.only(top: 29),
                   child: PasswordInputs(

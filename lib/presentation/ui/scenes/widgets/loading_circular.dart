@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 
 class LoadingCircular extends StatelessWidget {
   const LoadingCircular({Key key}) : super(key: key);

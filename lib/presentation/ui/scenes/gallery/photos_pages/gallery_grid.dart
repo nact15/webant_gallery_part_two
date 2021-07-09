@@ -21,11 +21,12 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/widgets/photo_bot
 import 'gallery_bloc/gallery_bloc.dart';
 
 class GalleryGrid extends StatefulWidget {
-  GalleryGrid({Key key, this.type, this.crossCount, this.queryText})
-      : super(key: key);
   final typeGrid type;
   final int crossCount;
   final queryText;
+
+  GalleryGrid({Key key, this.type, this.crossCount, this.queryText})
+      : super(key: key);
 
   @override
   _GalleryGridState createState() => _GalleryGridState();
@@ -40,27 +41,10 @@ class _GalleryGridState extends State<GalleryGrid>
 
   @override
   void initState() {
-    _reFresh = Completer<void>();
     _controller = ScrollController();
-    _controller.addListener(_scrollListener);
+    _reFresh = Completer<void>();
     _isLastPage = false;
     super.initState();
-  }
-
-  _scrollListener() {
-    if (!_isLastPage) {
-      if (_controller.offset >= _controller.position.maxScrollExtent &&
-          !_controller.position.outOfRange) {
-        if (widget.type == typeGrid.PHOTOS) {
-          context.read<GalleryBloc>().add(GalleryFetch());
-        }
-        if (widget.type == typeGrid.SEARCH) {
-          context
-              .read<SearchPhotoBloc>()
-              .add(Searching(queryText: widget.queryText, newQuery: false));
-        }
-      }
-    }
   }
 
   @override
@@ -70,69 +54,90 @@ class _GalleryGridState extends State<GalleryGrid>
   }
 
   Widget _photosGrid(List<PhotoModel> photos) {
-    return CustomScrollView(
-      physics: AlwaysScrollableScrollPhysics(),
-      controller: _controller,
-      slivers: <Widget>[
-        SliverPadding(
-          padding: const EdgeInsets.all(16.0),
-          sliver: SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-              (c, i) => Container(
-                child: GestureDetector(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: Hero(
-                        tag: photos[i].id,
-                        child: photos[i].isPhotoSVG()
-                            ? SvgPicture.network(photos[i].getImage())
-                            : FancyShimmerImage(
-                                imageUrl: photos[i].getImage(),
-                                boxFit: BoxFit.cover,
-                              ),
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (!_isLastPage &&
+            scrollInfo is ScrollEndNotification &&
+            scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          if (widget.type == typeGrid.PHOTOS) {
+            context.read<GalleryBloc>().add(GalleryFetch());
+            return false;
+          }
+          if (widget.type == typeGrid.SEARCH) {
+            context
+                .read<SearchPhotoBloc>()
+                .add(Searching(queryText: widget.queryText, newQuery: false));
+            return false;
+          }
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
+          SliverOverlapInjector(
+              handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverGrid(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext c, int i) => Container(
+                  child: GestureDetector(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Hero(
+                          tag: photos[i].id,
+                          child: photos[i].isPhotoSVG()
+                              ? SvgPicture.network(photos[i].getImage())
+                              : FancyShimmerImage(
+                                  imageUrl: photos[i].getImage(),
+                                  boxFit: BoxFit.cover,
+                                ),
+                        ),
                       ),
-                    ),
-                    onTap: () => _toScreenInfo(photos[i]),
-                    onLongPress: () {
-                      showCupertinoModalPopup(
-                          context: context,
-                          builder: (BuildContext context) =>
-                              PhotoBottomSheet(photo: photos[i]));
-                    }),
+                      onTap: () => _toScreenInfo(photos[i]),
+                      onLongPress: () {
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                PhotoBottomSheet(photo: photos[i]));
+                      }),
+                ),
+                childCount: photos?.length ?? 0,
               ),
-              childCount: photos?.length ?? 0,
-            ),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: widget.crossCount ?? 2,
-              childAspectRatio: 1,
-              mainAxisSpacing: 9,
-              crossAxisSpacing: 9,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.crossCount ?? 2,
+                childAspectRatio: 1,
+                mainAxisSpacing: 9,
+                crossAxisSpacing: 9,
+              ),
             ),
           ),
-        ),
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.all(5.0),
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: _isLastPage
-                    ? null
-                    : CircularProgressIndicator(
-                        color: AppColors.mainColorAccent,
-                        strokeWidth: 2.0,
-                      ),
+          SliverToBoxAdapter(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(5.0),
+                child: SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: _isLastPage
+                      ? null
+                      : CircularProgressIndicator(
+                          color: AppColors.mainColorAccent,
+                          strokeWidth: 2.0,
+                        ),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
+    super.build(context);
     return MultiBlocListener(
       listeners: [
         widget.type == typeGrid.PHOTOS
@@ -225,34 +230,34 @@ class _GalleryGridState extends State<GalleryGrid>
               ),
             );
           }
-          if (state is InternetError){
+          if (state is InternetError) {
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
                 color: AppColors.colorWhite,
-                width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
-                        child: Image.asset(AppStrings.imageIntersect),
+                width: double.infinity,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
+                      child: Image.asset(AppStrings.imageIntersect),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        S.of(context).errorSorry,
+                        style: TextStyle(
+                            fontSize: 25,
+                            color: AppColors.mainColorAccent,
+                            fontWeight: FontWeight.bold),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          S.of(context).errorSorry,
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: AppColors.mainColorAccent,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(
-                        S.of(context).errorLoadedPhoto,
-                        style: TextStyle(color: AppColors.mainColorAccent),
-                        textAlign: TextAlign.center,
-                      )
-                    ],
+                    ),
+                    Text(
+                      S.of(context).errorLoadedPhoto,
+                      style: TextStyle(color: AppColors.mainColorAccent),
+                      textAlign: TextAlign.center,
+                    )
+                  ],
                 ),
               ),
             );

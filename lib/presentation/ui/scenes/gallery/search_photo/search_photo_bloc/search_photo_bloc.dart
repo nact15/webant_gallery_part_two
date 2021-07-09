@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
-import 'package:webant_gallery_part_two/data/repositories/firesrore_repository.dart';
 import 'package:webant_gallery_part_two/domain/models/base_model/base_model.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/photo_gateway.dart';
