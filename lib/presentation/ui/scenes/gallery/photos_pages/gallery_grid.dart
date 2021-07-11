@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
@@ -33,15 +35,18 @@ class GalleryGrid extends StatefulWidget {
 }
 
 class _GalleryGridState extends State<GalleryGrid>
-    with AutomaticKeepAliveClientMixin {
-  ScrollController _controller;
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   Completer<void> _reFresh;
   List<PhotoModel> _photos;
   bool _isLastPage;
+  static const _indicatorSize = 150.0;
+  final _helper = IndicatorStateHelper();
+
+  bool _renderCompleteState = false;
+  ScrollDirection prevScrollDirection = ScrollDirection.idle;
 
   @override
   void initState() {
-    _controller = ScrollController();
     _reFresh = Completer<void>();
     _isLastPage = false;
     super.initState();
@@ -49,7 +54,6 @@ class _GalleryGridState extends State<GalleryGrid>
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
@@ -182,9 +186,6 @@ class _GalleryGridState extends State<GalleryGrid>
               ),
       ],
       child: RefreshIndicator(
-        color: AppColors.mainColorAccent,
-        backgroundColor: AppColors.colorWhite,
-        strokeWidth: 2.0,
         onRefresh: () async {
           if (widget.type == typeGrid.PHOTOS) {
             context.read<GalleryBloc>().add(GalleryRefresh());

@@ -23,19 +23,21 @@ class HttpOauthInterceptor extends Interceptor {
   @override
   Future onError(DioError err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      String accessToken = await _httpOauthGateway.refreshToken();
+      String accessToken =
+          await _httpOauthGateway.refreshToken().catchError((onError) {
+             handler.reject(err);
+          });
       if (accessToken != null) {
         print(accessToken);
         err.requestOptions.headers =
             ({HttpStrings.authorization: 'Bearer $accessToken'});
-        _dio.fetch(err.requestOptions).then(
-              (r) => handler.resolve(r),
-            );
-      } else {
-        handler.next(err);
+        _dio.fetch(err.requestOptions).then((r) => handler.resolve(r),
+        onError: (e) => handler.reject(e),
+        );
+        return;
       }
-    } else {
-      handler.next(err);
+     //else return handler.next(err);
     }
+    else return handler.next(err);
   }
 }

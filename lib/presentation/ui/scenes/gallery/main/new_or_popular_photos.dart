@@ -21,20 +21,19 @@ class NewOrPopularPhotos extends StatefulWidget {
 enum typePhoto { NEW, POPULAR, SEARCH_BY_USER, SEARCH }
 enum typeGrid { PHOTOS, SEARCH }
 
-class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
+class _NewOrPopularPhotosState extends State<NewOrPopularPhotos>{
   TextEditingController _searchController;
   bool _search;
   String _queryText;
-  ScrollController _controller;
 
   @override
   void initState() {
-    _controller = ScrollController();
     _search = false;
     _searchController = TextEditingController();
     _searchController.addListener(_searchListener);
     super.initState();
   }
+
 
   _searchListener() {
     String searchText = _searchController.text;
@@ -64,59 +63,55 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       onHorizontalDragCancel: () =>
           FocusManager.instance.primaryFocus?.unfocus(),
-      child: DefaultTabController(
-        length: _search ? 1 : 2,
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: AppColors.colorWhite,
-          body: NestedScrollView(
-            controller: _controller,
-            floatHeaderSlivers: true,
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverOverlapAbsorber(
-                  handle:
-                      NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverAppBar(
-                    title: SearchBar(
-                      searchController: _searchController,
-                    ),
-                    floating: true,
-                    pinned: true,
-                    snap: true,
-                    forceElevated: innerBoxIsScrolled,
-                    elevation: 0,
-                    automaticallyImplyLeading: false,
-                    backgroundColor: AppColors.colorWhite,
-                    bottom: PreferredSize(
-                      preferredSize: Size.fromHeight(48),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: TabBar(
-                          onTap: (i) => _controller.animateTo(
-                              _controller.position.maxScrollExtent,
-                              curve: Curves.easeInOut,
-                              duration: const Duration(milliseconds: 500)),
-                          tabs: _search
-                              ? [Tab(text: S.of(context).tabBarTitleSearch)]
-                              : ([
-                                  Tab(text: S.of(context).tabBarTitleNew),
-                                  Tab(text: S.of(context).tabBarTitlePopular)
-                                ]),
-                          indicatorColor: AppColors.decorationColor,
-                          labelColor: AppColors.mainColor,
-                          unselectedLabelColor: AppColors.mainColorAccent,
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 17),
+      child: SafeArea(
+        child: DefaultTabController(
+          length: _search ? 1 : 2,
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: AppColors.colorWhite,
+            body: NestedScrollView(
+              floatHeaderSlivers: true,
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) {
+                return <Widget>[
+                  SliverOverlapAbsorber(
+                    handle:
+                        NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                    sliver: SliverAppBar(
+                      title: SearchBar(
+                        searchController: _searchController,
+                      ),
+                      floating: true,
+                      pinned: true,
+                      snap: true,
+                      forceElevated: innerBoxIsScrolled,
+                      elevation: 0,
+                      automaticallyImplyLeading: false,
+                      backgroundColor: AppColors.colorWhite,
+                      bottom: PreferredSize(
+                        preferredSize: Size.fromHeight(48),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: TabBar(
+                            tabs: _search
+                                ? [Tab(text: S.of(context).tabBarTitleSearch)]
+                                : ([
+                                    Tab(text: S.of(context).tabBarTitleNew),
+                                    Tab(text: S.of(context).tabBarTitlePopular)
+                                  ]),
+                            indicatorColor: AppColors.decorationColor,
+                            labelColor: AppColors.mainColor,
+                            unselectedLabelColor: AppColors.mainColorAccent,
+                            labelStyle: TextStyle(
+                                fontWeight: FontWeight.w400, fontSize: 17),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ];
-            },
-            body: Builder(
+                ];
+              },
+              body: Builder(
                 builder: (BuildContext context) => _search
                     ? GalleryGrid(
                         type: typeGrid.SEARCH,
@@ -143,6 +138,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
               ),
             ),
           ),
+        ),
       ),
     );
   }

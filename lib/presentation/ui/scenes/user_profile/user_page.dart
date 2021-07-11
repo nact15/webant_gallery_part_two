@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
+import 'package:webant_gallery_part_two/domain/usecases/date_formatter.dart';
 import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
@@ -28,6 +29,7 @@ class _UserPageState extends State<UserPage> {
   List<PhotoModel> photos;
   Completer<void> _reFresh;
   List<String> locales = ['en', 'ru'];
+  DateFormatter _dateFormatter = DateFormatter();
 
   @override
   void initState() {
@@ -93,21 +95,21 @@ class _UserPageState extends State<UserPage> {
             },
           ),
         ],
-        child: BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            if (state is LoadingUpdate) {
-              return LoadingCircular();
-            }
-            if (state is ErrorData) {
-              return RefreshIndicator(
-                color: AppColors.mainColorAccent,
-                backgroundColor: AppColors.colorWhite,
-                strokeWidth: 2.0,
-                onRefresh: () async {
-                  context.read<UserBloc>().add(UserFetch());
-                  return _reFresh.future;
-                },
-                child: SingleChildScrollView(
+        child: RefreshIndicator(
+          color: AppColors.mainColorAccent,
+          backgroundColor: AppColors.colorWhite,
+          strokeWidth: 2.0,
+          onRefresh: () async {
+            context.read<UserBloc>().add(UserFetch());
+            return _reFresh.future;
+          },
+          child: BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              if (state is LoadingUpdate) {
+                return LoadingCircular();
+              }
+              if (state is ErrorData) {
+                return SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: Container(
                     color: AppColors.colorWhite,
@@ -138,171 +140,242 @@ class _UserPageState extends State<UserPage> {
                       ),
                     ),
                   ),
-                ),
-              );
-            }
-            if (state is UserData) {
-              _user = state.user;
-              return RefreshIndicator(
-                color: AppColors.mainColorAccent,
-                backgroundColor: AppColors.colorWhite,
-                strokeWidth: 2.0,
-                onRefresh: () async {
-                  context.read<UserBloc>().add(UserFetch());
-                  return _reFresh.future;
-                },
-                child: NestedScrollView(
-                  floatHeaderSlivers: true,
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      SliverOverlapAbsorber(
-                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                            context),
-                        sliver: SliverAppBar(
-                          title: const Text('Floating Nested SliverAppBar'),
-                          floating: true,
-                          expandedHeight: 300.0,
-                          snap: true,
-                          forceElevated: innerBoxIsScrolled,
+                );
+              }
+              if (state is UserData) {
+                _user = state.user;
+                return NestedScrollView(
+                    floatHeaderSlivers: true,
+                    headerSliverBuilder:
+                        (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverOverlapAbsorber(
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                  context),
+                          sliver: SliverAppBar(
+                            floating: true,
+                            expandedHeight: 275.0,
+                            snap: true,
+                            backgroundColor: AppColors.colorWhite,
+                            forceElevated: innerBoxIsScrolled,
+                            flexibleSpace: FlexibleSpaceBar(
+                              stretchModes: const <StretchMode>[
+                                StretchMode.zoomBackground
+                              ],
+                              collapseMode: CollapseMode.parallax,
+                              background: Column(
+                                children: <Widget>[
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 30),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.mainColorAccent,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: CircleAvatar(
+                                        child: Icon(
+                                          Icons.camera_alt,
+                                          size: 55,
+                                          color: AppColors.mainColorAccent,
+                                        ),
+                                        radius: 50,
+                                        backgroundColor: AppColors.colorWhite,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Center(
+                                      child: Text(
+                                        _user.username,
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 10),
+                                    child: Center(
+                                      child: Text(
+                                        _dateFormatter.fromDate(_user.birthday),
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.mainColorAccent),
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(16, 27, 0, 0),
+                                    child: Row(
+                                      children: [
+                                        Text(S.of(context).countOfViews +
+                                            state.countOfViews.toString()),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 16),
+                                          child: Text(S
+                                                  .of(context)
+                                                  .countOfLoaded +
+                                              state.countOfPhotos.toString()),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                            width: 1.0,
+                                            color: AppColors.mainColorAccent),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ];
-                  },
-                  body: BlocProvider(
-                    create: (context) => SearchPhotoBloc(
-                        HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER))
-                      ..add(Searching(queryText: _user.id, newQuery: false)),
-                    child: Builder(builder: (BuildContext context) {
-                      return GalleryGrid(
-                        type: typeGrid.SEARCH,
-                        crossCount: 4,
-                        queryText: _user.id,
-                      );
-                    }),
-                  ),
-                ),
-              );
-            }
-            //return Center(
-            //   child: Expanded(
-            //     child: Column(
-            //       children: [
-            //         RefreshIndicator(
-            //           color: AppColors.mainColorAccent,
-            //           backgroundColor: AppColors.colorWhite,
-            //           strokeWidth: 2.0,
-            //           onRefresh: () async {
-            //             context.read<UserBloc>().add(UserFetch());
-            //             return _reFresh.future;
-            //           },
-            //           child: SingleChildScrollView(
-            //             physics: AlwaysScrollableScrollPhysics(),
-            //             child: Expanded(
-            //               child: Column(
-            //                 children: <Widget>[
-            //                   SizedBox(
-            //                     height: 250,
-            //                     child: Column(
-            //                       children: <Widget>[
-            //                         Container(
-            //                           padding: const EdgeInsets.only(top: 20),
-            //                           decoration: BoxDecoration(
-            //                             shape: BoxShape.circle,
-            //                             border: Border.all(
-            //                               color: AppColors.mainColorAccent,
-            //                             ),
-            //                           ),
-            //                           child: Center(
-            //                             child: CircleAvatar(
-            //                               child: Icon(
-            //                                 Icons.camera_alt,
-            //                                 size: 55,
-            //                                 color: AppColors.mainColorAccent,
-            //                               ),
-            //                               radius: 50,
-            //                               backgroundColor: AppColors.colorWhite,
-            //                             ),
-            //                           ),
-            //                         ),
-            //                         Padding(
-            //                           padding: const EdgeInsets.only(top: 10),
-            //                           child: Center(
-            //                             child: Text(
-            //                               _user.username,
-            //                               style: TextStyle(
-            //                                   fontSize: 17,
-            //                                   fontWeight: FontWeight.w400),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                         Padding(
-            //                           padding: EdgeInsets.only(top: 10),
-            //                           child: Center(
-            //                             child: Text(
-            //                               _dateFormatter
-            //                                   .fromDate(_user.birthday),
-            //                               style: TextStyle(
-            //                                   fontSize: 12,
-            //                                   color: AppColors.mainColorAccent),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                         //Spacer(),
-            //                         Padding(
-            //                           padding: const EdgeInsets.fromLTRB(
-            //                               16, 27, 0, 0),
-            //                           child: Row(
-            //                             children: [
-            //                               Text(S.of(context).countOfViews +
-            //                                   state.countOfViews.toString()),
-            //                               Padding(
-            //                                 padding: EdgeInsets.only(left: 16),
-            //                                 child: Text(S
-            //                                         .of(context)
-            //                                         .countOfLoaded +
-            //                                     state.countOfPhotos.toString()),
-            //                               ),
-            //                             ],
-            //                           ),
-            //                         ),
-            //                         Container(
-            //                           decoration: const BoxDecoration(
-            //                             border: Border(
-            //                               bottom: BorderSide(
-            //                                   width: 1.0,
-            //                                   color: AppColors.mainColorAccent),
-            //                             ),
-            //                           ),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ),
-            //                   Expanded(
-            //                     child: BlocProvider(
-            //                       create: (context) => SearchPhotoBloc(
-            //                           HttpPhotoGateway(
-            //                               type: typePhoto.SEARCH_BY_USER))
-            //                         ..add(Searching(
-            //                             queryText: _user.id, newQuery: false)),
-            //                       child: GalleryGrid(
-            //                         type: typeGrid.SEARCH,
-            //                         crossCount: 4,
-            //                         queryText: _user.id,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // );
-            return Container();
-          },
+                      ];
+                    },
+                    body: BlocProvider(
+                      create: (context) => SearchPhotoBloc(
+                          HttpPhotoGateway(type: typePhoto.SEARCH_BY_USER))
+                        ..add(Searching(queryText: _user.id, newQuery: false)),
+                      child: Builder(builder: (BuildContext context) {
+                        return GalleryGrid(
+                          type: typeGrid.SEARCH,
+                          crossCount: 4,
+                          queryText: _user.id,
+                        );
+                      }),
+                    ),
+                );
+              }
+              //return Center(
+              //   child: Expanded(
+              //     child: Column(
+              //       children: [
+              //         RefreshIndicator(
+              //           color: AppColors.mainColorAccent,
+              //           backgroundColor: AppColors.colorWhite,
+              //           strokeWidth: 2.0,
+              //           onRefresh: () async {
+              //             context.read<UserBloc>().add(UserFetch());
+              //             return _reFresh.future;
+              //           },
+              //           child: SingleChildScrollView(
+              //             physics: AlwaysScrollableScrollPhysics(),
+              //             child: Expanded(
+              //               child: Column(
+              //                 children: <Widget>[
+              //                   SizedBox(
+              //                     height: 250,
+              //                     child: Column(
+              //                       children: <Widget>[
+              //                         Container(
+              //                           padding: const EdgeInsets.only(top: 20),
+              //                           decoration: BoxDecoration(
+              //                             shape: BoxShape.circle,
+              //                             border: Border.all(
+              //                               color: AppColors.mainColorAccent,
+              //                             ),
+              //                           ),
+              //                           child: Center(
+              //                             child: CircleAvatar(
+              //                               child: Icon(
+              //                                 Icons.camera_alt,
+              //                                 size: 55,
+              //                                 color: AppColors.mainColorAccent,
+              //                               ),
+              //                               radius: 50,
+              //                               backgroundColor: AppColors.colorWhite,
+              //                             ),
+              //                           ),
+              //                         ),
+              //                         Padding(
+              //                           padding: const EdgeInsets.only(top: 10),
+              //                           child: Center(
+              //                             child: Text(
+              //                               _user.username,
+              //                               style: TextStyle(
+              //                                   fontSize: 17,
+              //                                   fontWeight: FontWeight.w400),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                         Padding(
+              //                           padding: EdgeInsets.only(top: 10),
+              //                           child: Center(
+              //                             child: Text(
+              //                               _dateFormatter
+              //                                   .fromDate(_user.birthday),
+              //                               style: TextStyle(
+              //                                   fontSize: 12,
+              //                                   color: AppColors.mainColorAccent),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                         //Spacer(),
+              //                         Padding(
+              //                           padding: const EdgeInsets.fromLTRB(
+              //                               16, 27, 0, 0),
+              //                           child: Row(
+              //                             children: [
+              //                               Text(S.of(context).countOfViews +
+              //                                   state.countOfViews.toString()),
+              //                               Padding(
+              //                                 padding: EdgeInsets.only(left: 16),
+              //                                 child: Text(S
+              //                                         .of(context)
+              //                                         .countOfLoaded +
+              //                                     state.countOfPhotos.toString()),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                         ),
+              //                         Container(
+              //                           decoration: const BoxDecoration(
+              //                             border: Border(
+              //                               bottom: BorderSide(
+              //                                   width: 1.0,
+              //                                   color: AppColors.mainColorAccent),
+              //                             ),
+              //                           ),
+              //                         ),
+              //                       ],
+              //                     ),
+              //                   ),
+              //                   Expanded(
+              //                     child: BlocProvider(
+              //                       create: (context) => SearchPhotoBloc(
+              //                           HttpPhotoGateway(
+              //                               type: typePhoto.SEARCH_BY_USER))
+              //                         ..add(Searching(
+              //                             queryText: _user.id, newQuery: false)),
+              //                       child: GalleryGrid(
+              //                         type: typeGrid.SEARCH,
+              //                         crossCount: 4,
+              //                         queryText: _user.id,
+              //                       ),
+              //                     ),
+              //                   ),
+              //                 ],
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // );
+              return Container();
+            },
+          ),
         ),
       ),
     );

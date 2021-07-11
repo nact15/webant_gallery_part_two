@@ -16,6 +16,7 @@ import 'package:webant_gallery_part_two/domain/repositories/user_gateway.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/main/new_or_popular_photos.dart';
 
 part 'user_event.dart';
+
 part 'user_state.dart';
 
 class UserBloc<T> extends Bloc<UserEvent, UserState> {
@@ -61,19 +62,20 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
       yield LoadingUpdate();
       _user = await _oauthGateway.getUser();
       _baseModel =
-      await _photoGateway.fetchPhotos(page: 1, queryText: _user.id);
+          await _photoGateway.fetchPhotos(page: 1, queryText: _user.id);
       int countOfPhotos = _baseModel.totalItems;
-      userData = UserData(user: _user, countOfPhotos: countOfPhotos, isUpdate: _isUpdate);
+      userData = UserData(
+          user: _user, countOfPhotos: countOfPhotos, isUpdate: _isUpdate);
       yield userData;
       _isUpdate = false;
       _countUserSubscription?.cancel();
       _countUserSubscription =
           _firestoreRepository.getViewsCountOfUserPhoto(_user).listen(
                 (count) => add(CountOfViews(count)),
-          );
-    } on DioError {
-      yield ErrorData();
-
+              );
+    } on DioError catch (err) {
+      if (err.response.statusCode == 401) add(LogOut());
+      else yield ErrorData();
     }
   }
 
@@ -83,9 +85,11 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
       await _userGateway.updateUser(event.user);
       _isUpdate = true;
       add(UserFetch());
-    } on DioError catch (err){
-      if (err.type == DioErrorType.other) yield ErrorData();
-      else yield ErrorUpdate('error');
+    } on DioError catch (err) {
+      if (err.type == DioErrorType.other)
+        yield ErrorData();
+      else
+        yield ErrorUpdate('error');
     }
   }
 

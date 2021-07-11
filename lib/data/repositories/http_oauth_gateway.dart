@@ -63,40 +63,41 @@ class HttpOauthGateway extends OauthGateway {
 
   @override
   Future<UserModel> getUser() async {
-    _dio.interceptors.clear();
-    _dio.interceptors
-      ..add(HttpOauthInterceptor(_dio, this))
-      ..add(alice.getDioInterceptor());
-    var user = await _dio.get(HttpStrings.currentUser);
-    userModel = UserModel.fromJson(user.data);
-    return userModel;
+      _dio.interceptors.clear();
+      _dio.interceptors
+        ..add(HttpOauthInterceptor(_dio, this))
+        ..add(alice.getDioInterceptor());
+      await _storage.write(key: HttpStrings.userAccessToken, value: '000');
+      var user = await _dio.get(HttpStrings.currentUser);
+      userModel = UserModel.fromJson(user.data);
+      return userModel;
+
   }
 
   @override
   Future<String> refreshToken() async {
-    String refreshToken =
-        await _storage.read(key: HttpStrings.userRefreshToken);
-    final id = await _storage.read(key: HttpStrings.userId);
-    final secret = await _storage.read(key: HttpStrings.userSecret);
-    final Map<String, dynamic> queryParameters = <String, dynamic>{
-      HttpStrings.clientId: id,
-      HttpStrings.grantType: HttpStrings.refreshToken,
-      HttpStrings.refreshToken: refreshToken,
-      HttpStrings.clientSecret: secret,
-    };
-    var getToken = await _dio.get(HttpStrings.tokenEndpoint,
-        queryParameters: queryParameters);
-    if (getToken.statusCode == 200) {
-      String accessToken = getToken.data[HttpStrings.accessToken];
-      String refreshToken = getToken.data[HttpStrings.refreshToken];
-      _writeTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-          id: id,
-          secret: secret);
-      return accessToken;
-    }
-    return '';
+      String refreshToken =
+          await _storage.read(key: HttpStrings.userRefreshToken);
+      final id = await _storage.read(key: HttpStrings.userId);
+      final secret = await _storage.read(key: HttpStrings.userSecret);
+      final Map<String, dynamic> queryParameters = <String, dynamic>{
+        HttpStrings.clientId: id,
+        HttpStrings.grantType: HttpStrings.refreshToken,
+        HttpStrings.refreshToken: refreshToken,
+        HttpStrings.clientSecret: secret,
+      };
+      var getToken = await _dio
+          .get(HttpStrings.tokenEndpoint, queryParameters: queryParameters);
+      if (getToken.statusCode == 200) {
+        String accessToken = getToken.data[HttpStrings.accessToken];
+        String refreshToken = getToken.data[HttpStrings.refreshToken];
+        _writeTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            id: id,
+            secret: secret);
+        return accessToken;
+      } return '';
   }
 
   void _writeTokens(
