@@ -23,18 +23,44 @@ class SelectPhoto extends StatefulWidget {
 
 class _SelectPhotoState extends State<SelectPhoto> {
   File image;
-  final _picker = ImagePicker();
-
+  ImagePicker _picker;
+@override
+  void initState(){
+    super.initState();
+    _picker = ImagePicker();
+  }
   Future getImage(ImageSource imageSource) async {
     if (imageSource == ImageSource.camera) {
-      _takeAPicture();
+      _takeAPhoto();
     } else {
-      final pickedFile = await _picker.getImage(source: imageSource);
-      setState(() {
-        if (pickedFile != null) {
-          image = File(pickedFile.path);
-        }
-      });
+      if (await Permission.photos.request().isGranted) {
+        _photoFromGallery();
+      }
+    }
+  }
+
+  void _photoFromGallery() async {
+    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        image = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future<CameraDescription> _selectCamera() async {
+    final cameras = await availableCameras();
+    return cameras.first;
+  }
+
+  void _takeAPhoto() async {
+    if (await Permission.camera.request().isGranted) {
+      final firstCamera = await _selectCamera();
+      final cameraImage = await Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (BuildContext context) => Camera(camera: firstCamera)),
+      );
+      setState(() => image = cameraImage);
     }
   }
 
@@ -129,23 +155,6 @@ class _SelectPhotoState extends State<SelectPhoto> {
           ),
         ),
       );
-    }
-  }
-
-  Future<CameraDescription> _selectCamera() async {
-    final cameras = await availableCameras();
-    return cameras.first;
-  }
-
-  void _takeAPicture() async {
-    var status = await Permission.camera.request();
-    if (status.isGranted) {
-      final firstCamera = await _selectCamera();
-      final cameraImage = await Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (BuildContext context) => Camera(camera: firstCamera)),
-      );
-      setState(() => image = cameraImage);
     }
   }
 }

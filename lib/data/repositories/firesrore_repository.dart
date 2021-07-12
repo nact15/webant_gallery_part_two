@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/domain/models/user/user_model.dart';
 import 'package:webant_gallery_part_two/domain/repositories/firestore_repository.dart';
@@ -16,10 +18,22 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
         .map((doc) => doc['viewsCount']);
   }
 
+  Future<void> uploadFile(File file) async {
+    try {
+      await FirebaseStorage.instance
+          .ref('uploads/file-to-upload.png')
+          .putFile(file);
+    } catch (e) {
+      // e.g, e.code == 'canceled'
+    }
+  }
+
   @override
   Stream<int> getViewsCountOfUserPhoto(UserModel user) {
-    return _photos.where('user', isEqualTo: '/api/users/${user.id}').snapshots().map(
-        (event) =>
+    return _photos
+        .where('user', isEqualTo: '/api/users/${user.id}')
+        .snapshots()
+        .map((event) =>
             event.docs.fold(0, (prev, next) => prev + next['viewsCount']));
   }
 
@@ -63,8 +77,6 @@ class FirebaseFirestoreRepository extends FirestoreRepository {
         List<dynamic> tags = doc['tags'];
         if (tags.isNotEmpty || tags != null) {
           return tags;
-        } else {
-          return [];
         }
       } catch (e) {
         return [];

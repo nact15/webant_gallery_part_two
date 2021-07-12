@@ -21,28 +21,24 @@ class UploadPhoto extends StatefulWidget {
   final PhotoModel photo;
 
   @override
-  _UploadPhotoState createState() => _UploadPhotoState(image, photo);
+  _UploadPhotoState createState() => _UploadPhotoState();
 }
 
 enum typeValidator { NAME, DESCRIPTION }
 
 class _UploadPhotoState extends State<UploadPhoto> {
-  _UploadPhotoState(this._image, this._photo);
 
-  final PhotoModel _photo;
   final _formKey = GlobalKey<FormState>();
-
-  final File _image;
   TextEditingController _nameController;
   TextEditingController _descriptionController;
   List<String> _tags = [];
 
   @override
   void initState() {
-    _nameController = TextEditingController(text: _photo?.name ?? '');
-    _descriptionController =
-        TextEditingController(text: _photo?.description ?? '');
     super.initState();
+    _nameController = TextEditingController(text: widget.photo?.name ?? '');
+    _descriptionController =
+        TextEditingController(text: widget.photo?.description ?? '');
   }
 
   @override
@@ -67,7 +63,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
             TextButton(
               onPressed: _postPhoto,
               child: Text(
-                (_photo == null
+                (widget.photo == null
                     ? S.of(context).buttonAddPhoto
                     : S.of(context).buttonEditPhoto),
                 style: TextStyle(
@@ -126,9 +122,9 @@ class _UploadPhotoState extends State<UploadPhoto> {
                       width: MediaQuery.of(context).size.width,
                       child: Align(
                         alignment: Alignment.center,
-                        child: _photo == null
-                            ? Image.file(_image)
-                            : Image.network(_photo.getImage()),
+                        child: widget.photo == null
+                            ? Image.file(widget.image)
+                            : Image.network(widget.photo.getImage()),
                       ),
                     ),
                     Form(
@@ -203,10 +199,10 @@ class _UploadPhotoState extends State<UploadPhoto> {
 
   void _postPhoto() {
     if (_formKey.currentState.validate()) {
-      if (_image != null) {
+      if (widget.image != null) {
         context.read<AddPhotoBloc>().add(
               PostPhoto(
-                  file: _image,
+                  file: widget.image,
                   name: _nameController.text,
                   tags: _tags,
                   description: _descriptionController.text),
@@ -214,7 +210,7 @@ class _UploadPhotoState extends State<UploadPhoto> {
       } else {
         context.read<AddPhotoBloc>().add(
               EditingPhoto(
-                  photo: _photo,
+                  photo: widget.photo,
                   name: _nameController.text,
                   tags: _tags,
                   description: _descriptionController.text),

@@ -28,10 +28,10 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
 
   @override
   void initState() {
+    super.initState();
     _search = false;
     _searchController = TextEditingController();
     _searchController.addListener(_searchListener);
-    super.initState();
   }
 
   @override
@@ -42,8 +42,8 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
   _searchListener() {
     String searchText = _searchController.text;
     if (_searchController.text.isEmpty) {
-      _queryText = '';
       setState(() {
+        _queryText = '';
         _search = false;
       });
     } else if (searchText != _queryText) {
@@ -57,7 +57,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
     }
   }
 
-  String getQueryText() {
+  String _getQueryText() {
     return _queryText;
   }
 
@@ -119,8 +119,8 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                   ? Builder(builder: (BuildContext context) {
                       return GalleryGrid(
                         type: typeGrid.SEARCH,
-                        queryText: getQueryText(),
-                        name: 'search',
+                        queryText: _getQueryText(),
+                        keyName: 'search',
                       );
                     })
                   : TabBarView(
@@ -132,7 +132,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                             child: Builder(builder: (BuildContext context) {
                               return GalleryGrid(
                                 type: typeGrid.PHOTOS,
-                                name: 'new',
+                                keyName: 'new',
                               );
                             })),
                         BlocProvider<GalleryBloc>(
@@ -142,7 +142,7 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
                             child: Builder(builder: (BuildContext context) {
                               return GalleryGrid(
                                 type: typeGrid.PHOTOS,
-                                name: 'popular',
+                                keyName: 'popular',
                               );
                             })),
                       ],

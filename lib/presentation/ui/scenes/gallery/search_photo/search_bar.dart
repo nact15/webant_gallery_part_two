@@ -10,13 +10,10 @@ class SearchBar extends StatefulWidget {
   final TextEditingController searchController;
 
   @override
-  _SearchBarState createState() => _SearchBarState(searchController);
+  _SearchBarState createState() => _SearchBarState();
 }
 
 class _SearchBarState extends State<SearchBar> {
-  _SearchBarState(this._searchController);
-
-  TextEditingController _searchController;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +34,10 @@ class _SearchBarState extends State<SearchBar> {
             Icons.search,
             color: AppColors.mainColorAccent,
           ),
-          suffixIcon: _searchController.text.isEmpty ? null :
+          suffixIcon: widget.searchController.text.isEmpty ? null :
           IconButton(
             icon: Icon(GalleryIcons.cancel),
-            onPressed: () => _searchController.clear(),
+            onPressed: () => widget.searchController.clear(),
             color: AppColors.mainColorAccent,
           ),
           focusedBorder: OutlineInputBorder(
@@ -51,7 +48,7 @@ class _SearchBarState extends State<SearchBar> {
             borderSide: BorderSide(color: AppColors.colorWhite),
           ),
         ),
-        controller: _searchController,
+        controller: widget.searchController,
       ),
     );
   }

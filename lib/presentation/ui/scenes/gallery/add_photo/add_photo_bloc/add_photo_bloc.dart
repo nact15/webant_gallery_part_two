@@ -61,6 +61,7 @@ class AddPhotoBloc extends Bloc<AddPhotoEvent, AddPhotoState> {
       EditingPhoto event) async* {
     try {
       _httpPostPhoto.editPhoto(event.photo, event.name, event.description);
+      await _firestoreRepository.createPhoto(event.photo, event.tags);
       yield CompletePost();
     } on DioError {
       yield ErrorPostPhoto('Lost internet connection');

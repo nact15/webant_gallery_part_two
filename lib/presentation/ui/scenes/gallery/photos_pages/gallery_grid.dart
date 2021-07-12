@@ -25,9 +25,9 @@ class GalleryGrid extends StatefulWidget {
   final typeGrid type;
   final int crossCount;
   final queryText;
-  final String name;
+  final String keyName;
 
-  GalleryGrid({Key key, this.type, this.crossCount, this.queryText, this.name})
+  GalleryGrid({Key key, this.type, this.crossCount, this.queryText, this.keyName})
       : super(key: key);
 
   @override
@@ -41,9 +41,9 @@ class _GalleryGridState extends State<GalleryGrid> {
 
   @override
   void initState() {
+    super.initState();
     _reFresh = Completer<void>();
     _isLastPage = false;
-    super.initState();
   }
 
   @override
@@ -72,7 +72,7 @@ class _GalleryGridState extends State<GalleryGrid> {
         return false;
       },
       child: CustomScrollView(
-        key: PageStorageKey<String>(widget.name),
+        key: PageStorageKey<String>(widget.keyName),
         physics: AlwaysScrollableScrollPhysics(),
         slivers: <Widget>[
           SliverOverlapInjector(

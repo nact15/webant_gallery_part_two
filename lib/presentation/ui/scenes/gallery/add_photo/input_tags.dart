@@ -14,10 +14,11 @@ class InputTags extends StatefulWidget {
 
 class _InputTagsState extends State<InputTags> {
   TextEditingController _controller;
+
   @override
   void initState() {
-    _controller = TextEditingController();
     super.initState();
+    _controller = TextEditingController();
   }
 
   @override
@@ -30,44 +31,42 @@ class _InputTagsState extends State<InputTags> {
         children: <Widget>[
           for (String tag in widget.tags) _buildInputChips(tag),
           Container(
-            margin: EdgeInsets.only(top: 6.0),
-            width: 100.0,
             height: 36,
-            child: TextField(
-              cursorColor: AppColors.mainColorAccent,
-              controller: _controller..text = '',
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(8),
-                hintText: 'Add',
-                hintStyle: TextStyle(color: AppColors.mainColorAccent,),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  borderSide: BorderSide(
+            child: IntrinsicWidth(
+              child: TextField(
+                cursorColor: AppColors.mainColorAccent,
+                controller: _controller..text = '',
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(8),
+                  hintText: 'Add',
+                  hintStyle: TextStyle(
                     color: AppColors.mainColorAccent,
                   ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(
+                      color: AppColors.mainColorAccent,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide(color: AppColors.decorationColor),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.add,
+                    color: AppColors.mainColorAccent,
+                  ),
+                  prefixIconConstraints: BoxConstraints(
+                    minHeight: 30,
+                    minWidth: 30,
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25),
-                  borderSide: BorderSide(color: AppColors.decorationColor),
-                ),
-                prefixIcon: Icon(
-                  Icons.add,
-                  color: AppColors.mainColorAccent,
-                ),
-                prefixIconConstraints: BoxConstraints(
-                  minHeight: 30,
-                  minWidth: 30,
-                ),
+                onEditingComplete: () => setState(() {
+                  if (_controller.text.isNotEmpty) {
+                    widget.tags.add(_controller.text);
+                  }
+                }),
               ),
-              onEditingComplete: () {
-                {
-                  setState(() {
-                    if (_controller.text.isNotEmpty) {
-                      widget.tags.add(_controller.text);
-                    }
-                  });
-                }
-              },
             ),
           ),
         ],
@@ -88,11 +87,7 @@ class _InputTagsState extends State<InputTags> {
         color: AppColors.colorWhite,
       ),
       backgroundColor: AppColors.decorationColor,
-      onDeleted: () {
-        setState(() {
-          widget.tags.remove(tag);
-        });
-      },
+      onDeleted: () => setState(() => widget.tags.remove(tag)),
     );
   }
 }

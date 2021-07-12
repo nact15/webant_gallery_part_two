@@ -49,6 +49,7 @@ class _UserSettingsState extends State<UserSettings> {
 
   @override
   void initState() {
+    super.initState();
     _nameController = TextEditingController();
     _birthdayController = TextEditingController();
     _emailController = TextEditingController();
@@ -57,7 +58,6 @@ class _UserSettingsState extends State<UserSettings> {
     _confirmPasswordController = TextEditingController();
     _dateFormatter = DateFormatter();
     _reFresh = Completer<void>();
-    super.initState();
   }
 
   @override

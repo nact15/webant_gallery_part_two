@@ -38,6 +38,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void initState() {
+    super.initState();
     _nameController = TextEditingController();
     _birthdayController = TextEditingController();
     _emailController = TextEditingController();
@@ -45,7 +46,6 @@ class _SignUpPageState extends State<SignUpPage> {
     _phoneController = TextEditingController();
     _confirmPasswordController = TextEditingController();
     _buttonColor = true;
-    super.initState();
   }
 
   @override

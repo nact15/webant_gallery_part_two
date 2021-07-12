@@ -34,8 +34,8 @@ class _UserPageState extends State<UserPage> {
 
   @override
   void initState() {
-    _reFresh = Completer<void>();
     super.initState();
+    _reFresh = Completer<void>();
   }
 
   @override
@@ -182,7 +182,7 @@ class _UserPageState extends State<UserPage> {
                       type: typeGrid.SEARCH,
                       crossCount: 4,
                       queryText: _user.id,
-                      name: 'user',
+                      keyName: 'user',
                     );
                   }),
                 ),

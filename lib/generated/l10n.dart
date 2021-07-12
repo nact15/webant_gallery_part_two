@@ -235,10 +235,10 @@ class S {
     );
   }
 
-  /// `Email*`
+  /// `Email`
   String get labelEmail {
     return Intl.message(
-      'Email*',
+      'Email',
       name: 'labelEmail',
       desc: '',
       args: [],
@@ -265,10 +265,10 @@ class S {
     );
   }
 
-  /// `Username*`
+  /// `Username`
   String get labelUsername {
     return Intl.message(
-      'Username*',
+      'Username',
       name: 'labelUsername',
       desc: '',
       args: [],

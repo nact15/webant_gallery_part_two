@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:webant_gallery_part_two/data/repositories/http_photo_gateway.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
-import 'package:webant_gallery_part_two/presentation/resources/app_strings.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/select_photo.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_page.dart';
@@ -20,19 +19,18 @@ class Gallery extends StatefulWidget {
 }
 
 class _GalleryState extends State<Gallery> {
-  _GalleryState();
 
   int _bottomSelectedIndex;
   PageController _pageController;
 
   @override
   void initState() {
+    super.initState();
     _pageController = PageController(
       initialPage: 0,
       keepPage: true,
     );
     _bottomSelectedIndex = 0;
-    super.initState();
   }
 
   @override
@@ -41,7 +39,7 @@ class _GalleryState extends State<Gallery> {
     super.dispose();
   }
 
-  void pageChanged(int index) {
+  void _pageChanged(int index) {
     setState(() {
       _bottomSelectedIndex = index;
     });
@@ -51,7 +49,7 @@ class _GalleryState extends State<Gallery> {
     return PageView(
       controller: _pageController,
       onPageChanged: (int index) {
-        pageChanged(index);
+        _pageChanged(index);
       },
       children: <Widget>[
         BlocProvider<SearchPhotoBloc>(
@@ -64,7 +62,7 @@ class _GalleryState extends State<Gallery> {
     );
   }
 
-  void bottomTapped(int index) {
+  void _bottomTapped(int index) {
     setState(() {
       _bottomSelectedIndex = index;
       _pageController.animateToPage(index,
@@ -73,19 +71,19 @@ class _GalleryState extends State<Gallery> {
     });
   }
 
-  List<BottomNavigationBarItem> buildBottomBar() {
+  List<BottomNavigationBarItem> _buildBottomBar() {
     return <BottomNavigationBarItem>[
       const BottomNavigationBarItem(
         icon: Icon(GalleryIcons.home, size: 23),
-        label: AppStrings.home,
+        label: '',
       ),
       const BottomNavigationBarItem(
         icon: Icon(GalleryIcons.camera, size: 23),
-        label: AppStrings.camera,
+        label: '',
       ),
       const BottomNavigationBarItem(
         icon: Icon(GalleryIcons.profile, size: 26),
-        label: AppStrings.profile,
+        label: '',
       ),
     ];
   }
@@ -105,9 +103,9 @@ class _GalleryState extends State<Gallery> {
             unselectedItemColor: AppColors.mainColorAccent,
             showSelectedLabels: false,
             showUnselectedLabels: false,
-            items: buildBottomBar(),
+            items: _buildBottomBar(),
             currentIndex: _bottomSelectedIndex,
-            onTap: (int index) => bottomTapped(index),
+            onTap: (int index) => _bottomTapped(index),
           ),
         ),
       ),

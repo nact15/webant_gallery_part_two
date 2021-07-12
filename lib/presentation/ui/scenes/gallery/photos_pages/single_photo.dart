@@ -37,20 +37,21 @@ class ScreenInfo extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             GestureDetector(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: 350.0,
-                  ),
-                  child: Hero(
-                    tag: photo.id,
-                    child: selectPhoto(context),
-                  ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: 350.0,
                 ),
-                onLongPress: () => showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) =>
-                        PhotoBottomSheet(photo: photo)),
+                child: Hero(
+                  tag: photo.id,
+                  child: selectPhoto(context),
                 ),
+              ),
+              //onTap: () => _fullScreen(context),
+              onLongPress: () => showCupertinoModalPopup(
+                  context: context,
+                  builder: (BuildContext context) =>
+                      PhotoBottomSheet(photo: photo)),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
               child: Row(
