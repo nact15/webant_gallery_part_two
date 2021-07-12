@@ -5,12 +5,14 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.
 import 'date_formatter.dart';
 
 class Validation {
-
   DateFormatter dateFormatter = DateFormatter();
   String confirmPassword;
 
   String selectUserValidator(
-      {BuildContext context, String value, typeTextField typeField, String confirmPassword}) {
+      {BuildContext context,
+      String value,
+      typeTextField typeField,
+      String confirmPassword}) {
     switch (typeField) {
       case typeTextField.USERNAME:
         if (value == null || value.isEmpty) {
@@ -46,23 +48,16 @@ class Validation {
             }
           }
         } catch (e) {
-          print(e.toString());
           return S.of(context).errorInvalidDate;
         }
         return null;
-      case typeTextField.PHONE:
-        if (value.isEmpty || value == null) {
-          return S.of(context).errorEmptyPhone;
-        } else if (value.length < 15) {
-          return S.of(context).errorShortPhone;
-        }
-        return null;
+        break;
     }
     return S.of(context).error;
   }
 
-  String selectPasswordValidator(BuildContext context, String value, typePasswordField typeField,
-      TextEditingController confirmPassword) {
+  String selectPasswordValidator(BuildContext context, String value,
+      typePasswordField typeField, TextEditingController confirmPassword) {
     switch (typeField) {
       case typePasswordField.OLD_PASSWORD:
         if (value == null || value.isEmpty) {

@@ -68,95 +68,97 @@ class _SignInPageState extends State<SignInPage> {
           appBar: AppBarSign(),
           body: Form(
             key: _formKey,
-            child: ListView(
+            child: SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 16),
-              children: <Widget>[
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 100),
-                    child: Text(S.of(context).buttonSignIn, style: AppStyles.styleSign),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: TextFormFields(
-                    controller: _nameController,
-                    label: S.of(context).labelUsername,
-                    typeField: typeTextField.USERNAME,
-                    textInputType: TextInputType.name,
-                    node: node,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 29),
-                  child: PasswordInputs(
-                    typeField: typePasswordField.OLD_PASSWORD,
-                    controller: _passwordController,
-                    label: S.of(context).labelPassword,
-                    node: node,
-                    callBack: addLoginEvent,
-                    validation: Validation(),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: TextButton(
-                      child: Text(
-                        S.of(context).buttonForgotPassword,
-                        style: TextStyle(color: AppColors.mainColorAccent),
-                      ),
-                      onPressed: () {},
-                      style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+              child: Column(
+                children: <Widget>[
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 100),
+                      child: Text(S.of(context).buttonSignIn, style: AppStyles.styleSign),
                     ),
                   ),
-                ),
-                Center(
-                  child: Padding(
-                    //sign in
-                    padding: EdgeInsets.only(top: 50),
-                    child: SizedBox(
-                      height: _heightFields,
-                      width: _widthButton,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          shadowColor: AppColors.colorWhite,
-                          splashFactory: NoSplash.splashFactory,
-                          primary:
-                              _buttonColor ? AppColors.mainColor : Colors.white,
-                        ),
-                        onPressed: () {
-                          node.unfocus();
-                          addLoginEvent();
-                        },
-                        child: signIn(),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 50),
+                    child: TextFormFields(
+                      controller: _nameController,
+                      label: S.of(context).labelUsername,
+                      typeField: typeTextField.USERNAME,
+                      textInputType: TextInputType.name,
+                      node: node,
                     ),
                   ),
-                ),
-                Center(
-                  child: Padding(
-                    //sign up
-                    padding: EdgeInsets.only(top: 10),
-                    child: SizedBox(
-                      height: _heightFields,
-                      width: _widthButton,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 29),
+                    child: PasswordInputs(
+                      typeField: typePasswordField.OLD_PASSWORD,
+                      controller: _passwordController,
+                      label: S.of(context).labelPassword,
+                      node: node,
+                      callBack: addLoginEvent,
+                      validation: Validation(),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 8.0),
                       child: TextButton(
-                        style:
-                            ButtonStyle(splashFactory: NoSplash.splashFactory),
-                        onPressed: signup, //to SignUpPage
                         child: Text(
-                          S.of(context).buttonSignUp,
-                          style: AppStyles.signUpButtonSecondary,
+                          S.of(context).buttonForgotPassword,
+                          style: TextStyle(color: AppColors.mainColorAccent),
+                        ),
+                        onPressed: () {},
+                        style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Padding(
+                      //sign in
+                      padding: EdgeInsets.only(top: 50),
+                      child: SizedBox(
+                        height: _heightFields,
+                        width: _widthButton,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            shadowColor: AppColors.colorWhite,
+                            splashFactory: NoSplash.splashFactory,
+                            primary:
+                                _buttonColor ? AppColors.mainColor : Colors.white,
+                          ),
+                          onPressed: () {
+                            node.unfocus();
+                            addLoginEvent();
+                          },
+                          child: signIn(),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  Center(
+                    child: Padding(
+                      //sign up
+                      padding: EdgeInsets.only(top: 10),
+                      child: SizedBox(
+                        height: _heightFields,
+                        width: _widthButton,
+                        child: TextButton(
+                          style:
+                              ButtonStyle(splashFactory: NoSplash.splashFactory),
+                          onPressed: signup, //to SignUpPage
+                          child: Text(
+                            S.of(context).buttonSignUp,
+                            style: AppStyles.signUpButtonSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

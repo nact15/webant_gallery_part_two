@@ -12,10 +12,9 @@ class SignUpEvent extends AuthorizationEvent{
   final String name;
   final String password;
   final String birthday;
-  final String phone;
   final String email;
 
   SignUpEvent(
-      {this.name, this.password, this.birthday, this.phone, this.email});
+      {this.name, this.password, this.birthday, this.email});
 }
 class LoginFetch extends AuthorizationEvent{}

@@ -39,10 +39,10 @@ class HttpPhotoGateway extends PhotoGateway<PhotoModel> {
   String enumToString() {
     switch (type) {
       case typePhoto.NEW:
-        return 'popular';
+        return 'new';
         break;
       case typePhoto.POPULAR:
-        return 'new';
+        return 'popular';
         break;
       case typePhoto.SEARCH_BY_USER:
         return 'user.id';

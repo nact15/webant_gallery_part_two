@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:webant_gallery_part_two/domain/models/photos_model/photo_model.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/add_photo_bloc/add_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo/upload_photo.dart';
@@ -17,8 +18,8 @@ class PhotoBottomSheet extends StatelessWidget {
     return CupertinoActionSheet(
       actions: <CupertinoActionSheetAction>[
         CupertinoActionSheetAction(
-          child: const Text(
-            'Edit photo',
+          child: Text(
+            S.of(context).actionSheetEditPhoto,
             style: TextStyle(color: AppColors.decorationColor),
           ),
           onPressed: () {
@@ -31,15 +32,15 @@ class PhotoBottomSheet extends StatelessWidget {
           },
         ),
         CupertinoActionSheetAction(
-          child: const Text(
-            'Delete photo',
+          child: Text(
+            S.of(context).actionSheetDeletePhoto,
             style: TextStyle(color: AppColors.decorationColor),
           ),
           onPressed: () {
             context.read<AddPhotoBloc>().add(DeletingPhoto(photo));
             Navigator.pop(context);
             Fluttertoast.showToast(
-                msg: 'Photo has been deleted',
+                msg: S.of(context).msgDeletedPhoto,
                 toastLength: Toast.LENGTH_LONG,
                 gravity: ToastGravity.BOTTOM,
                 backgroundColor: AppColors.mainColorAccent,
@@ -49,8 +50,8 @@ class PhotoBottomSheet extends StatelessWidget {
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
-        child: const Text(
-          'Cancel',
+        child: Text(
+          S.of(context).cancel,
           style: TextStyle(color: AppColors.decorationColor),
         ),
         onPressed: () {

@@ -9,6 +9,7 @@ import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/add_photo
 import 'package:webant_gallery_part_two/presentation/ui/scenes/gallery/search_photo/search_photo_bloc/search_photo_bloc.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/user_profile/user_page.dart';
 
+import '../../../../gallery_icons_icons.dart';
 import 'new_or_popular_photos.dart';
 
 class Gallery extends StatefulWidget {
@@ -32,6 +33,12 @@ class _GalleryState extends State<Gallery> {
     );
     _bottomSelectedIndex = 0;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   void pageChanged(int index) {
@@ -69,15 +76,15 @@ class _GalleryState extends State<Gallery> {
   List<BottomNavigationBarItem> buildBottomBar() {
     return <BottomNavigationBarItem>[
       const BottomNavigationBarItem(
-        icon: Icon(Icons.home, size: 28),
+        icon: Icon(GalleryIcons.home, size: 23),
         label: AppStrings.home,
       ),
       const BottomNavigationBarItem(
-        icon: Icon(Icons.camera_alt, size: 28),
+        icon: Icon(GalleryIcons.camera, size: 23),
         label: AppStrings.camera,
       ),
       const BottomNavigationBarItem(
-        icon: Icon(Icons.account_circle, size: 28),
+        icon: Icon(GalleryIcons.profile, size: 26),
         label: AppStrings.profile,
       ),
     ];

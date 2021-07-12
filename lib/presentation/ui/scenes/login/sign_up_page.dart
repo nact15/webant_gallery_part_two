@@ -83,125 +83,127 @@ class _SignUpPageState extends State<SignUpPage> {
           appBar: AppBarSign(),
           body: Form(
             key: _formKey,
-            child: ListView(
+            child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 16),
               physics: AlwaysScrollableScrollPhysics(),
-              children: <Widget>[
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 30),
-                    child: Text(S.of(context).buttonSignUp, style: AppStyles.styleSign),
+              child: Column(
+                children: <Widget>[
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 75),
+                      child: Text(S.of(context).buttonSignUp, style: AppStyles.styleSign),
+                    ),
                   ),
-                ),
-                Padding(
-                  //user name
-                  padding: const EdgeInsets.only(top: 40),
-                  child: TextFormFields(
-                    controller: _nameController,
-                    label: S.of(context).labelUsername,
-                    typeField: typeTextField.USERNAME,
-                    textInputType: TextInputType.name,
-                    node: node,
+                  Padding(
+                    //user name
+                    padding: const EdgeInsets.only(top: 40),
+                    child: TextFormFields(
+                      controller: _nameController,
+                      label: S.of(context).labelUsername,
+                      typeField: typeTextField.USERNAME,
+                      textInputType: TextInputType.name,
+                      node: node,
+                    ),
                   ),
-                ),
-                Padding(
-                  //birthday
-                  padding: const EdgeInsets.only(top: 29),
-                  child: TextFormFields(
-                    controller: _birthdayController,
-                    label: S.of(context).labelBirthday,
-                    typeField: typeTextField.BIRTHDAY,
-                    textInputType: TextInputType.number,
-                    textInputFormatter: <TextInputFormatter>[
-                      MaskTextInputFormatter(
-                          mask: (AppStrings.dateMask),
-                          filter: {"#": RegExp(r'[0-9]')})
-                    ],
-                    node: node,
+                  Padding(
+                    //birthday
+                    padding: const EdgeInsets.only(top: 29),
+                    child: TextFormFields(
+                      controller: _birthdayController,
+                      label: S.of(context).labelBirthday,
+                      typeField: typeTextField.BIRTHDAY,
+                      textInputType: TextInputType.number,
+                      textInputFormatter: <TextInputFormatter>[
+                        MaskTextInputFormatter(
+                            mask: (AppStrings.dateMask),
+                            filter: {"#": RegExp(r'[0-9]')})
+                      ],
+                      node: node,
+                    ),
                   ),
-                ),
-                Padding(
-                  //email
-                  padding: EdgeInsets.only(top: 29),
-                  child: TextFormFields(
-                    controller: _emailController,
-                    label: S.of(context).labelEmail,
-                    typeField: typeTextField.EMAIL,
-                    textInputType: TextInputType.emailAddress,
-                    node: node,
-                  ),
-                ),
-                Padding(
-                  //password
-                  padding: EdgeInsets.only(top: 29),
-                  child: PasswordInputs(
-                    typeField: typePasswordField.NEW_PASSWORD,
-                    controller: _passwordController,
-                    label: S.of(context).labelPassword,
-                    node: node,
-                    validation: Validation(),
-                  ),
-                ),
-                Padding(
-                  //confirm password
-                  padding: EdgeInsets.only(top: 29),
-                  child: PasswordInputs(
-                    typeField: typePasswordField.CONFIRM_PASSWORD,
-                    controller: _confirmPasswordController,
-                    label: S.of(context).labelConfirmPassword,
-                    node: node,
-                    confirmPassword: _passwordController,
-                    callBack: addSignUpEvent,
-                    validation: Validation(),
-                  ),
-                ),
-                Center(
-                  child: Padding(
-                    //sign up
+                  Padding(
+                    //email
                     padding: EdgeInsets.only(top: 29),
-                    child: SizedBox(
-                      height: 36,
-                      width: 150,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          shadowColor: AppColors.colorWhite,
-                          splashFactory: NoSplash.splashFactory,
-                          primary:
-                              _buttonColor ? AppColors.mainColor : Colors.white,
+                    child: TextFormFields(
+                      controller: _emailController,
+                      label: S.of(context).labelEmail,
+                      typeField: typeTextField.EMAIL,
+                      textInputType: TextInputType.emailAddress,
+                      node: node,
+                    ),
+                  ),
+                  Padding(
+                    //password
+                    padding: EdgeInsets.only(top: 29),
+                    child: PasswordInputs(
+                      typeField: typePasswordField.NEW_PASSWORD,
+                      controller: _passwordController,
+                      label: S.of(context).labelPassword,
+                      node: node,
+                      validation: Validation(),
+                    ),
+                  ),
+                  Padding(
+                    //confirm password
+                    padding: EdgeInsets.only(top: 29),
+                    child: PasswordInputs(
+                      typeField: typePasswordField.CONFIRM_PASSWORD,
+                      controller: _confirmPasswordController,
+                      label: S.of(context).labelConfirmPassword,
+                      node: node,
+                      confirmPassword: _passwordController,
+                      callBack: addSignUpEvent,
+                      validation: Validation(),
+                    ),
+                  ),
+                  Center(
+                    child: Padding(
+                      //sign up
+                      padding: EdgeInsets.only(top: 29),
+                      child: SizedBox(
+                        height: 36,
+                        width: 150,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            shadowColor: AppColors.colorWhite,
+                            splashFactory: NoSplash.splashFactory,
+                            primary:
+                                _buttonColor ? AppColors.mainColor : Colors.white,
+                          ),
+                          onPressed: () {
+                            node.unfocus();
+                            addSignUpEvent();
+                          },
+                          child: signUp(),
                         ),
-                        onPressed: () {
-                          node.unfocus();
-                          addSignUpEvent();
-                        },
-                        child: signUp(),
                       ),
                     ),
                   ),
-                ),
-                Center(
-                  child: Padding(
-                    //sign in
-                    padding: EdgeInsets.only(top: 10),
-                    child: SizedBox(
-                      height: 36,
-                      width: 150,
-                      child: TextButton(
-                        style:
-                            ButtonStyle(splashFactory: NoSplash.splashFactory),
-                        onPressed: signIn, //to SignInPage
-                        child: Text(
-                          S.of(context).buttonSignIn,
-                          style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.mainColor),
+                  Center(
+                    child: Padding(
+                      //sign in
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: SizedBox(
+                        height: 36,
+                        width: 150,
+                        child: TextButton(
+                          style:
+                              ButtonStyle(splashFactory: NoSplash.splashFactory),
+                          onPressed: signIn, //to SignInPage
+                          child: Text(
+                            S.of(context).buttonSignIn,
+                            style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.mainColor),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -216,7 +218,6 @@ class _SignUpPageState extends State<SignUpPage> {
               name: _nameController.text,
               password: _passwordController.text,
               email: _emailController.text,
-              phone: _phoneController.text,
               birthday: _birthdayController.text.isNotEmpty
                   ? _birthdayController.text
                   : DateTime.now().toString(),

@@ -57,7 +57,6 @@ class AuthorizationBloc extends Bloc<AuthorizationEvent, AuthorizationState> {
           username: event.name,
           birthday: event.birthday,
           email: event.email,
-          phone: event.phone,
           password: event.password,
           roles: [HttpStrings.roleUser]);
       await _userGateway.registration(_user);

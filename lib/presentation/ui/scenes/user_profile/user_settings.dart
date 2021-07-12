@@ -141,47 +141,51 @@ class _UserSettingsState extends State<UserSettings> {
                 context.read<UserBloc>().add(UserFetch());
                 return _reFresh.future;
               },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                 // height: double.infinity,
-                  color: AppColors.colorWhite,
-                  constraints: BoxConstraints.expand(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
-                        child: Image.asset(AppStrings.imageIntersect),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          S.of(context).errorSorry,
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: AppColors.mainColorAccent,
-                              fontWeight: FontWeight.bold),
+              child: Container(
+                height: double.maxFinite,
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(0.0, 200, 0, 8),
+                          child: Image.asset(AppStrings.imageIntersect),
                         ),
-                      ),
-                      Text(
-                        S.of(context).errorLostInternetConnection,
-                        style: TextStyle(color: AppColors.mainColorAccent),
-                        textAlign: TextAlign.center,
-                      ),
-                      Expanded(
-                        //alignment: Alignment.bottomLeft,
-                        child: TextButton(
-                          onPressed: () => showSignOutDialog(context),
-                          style: ButtonStyle(
-                              splashFactory: NoSplash.splashFactory),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
-                            S.of(context).alertDialogSignOut,
-                            style: TextStyle(color: AppColors.decorationColor),
+                            S.of(context).errorSorry,
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: AppColors.mainColorAccent,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          S.of(context).errorLostInternetConnection,
+                          style: TextStyle(color: AppColors.mainColorAccent),
+                          textAlign: TextAlign.center,
+                        ),
+                        Align(
+                          alignment: FractionalOffset.bottomCenter,
+                          child: Container(
+                            child: TextButton(
+                              onPressed: () => showSignOutDialog(context),
+                              style: ButtonStyle(
+                                  splashFactory: NoSplash.splashFactory),
+                              child: Text(
+                                S.of(context).alertDialogSignOut,
+                                style:
+                                    TextStyle(color: AppColors.decorationColor),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -392,7 +396,7 @@ class _UserSettingsState extends State<UserSettings> {
               ],
             );
           }
-          return Container();
+          return Text('no state');
         },
       ),
     );

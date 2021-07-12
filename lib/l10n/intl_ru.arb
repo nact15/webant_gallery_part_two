@@ -20,10 +20,10 @@
   "labelOldPassword": "Старый пароль",
   "labelNewPassword": "Новый пароль",
   "labelConfirmPassword": "Подтверждение пароля",
-  "labelEmail": "Email",
+  "labelEmail": "Email*",
   "labelPhone": "Телефон",
   "labelBirthday": "Дата рождения",
-  "labelUsername": "Имя пользователя",
+  "labelUsername": "Имя пользователя*",
   "hintSearch": "Поиск",
   "tabBarTitleSearch": "Поиск по названию фото",
   "errorAgeDisclaimer": "Вы должны быть старше 18",
@@ -70,5 +70,7 @@
   "buttonEditPhoto": "Изменить",
   "errorLoadedPhoto": "Здесь нет фотографии. \nПожалуйста, возвращайтесь позднее",
   "errorFoundImage": "Фото не найдено",
-  "titleCamera": "Фото"
+  "titleCamera": "Фото",
+  "bottomSheetCamera": "Камера",
+  "bottomSheetGallery": "Галерея"
 }

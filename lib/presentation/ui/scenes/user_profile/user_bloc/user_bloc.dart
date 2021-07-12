@@ -74,7 +74,7 @@ class UserBloc<T> extends Bloc<UserEvent, UserState> {
                 (count) => add(CountOfViews(count)),
               );
     } on DioError catch (err) {
-      if (err.response.statusCode == 401) add(LogOut());
+      if (err?.response?.statusCode == 401) add(LogOut());
       else yield ErrorData();
     }
   }

@@ -50,21 +50,7 @@ class ScreenInfo extends StatelessWidget {
                     context: context,
                     builder: (BuildContext context) =>
                         PhotoBottomSheet(photo: photo)),
-                onTap: () {
-                  return Center(
-                    child: Hero(
-                      tag: photo.id,
-                      child: CachedNetworkImage(
-                        imageUrl: photo.getImage(),
-                        fit: BoxFit.fill,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        errorWidget: (context, url, error) => Icon(Icons.error),
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                  );
-                }),
+                ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
               child: Row(
@@ -192,7 +178,7 @@ class ScreenInfo extends StatelessWidget {
     );
   }
 
-  Widget selectPhoto(BuildContext context) {
+  Object selectPhoto(BuildContext context) {
     return photo.isPhotoSVG()
         ? SvgPicture.network(
             photo.getImage(),

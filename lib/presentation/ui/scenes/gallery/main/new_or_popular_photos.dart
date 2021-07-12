@@ -21,7 +21,7 @@ class NewOrPopularPhotos extends StatefulWidget {
 enum typePhoto { NEW, POPULAR, SEARCH_BY_USER, SEARCH }
 enum typeGrid { PHOTOS, SEARCH }
 
-class _NewOrPopularPhotosState extends State<NewOrPopularPhotos>{
+class _NewOrPopularPhotosState extends State<NewOrPopularPhotos> {
   TextEditingController _searchController;
   bool _search;
   String _queryText;
@@ -34,6 +34,10 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos>{
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   _searchListener() {
     String searchText = _searchController.text;
@@ -75,8 +79,8 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos>{
                   (BuildContext context, bool innerBoxIsScrolled) {
                 return <Widget>[
                   SliverOverlapAbsorber(
-                    handle:
-                        NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context),
                     sliver: SliverAppBar(
                       title: SearchBar(
                         searchController: _searchController,
@@ -111,31 +115,38 @@ class _NewOrPopularPhotosState extends State<NewOrPopularPhotos>{
                   ),
                 ];
               },
-              body: Builder(
-                builder: (BuildContext context) => _search
-                    ? GalleryGrid(
+              body: _search
+                  ? Builder(builder: (BuildContext context) {
+                      return GalleryGrid(
                         type: typeGrid.SEARCH,
                         queryText: getQueryText(),
-                      )
-                    : TabBarView(
-                        children: <Widget>[
-                          BlocProvider<GalleryBloc>(
-                              create: (context) => GalleryBloc<PhotoModel>(
-                                  HttpPhotoGateway(type: typePhoto.NEW))
-                                ..add(GalleryFetch()),
-                              child: GalleryGrid(
+                        name: 'search',
+                      );
+                    })
+                  : TabBarView(
+                      children: <Widget>[
+                        BlocProvider<GalleryBloc>(
+                            create: (context) => GalleryBloc<PhotoModel>(
+                                HttpPhotoGateway(type: typePhoto.NEW))
+                              ..add(GalleryFetch()),
+                            child: Builder(builder: (BuildContext context) {
+                              return GalleryGrid(
                                 type: typeGrid.PHOTOS,
-                              )),
-                          BlocProvider<GalleryBloc>(
-                              create: (context) => GalleryBloc<PhotoModel>(
-                                  HttpPhotoGateway(type: typePhoto.POPULAR))
-                                ..add(GalleryFetch()),
-                              child: GalleryGrid(
+                                name: 'new',
+                              );
+                            })),
+                        BlocProvider<GalleryBloc>(
+                            create: (context) => GalleryBloc<PhotoModel>(
+                                HttpPhotoGateway(type: typePhoto.POPULAR))
+                              ..add(GalleryFetch()),
+                            child: Builder(builder: (BuildContext context) {
+                              return GalleryGrid(
                                 type: typeGrid.PHOTOS,
-                              )),
-                        ],
-                      ),
-              ),
+                                name: 'popular',
+                              );
+                            })),
+                      ],
+                    ),
             ),
           ),
         ),

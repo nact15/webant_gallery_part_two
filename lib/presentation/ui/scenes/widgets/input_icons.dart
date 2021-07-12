@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:webant_gallery_part_two/presentation/gallery_icons_icons.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/enter_page.dart';
 
@@ -14,24 +15,20 @@ class InputIcons extends StatelessWidget {
     switch (typeField) {
       case typeTextField.EMAIL:
         return Icon(
-          Icons.mail_outline,
+          GalleryIcons.email,
           color: AppColors.mainColorAccent,
+          size: 16
         );
         break;
       case typeTextField.USERNAME:
         return Icon(
-          Icons.account_circle_outlined,
+          GalleryIcons.user,
           color: AppColors.mainColorAccent,
         );
         break;
       case typeTextField.BIRTHDAY:
         return Icon(
-          Icons.date_range,
-          color: AppColors.mainColorAccent,
-        );
-      case typeTextField.PHONE:
-        return Icon(
-          Icons.phone,
+          GalleryIcons.calendar,
           color: AppColors.mainColorAccent,
         );
     }

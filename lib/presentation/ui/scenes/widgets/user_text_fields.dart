@@ -58,15 +58,6 @@ class _TextFormFieldsState extends State<TextFormFields> {
         labelStyle: TextStyle(
           color: AppColors.mainColorAccent,
         ),
-        prefixIcon: Padding(
-            padding: EdgeInsets.only(left: 5, bottom: 2),
-            child: widget.typeField == typeTextField.PHONE
-                ? Text(
-                    '+7 ',
-                    style: TextStyle(
-                        fontSize: 17, color: AppColors.mainColorAccent),
-                  )
-                : null),
         prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
         suffixIcon: InputIcons(typeField: widget.typeField),
       ),

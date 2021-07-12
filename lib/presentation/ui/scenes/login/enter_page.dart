@@ -7,7 +7,7 @@ import 'package:webant_gallery_part_two/presentation/resources/app_styles.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/sign_in_page.dart';
 import 'package:webant_gallery_part_two/presentation/ui/scenes/login/sign_up_page.dart';
 
-enum typeTextField { USERNAME, BIRTHDAY, EMAIL, PHONE }
+enum typeTextField { USERNAME, BIRTHDAY, EMAIL }
 enum typePasswordField { OLD_PASSWORD, NEW_PASSWORD, CONFIRM_PASSWORD }
 
 class EnterPage extends StatefulWidget {
@@ -52,52 +52,55 @@ class _EnterPageState extends State<EnterPage> {
         ],
       ),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 150, 0, 40),
-              child: Image.asset(AppStrings.imageAnt),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 18),
-              child: Text(
-                S.of(context).welcomeTitle,
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mainColor,
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Image.asset(AppStrings.imageAnt),
+              Padding(
+                padding: const EdgeInsets.only(top: 40),
+                child: Text(
+                  S.of(context).welcomeTitle,
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.mainColor,
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
-              child: buttons(context, AppStyles.styleButtonCreateAccount,
-                  Text(//buttonCreateAccount
-                    S.of(context).buttonCreateAccount,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14),
-                  ), SignUpPage()),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-              child: buttons(context, AppStyles.styleButtonAlreadyHaveAccount,
-                  Text(
-                    S.of(context).buttonAlreadyHaveAccount,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 40, 16, 0),
+                child: buttons(
+                    AppStyles.styleButtonCreateAccount,
+                    Text(
+                      //buttonCreateAccount
+                      S.of(context).buttonCreateAccount,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14),
                     ),
-                  ), SignInPage()),
-            ),
-          ],
+                    SignUpPage()),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                child: buttons(
+                    AppStyles.styleButtonAlreadyHaveAccount,
+                    Text(
+                      S.of(context).buttonAlreadyHaveAccount,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SignInPage()),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget buttons(
-      BuildContext context, ButtonStyle styleButton, Text text, page) {
+  Widget buttons(ButtonStyle styleButton, Text text, page) {
     double widthButton = MediaQuery.of(context).size.width;
     return SizedBox(
       width: widthButton,

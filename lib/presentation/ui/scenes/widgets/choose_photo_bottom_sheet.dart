@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:webant_gallery_part_two/generated/l10n.dart';
 import 'package:webant_gallery_part_two/presentation/resources/app_colors.dart';
 
 
@@ -16,8 +17,8 @@ class ChoosePhotoBottomSheet extends StatelessWidget {
         CupertinoActionSheetAction(
           child: Align(
             alignment: Alignment.center,
-            child: const Text(
-              'Camera',
+            child: Text(
+              S.of(context).bottomSheetCamera,
               style: TextStyle(color: AppColors.decorationColor),
             ),
           ),
@@ -29,8 +30,8 @@ class ChoosePhotoBottomSheet extends StatelessWidget {
         CupertinoActionSheetAction(
           child: Align(
             alignment: Alignment.center,
-            child: const Text(
-              'Gallery',
+            child: Text(
+              S.of(context).bottomSheetGallery,
               style: TextStyle(color: AppColors.decorationColor),
             ),
           ),
