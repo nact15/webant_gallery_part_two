@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'user_model.g.dart';
 
 @JsonSerializable()
-class UserModel extends ChangeNotifier{
+class UserModel {
 
   @JsonKey(name: 'id')
   int id;
